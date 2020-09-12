@@ -34,6 +34,5 @@ const yash = {
 |*|Repo|Description|
 |---|---|---|
 | 📦 | [DataStructures and Algorithms](https://github.com/yashaggarwal85d/Data-structures-and-Algorithms) | Various DataStructures and Algorithms implementation in c++ by me. |
-| 📦 | [ProjectX1](https://github.com/yashaggarwal85d/
-ProjectX1) | a web-based application that makes collaboration with team members and clients easy, one can join projects and work on issues raised by the members and clients. |
+| 📦 | [ProjectX1](https://github.com/yashaggarwal85d/ProjectX1) | a web-based application that makes collaboration with team members and clients easy, one can join projects and work on issues raised by the members and clients. |
 | 📦 | [Blockchain](https://github.com/yashaggarwal85d/Blockchain) | a web and mobile based chatting application, the chatting contains 3 modes, Completely public, Private and Anonymous. User data is encrypted and runs on a blockchain and visible to anyone. |
