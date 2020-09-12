@@ -28,3 +28,12 @@ const yash = {
 ```
 
 <img src="https://media.giphy.com/media/LnQjpWaON8nhr21vNW/giphy.gif" width="60"> <em><b>I love connecting with different people</b> so if you want to say <b>hi, I'll be happy to meet you more!</b> 😊</em>
+
+### 🗄 My Repositories:
+
+|*|Repo|Description|
+|---|---|---|
+| 📦 | [DataStructures and Algorithms](https://github.com/yashaggarwal85d/Data-structures-and-Algorithms) | Various DataStructures and Algorithms implementation in c++ by me. |
+| 📦 | [ProjectX1](https://github.com/yashaggarwal85d/
+ProjectX1) | a web-based application that makes collaboration with team members and clients easy, one can join projects and work on issues raised by the members and clients. |
+| 📦 | [Blockchain](https://github.com/yashaggarwal85d/Blockchain) | a web and mobile based chatting application, the chatting contains 3 modes, Completely public, Private and Anonymous. User data is encrypted and runs on a blockchain and visible to anyone. |
