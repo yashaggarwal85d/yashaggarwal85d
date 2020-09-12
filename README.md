@@ -3,7 +3,7 @@
 <p><em>Currently a student at TIET<img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="30"> 
 </em></p>
 
-[![Linkedin: thaianebraga](https://img.shields.io/badge/-anmol-blue?style=flat-square&logo=Linkedin&logoColor=white&link=https://www.linkedin.com/in/yashaggarwal85d/)](https://www.linkedin.com/in/yashaggarwal85d/)
+[![Linkedin: thaianebraga](https://img.shields.io/badge/-yash-blue?style=flat-square&logo=Linkedin&logoColor=white&link=https://www.linkedin.com/in/yashaggarwal85d/)](https://www.linkedin.com/in/yashaggarwal85d/)
 
 ### <img src="https://media.giphy.com/media/VgCDAzcKvsR6OM0uWg/giphy.gif" width="50"> A little more about me...  
 
