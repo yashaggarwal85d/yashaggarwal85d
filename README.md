@@ -1,4 +1,4 @@
-<h2>HI 👋, I'm Yash Aggarwal! <img src="https://media.giphy.com/media/12oufCB0MyZ1Go/giphy.gif" width="50"></h2>
+<h2>HI 👋, I'm Yash Aggarwal! <img src="https://i1.wp.com/www.techjunkie.com/wp-content/uploads/2018/03/Dancing-Gif-with-Animated-Characters-1.gif?w=690&ssl=1" width="50"></h2>
 <img align='right' src="https://media.giphy.com/media/M9gbBd9nbDrOTu1Mqx/giphy.gif" width="230">
 <p><em>Currently a student at TIET<img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="30"> 
 </em></p>
@@ -36,3 +36,6 @@ const yash = {
 | 📦 | [DataStructures and Algorithms](https://github.com/yashaggarwal85d/Data-structures-and-Algorithms) | Various DataStructures and Algorithms implementation in c++ by me. |
 | 📦 | [ProjectX1](https://github.com/yashaggarwal85d/ProjectX1) | a web-based application that makes collaboration with team members and clients easy, one can join projects and work on issues raised by the members and clients. |
 | 📦 | [Blockchain](https://github.com/yashaggarwal85d/Blockchain) | a web and mobile based chatting application, the chatting contains 3 modes, Completely public, Private and Anonymous. User data is encrypted and runs on a blockchain and visible to anyone. |
+
+
+![Yash's github stats](https://github-readme-stats.vercel.app/api?username=yashaggarwal85d&show_icons=true&hide_border=true)
