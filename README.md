@@ -5,7 +5,7 @@
 
 [![Linkedin: thaianebraga](https://img.shields.io/badge/-yash-blue?style=flat-square&logo=Linkedin&logoColor=white&link=https://www.linkedin.com/in/yashaggarwal85d/)](https://www.linkedin.com/in/yashaggarwal85d/)
 
-### <img src="https://developers.giphy.com/branch/master/static/api-c99e353f761d318322c853c03ebcf21b.gif" width="50"> A little more about me...  
+### <img src="https://media.giphy.com/media/VgCDAzcKvsR6OM0uWg/giphy.gif" width="50"> A little more about me...  
 
 ```javascript
 const yash = {
