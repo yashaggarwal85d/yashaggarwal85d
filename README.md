@@ -11,7 +11,7 @@
 const yash = {
     pronouns: "He" | "Him",
     code: ["Javascript", "C/C++", "Python", "Bash"],
-    askMeAbout: ["web dev", "tech", "app dev", "photography"],
+    askMeAbout: ["web dev", "tech", "app dev", "Cryptography","Ethical Hacking","Blockchain","Gaming Tech"],
     technologies: {
         Development: ["Android App","Web App"],
         frontEnd: ["HTML","CSS","Javascript","React","React Native"],
