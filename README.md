@@ -38,4 +38,4 @@ const yash = {
 | 📦 | [Blockchain](https://github.com/yashaggarwal85d/Blockchain) | a web and mobile based chatting application, the chatting contains 3 modes, Completely public, Private and Anonymous. User data is encrypted and runs on a blockchain and visible to anyone. |
 
 
-![Yash's github stats](https://github-readme-stats.vercel.app/api?username=yashaggarwal85d&show_icons=true&hide_border=true)
+![Yash's github stats](https://github-readme-stats.vercel.app/api?username=yashaggarwal85d&show_icons=true&hide_border=true) 
