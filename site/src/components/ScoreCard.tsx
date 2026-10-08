@@ -3,6 +3,7 @@ import { C, F } from '../reel/palette';
 import { CHAPTERS, chapterAt } from '../reel/scenes';
 import { LOOP } from '../reel/anim';
 import type { ScoreController } from '../reel/score';
+import { tr } from '../i18n';
 
 /**
  * The score's face in the soundtrack card: a cup of cold brew seen from above,
@@ -11,7 +12,7 @@ import type { ScoreController } from '../reel/score';
  */
 export default function ScoreCard({ score }: { score: ScoreController }) {
   const canvas = useRef<HTMLCanvasElement>(null);
-  const [label, setLabel] = useState('INTRO');
+  const [label, setLabel] = useState(tr('INTRO'));
 
   useEffect(() => {
     const el = canvas.current;
@@ -35,7 +36,7 @@ export default function ScoreCard({ score }: { score: ScoreController }) {
       const live = !!score.analyser && !score.muted && playing;
       if (live) score.analyser!.getByteFrequencyData(bins);
 
-      const nextLabel = reel < 0 ? 'INTRO' : `${CHAPTERS[chapterAt(reel % LOOP)].label.toUpperCase()}`;
+      const nextLabel = reel < 0 ? tr('INTRO') : `${CHAPTERS[chapterAt(reel % LOOP)].label.toUpperCase()}`;
       if (nextLabel !== lastLabel) {
         lastLabel = nextLabel;
         setLabel(nextLabel);
@@ -114,14 +115,14 @@ export default function ScoreCard({ score }: { score: ScoreController }) {
       <canvas ref={canvas} className="absolute inset-0 h-full w-full" aria-hidden />
       <div className="absolute inset-x-0 top-0 flex items-center justify-between px-3 pt-2.5 font-mono text-[9px] tracking-[0.2em]" style={{ color: C.caramel }}>
         <span className="flex items-center gap-1.5">
-          <i className="block h-1.5 w-1.5 animate-pulse rounded-full" style={{ background: C.cinnamon }} /> LIVE SYNTH
+          <i className="block h-1.5 w-1.5 animate-pulse rounded-full" style={{ background: C.cinnamon }} /> {tr('LIVE SYNTH')}
         </span>
         <span style={{ color: C.latte }}>120 BPM</span>
       </div>
       <div className="absolute inset-x-0 bottom-0 px-3 pb-2.5">
         <p style={{ font: `800 15px/1 ${F.display}`, color: C.crema, letterSpacing: '-0.01em' }}>COLD BREW</p>
         <p className="mt-1 flex justify-between whitespace-nowrap font-mono text-[9px] tracking-[0.16em]" style={{ color: C.latte }}>
-          <span>DRIFT PHONK</span>
+          <span>{tr('DRIFT PHONK')}</span>
           <span style={{ color: C.caramel }}>{label}</span>
         </p>
       </div>

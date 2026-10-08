@@ -3,6 +3,7 @@ import { At, Flash, Stage, type SceneProps } from '../Stage';
 import { BEAT, beatEnv, clamp01, ease, hit, lerp, prog, rand, tw, typed } from '../anim';
 import { C, F, gradText } from '../palette';
 import BlackHole from '../../components/BlackHole';
+import { tr } from '../../i18n';
 
 /* ------------------------------------------------------------------ 09 */
 
@@ -24,7 +25,7 @@ export function BlackHoleScene(p: SceneProps) {
   const zoom = ease.expoIn(prog(t, 0, 1.0));
   const dark = prog(t, 0.55, 0.45);
   const reveal = prog(t, 1.0, 0.45);
-  const headline = 'I think about black holes.'.split(' ');
+  const headline = tr('I think about black holes.').split(' ');
 
   if (latte) {
     return (
@@ -35,7 +36,7 @@ export function BlackHoleScene(p: SceneProps) {
         overlay={<Flash color={C.void} opacity={dark} />}
         hud={
           <At x={W / 2} y={H - (portrait ? 220 : 120)} anchor="tc" style={{ font: `600 22px ${F.mono}`, letterSpacing: '0.3em', color: C.foam, whiteSpace: 'nowrap', opacity: 1 - dark }}>
-            ACT IV · OFF THE CLOCK
+            {tr('ACT IV · OFF THE CLOCK')}
           </At>
         }
       >
@@ -66,7 +67,7 @@ export function BlackHoleScene(p: SceneProps) {
       overlay={<Flash color={C.void} opacity={1 - reveal} />}
     >
       <At x={L.tx} y={L.ty} style={{ font: `600 ${portrait ? 24 : 22}px ${F.mono}`, letterSpacing: '0.3em', color: C.caramel }}>
-        {typed('ACT IV · OFF THE CLOCK', t, 1.25, 50)}
+        {typed(tr('ACT IV · OFF THE CLOCK'), t, 1.25, 50)}
       </At>
       <At x={L.tx} y={L.ty + 50} style={{ width: portrait ? 780 : 640, font: `italic 500 ${L.hs}px/1.02 ${F.display}`, letterSpacing: '-0.02em', color: C.crema }}>
         {headline.map((w, i) => {
@@ -79,7 +80,7 @@ export function BlackHoleScene(p: SceneProps) {
         })}
       </At>
       <At x={L.tx} y={L.ty + (portrait ? 340 : 330)} style={{ font: `600 ${portrait ? 22 : 20}px ${F.mono}`, letterSpacing: '0.16em', color: C.latte, opacity: prog(t, 2.6, 0.3) }}>
-        ASTROPHYSICS · GENERAL RELATIVITY
+        {tr('ASTROPHYSICS · GENERAL RELATIVITY')}
       </At>
     </Stage>
   );
@@ -126,13 +127,13 @@ export function Quantum(p: SceneProps) {
         {typed('|ψ⟩ = α|0⟩ + β|1⟩', t, 0.05, 32)}
       </At>
       <At x={L.tx} y={L.ty + L.eq * 1.5} style={{ font: `italic 400 ${portrait ? 46 : 48}px ${F.display}`, color: C.latte, opacity: prog(t, 0.55, 0.25), transform: `translateY(${(1 - ease.expoOut(prog(t, 0.55, 0.3))) * 20}px)` }}>
-        …and qubits that are both
+        {tr('…and qubits that are both')}
       </At>
       <At x={L.tx} y={L.ty + L.eq * 1.5 + 90} style={{ opacity: prog(t, 0.85, 0.1) }}>
         <div style={{ position: 'relative', font: `900 ${portrait ? 170 : 170}px/1 ${F.sans}`, letterSpacing: '-0.06em' }}>
           {!collapsed ? (
             <>
-              <div style={{ color: C.caramel, position: 'relative', zIndex: flick ? 2 : 1 }}>WORK</div>
+              <div style={{ color: C.caramel, position: 'relative', zIndex: flick ? 2 : 1 }}>{tr('WORK')}</div>
               <div
                 style={{
                   position: 'absolute',
@@ -143,10 +144,10 @@ export function Quantum(p: SceneProps) {
                   WebkitTextStroke: `4px ${C.crema}`,
                 }}
               >
-                PLAY
+                {tr('PLAY')}
               </div>
               {glitch && (
-                <div style={{ position: 'absolute', left: 6, top: -4, color: C.cinnamon, opacity: 0.35, mixBlendMode: 'screen' }}>WORK</div>
+                <div style={{ position: 'absolute', left: 6, top: -4, color: C.cinnamon, opacity: 0.35, mixBlendMode: 'screen' }}>{tr('WORK')}</div>
               )}
             </>
           ) : (
@@ -159,7 +160,7 @@ export function Quantum(p: SceneProps) {
                   transform: `translateY(${prog(t, 1.5, 0.3) * 60}px)`,
                 }}
               >
-                WORK
+                {tr('WORK')}
               </div>
               <div
                 style={{
@@ -171,14 +172,14 @@ export function Quantum(p: SceneProps) {
                   ...gradText(),
                 }}
               >
-                PLAY
+                {tr('PLAY')}
               </div>
             </>
           )}
         </div>
       </At>
       <At x={L.tx} y={portrait ? L.ty + 600 : H - 120} style={{ font: `600 22px ${F.mono}`, letterSpacing: '0.18em', color: C.latte }}>
-        {collapsed ? typed('MEASURED → |play⟩', t, 1.55, 60) : 'QUANTUM COMPUTING · SUPERPOSITION'}
+        {collapsed ? typed(tr('MEASURED → |play⟩'), t, 1.55, 60) : tr('QUANTUM COMPUTING · SUPERPOSITION')}
       </At>
     </Stage>
   );
@@ -258,10 +259,113 @@ export function Maths(p: SceneProps) {
         })}
       </At>
       <At x={W / 2} y={H * (portrait ? 0.6 : 0.7)} anchor="tc" style={{ font: `italic 400 ${portrait ? 46 : 56}px ${F.display}`, color: C.mocha, whiteSpace: 'nowrap' }}>
-        {typed('five constants, one line, no notes.', t, 1.4, 70)}
+        {typed(tr('five constants, one line, no notes.'), t, 1.4, 70)}
       </At>
-      <At x={60} y={60} style={{ font: `600 22px ${F.mono}`, letterSpacing: '0.2em', color: C.mocha }}>
-        MATHS · EULER’S IDENTITY
+      <At x={portrait ? 60 : 80} y={portrait ? 130 : 100} style={{ font: `600 22px ${F.mono}`, letterSpacing: '0.2em', color: C.mocha }}>
+        {tr('MATHS · EULER’S IDENTITY')}
+      </At>
+    </Stage>
+  );
+}
+
+/** Navier–Stokes: how coffee (and everything else) flows. Terms land on the beats. */
+const NS_TERMS = [
+  { at: 0, s: 'ρ(∂u/∂t + (u·∇)u)', line: 0 },
+  { at: BEAT, s: '= −∇p', line: 1 },
+  { at: 2 * BEAT, s: '+ μ∇²u', line: 1 },
+  { at: 3 * BEAT, s: '+ f', line: 1 },
+];
+
+export function NavierStokes(p: SceneProps) {
+  const { t, W, H, portrait } = p;
+  const size = portrait ? 86 : 90;
+  const cx = W / 2;
+  const cy = H * (portrait ? 0.46 : 0.5);
+  // Fraunces' italic operators are hairlines: set them upright in Inter so they read
+  const ops = (str: string) =>
+    str.split(/([+=−])/).map((part, j) =>
+      /^[+=−]$/.test(part) ? (
+        <span key={j} style={{ fontFamily: F.sans, fontStyle: 'normal', fontWeight: 300, margin: '0 0.14em', color: C.latte }}>
+          {part}
+        </span>
+      ) : (
+        part
+      ),
+    );
+  const sq = portrait ? 1 : 0.6;
+  const lines = portrait ? [0, 1] : [0];
+  return (
+    <Stage
+      p={p}
+      bg={C.espresso}
+      cam={{ s: 1 + 0.025 * beatEnv(t, 10) }}
+      backdrop={<div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 50% ${portrait ? 46 : 50}%, ${C.roast} 0%, ${C.espresso} 60%, #0b0705 100%)` }} />}
+    >
+      {/* a stirred cup seen from above: particles riding a vortex, faster near the middle */}
+      <svg className="absolute inset-0" width={W} height={H}>
+        <defs>
+          <radialGradient id="nsCalm">
+            <stop offset="0" stopColor={C.espresso} stopOpacity="0.96" />
+            <stop offset="0.55" stopColor={C.espresso} stopOpacity="0.7" />
+            <stop offset="1" stopColor={C.espresso} stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        {Array.from({ length: 170 }, (_, i) => {
+          const r = 60 + rand(i, 1) * (portrait ? 430 : 620);
+          const w = 2.4 / (0.35 + r / 170);
+          const a0 = rand(i, 2) * Math.PI * 2 + t * w;
+          const a1 = a0 - 0.22 - 7 / Math.sqrt(r);
+          const x0 = cx + Math.cos(a1) * r;
+          const y0 = cy + Math.sin(a1) * r * sq;
+          const x1 = cx + Math.cos(a0) * r;
+          const y1 = cy + Math.sin(a0) * r * sq;
+          return (
+            <path
+              key={i}
+              d={`M${x0.toFixed(1)} ${y0.toFixed(1)} A${r} ${r * sq} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`}
+              fill="none"
+              stroke={rand(i, 3) > 0.6 ? C.caramel : C.latte}
+              strokeWidth={1.5 + rand(i, 4) * 3}
+              strokeLinecap="round"
+              opacity={0.16 + 0.34 * rand(i, 5)}
+            />
+          );
+        })}
+        {/* a calm eye in the middle of the storm, where the equation sits */}
+        <ellipse cx={cx} cy={cy} rx={portrait ? 430 : 760} ry={portrait ? 280 : 210} fill="url(#nsCalm)" />
+      </svg>
+      {lines.map((line) => (
+        <At
+          key={line}
+          x={W / 2}
+          y={cy + (portrait ? (line - 0.5) * size * 1.25 : 0)}
+          anchor="c"
+          style={{ display: 'flex', columnGap: size * 0.28, font: `italic 500 ${size}px/1.2 ${F.display}`, color: C.crema, whiteSpace: 'nowrap' }}
+        >
+          {NS_TERMS.filter((term) => (portrait ? term.line === line : true)).map((term) => {
+            const e = ease.backOutHard(prog(t, term.at, 0.25));
+            return (
+              <span
+                key={term.s}
+                style={{
+                  display: 'inline-block',
+                  opacity: t >= term.at ? 1 : 0,
+                  color: term.at === 0 ? C.crema : C.caramel,
+                  textShadow: `0 0 40px ${term.at === 0 ? 'rgba(233,217,191,.25)' : 'rgba(212,154,87,.35)'}`,
+                  transform: `translateY(${(1 - e) * 50}px) scale(${lerp(1.4, 1, e) * (1 + 0.1 * hit(t, term.at, 12))})`,
+                }}
+              >
+                {ops(term.s)}
+              </span>
+            );
+          })}
+        </At>
+      ))}
+      <At x={W / 2} y={H * (portrait ? 0.66 : 0.72)} anchor="tc" style={{ font: `italic 400 ${portrait ? 40 : 48}px ${F.display}`, color: C.latte, whiteSpace: 'nowrap' }}>
+        {typed(tr('the million-dollar question: does it stay smooth?'), t, 1.45, 110)}
+      </At>
+      <At x={portrait ? 60 : 80} y={portrait ? 130 : 100} style={{ font: `600 22px ${F.mono}`, letterSpacing: '0.2em', color: C.caramel }}>
+        {tr('MATHS · NAVIER–STOKES')}
       </At>
     </Stage>
   );
@@ -434,6 +538,53 @@ function FrameArt({ kind, t, loop }: { kind: number; t: number; loop: number }) 
       </svg>
     );
   }
+  if (kind === 8) {
+    // Harry Potter: round glasses, and a bolt that strikes on the beat.
+    const strike = Math.exp(-((t % (BEAT * 2)) / (BEAT * 2)) * 5);
+    return (
+      <svg width={S} height={230} viewBox="0 0 300 230">
+        <g fill="none" stroke={C.crema} strokeWidth={8}>
+          <circle cx={105} cy={130} r={42} />
+          <circle cx={195} cy={130} r={42} />
+          <path d="M147 124 Q150 114 153 124 M63 124 L30 110 M237 124 L270 110" />
+        </g>
+        <path d="M160 20 L132 70 L152 70 L128 112 L178 58 L156 58 L176 20Z" fill={C.caramel} opacity={0.35 + 0.65 * strike} transform={`translate(0 ${-6 * strike})`} />
+      </svg>
+    );
+  }
+  if (kind === 9) {
+    // The Hobbit: a round green door, and a ring that won't stop glinting.
+    const glint = (Math.sin(t * 6) + 1) / 2;
+    return (
+      <svg width={S} height={230} viewBox="0 0 300 230">
+        <path d="M30 210 H270" stroke={C.mocha} strokeWidth={6} />
+        <circle cx={150} cy={130} r={80} fill="#3f5a3a" stroke={C.espresso} strokeWidth={6} />
+        {[-40, -14, 12, 38].map((x) => (
+          <path key={x} d={`M${150 + x} 54 V206`} stroke={C.espresso} strokeWidth={3} opacity={0.35} />
+        ))}
+        <circle cx={150} cy={130} r={9} fill={C.caramel} />
+        <g transform="translate(232 196)">
+          <ellipse rx={18} ry={7} fill="none" stroke={C.caramel} strokeWidth={6} />
+          <circle cx={-10} cy={-4} r={2 + 4 * glint} fill={C.foam} opacity={glint} />
+        </g>
+      </svg>
+    );
+  }
+  if (kind === 10) {
+    // Star Wars: a blade that ignites on the downbeat, under a field of stars.
+    const ignite = ease.expoOut(clamp01((t % (BEAT * 4)) / 0.25));
+    return (
+      <svg width={S} height={230} viewBox="0 0 300 230">
+        {Array.from({ length: 22 }, (_, j) => (
+          <circle key={j} cx={rand(j, 41) * 300} cy={rand(j, 42) * 230} r={1 + rand(j, 43) * 2} fill={C.foam} opacity={0.4 + 0.6 * rand(j, 44)} />
+        ))}
+        <g transform="rotate(-35 150 115)">
+          <rect x={146} y={60 + 120 * (1 - ignite)} width={8} height={120 * ignite} rx={4} fill={C.foam} style={{ filter: `drop-shadow(0 0 10px ${C.cinnamon}) drop-shadow(0 0 20px ${C.cinnamon})` }} />
+          <rect x={141} y={180} width={18} height={42} rx={3} fill={C.latte} stroke={C.espresso} strokeWidth={3} />
+        </g>
+      </svg>
+    );
+  }
   // Re:Zero: Return by Death, with the reel's own loop counter.
   return (
     <svg width={S} height={230} viewBox="-150 -115 300 230">
@@ -449,14 +600,17 @@ function FrameArt({ kind, t, loop }: { kind: number; t: number; loop: number }) 
 }
 
 const FILMS = [
-  { title: 'INTERSTELLAR', take: '10/10', bg: '#120c09', fg: C.crema, accent: C.caramel },
-  { title: 'INCEPTION', take: 'still spinning?', bg: C.oat, fg: C.espresso, accent: C.cinnamon },
-  { title: 'DEXTER', take: 'methodical.', bg: C.foam, fg: C.espresso, accent: C.cherry },
-  { title: 'RE:ZERO', take: 'return by death', bg: C.roast, fg: C.crema, accent: C.caramel },
-  { title: 'BOOKS', take: 'one more chapter', bg: C.cocoa, fg: C.crema, accent: C.caramel },
-  { title: 'PIANO', take: 'keys after dark', bg: C.void, fg: C.crema, accent: C.latte },
-  { title: 'TRAVELLING', take: 'window seat, always', bg: C.crema, fg: C.espresso, accent: C.cinnamon },
-  { title: 'COOKING', take: 'no recipe, all taste', bg: C.caramel, fg: C.espresso, accent: C.cherry },
+  { art: 0, title: 'INTERSTELLAR', take: '10/10', bg: '#120c09', fg: C.crema, accent: C.caramel },
+  { art: 1, title: 'INCEPTION', take: tr('still spinning?'), bg: C.oat, fg: C.espresso, accent: C.cinnamon },
+  { art: 2, title: 'DEXTER', take: tr('methodical.'), bg: C.foam, fg: C.espresso, accent: C.cherry },
+  { art: 3, title: 'RE:ZERO', take: tr('return by death'), bg: C.roast, fg: C.crema, accent: C.caramel },
+  { art: 8, title: 'HARRY POTTER', take: tr('always.'), bg: '#2a1d16', fg: C.crema, accent: C.caramel },
+  { art: 9, title: 'THE HOBBIT', take: tr('there and back again'), bg: C.crema, fg: C.espresso, accent: '#3f5a3a' },
+  { art: 10, title: 'STAR WARS', take: tr('a long time ago…'), bg: '#0d0806', fg: C.foam, accent: C.caramel },
+  { art: 4, title: tr('BOOKS'), take: tr('one more chapter'), bg: C.cocoa, fg: C.crema, accent: C.caramel },
+  { art: 5, title: tr('PIANO'), take: tr('keys after dark'), bg: C.void, fg: C.crema, accent: C.latte },
+  { art: 6, title: tr('TRAVELLING'), take: tr('window seat, always'), bg: C.crema, fg: C.espresso, accent: C.cinnamon },
+  { art: 7, title: tr('COOKING'), take: tr('no recipe, all taste'), bg: C.caramel, fg: C.espresso, accent: C.cherry },
 ];
 
 export function Cinema(p: SceneProps) {
@@ -464,7 +618,7 @@ export function Cinema(p: SceneProps) {
   const FW = portrait ? 340 : 320;
   const GAP = 34;
   let k = 0;
-  for (let j = 0; j < 7; j++) k += ease.backOut(prog(t, 0.5 + j * BEAT, 0.2));
+  for (let j = 0; j < FILMS.length - 1; j++) k += ease.backOut(prog(t, 0.5 + j * BEAT, 0.2));
   const stripX = W / 2 - FW / 2 - k * (FW + GAP) - (FW + GAP) * 0;
   const weave = Math.sin(t * 31) * 2 + Math.sin(t * 17) * 1.5;
   const push = 1 + 0.08 * ease.cubicOut(clamp01((t % BEAT) / BEAT)) * (t > 0.5 ? 1 : 0);
@@ -478,14 +632,34 @@ export function Cinema(p: SceneProps) {
       cam={{ s: push, oy: stripY }}
       hud={
         <At x={portrait ? 60 : 80} y={portrait ? 160 : 70} style={{ font: `700 ${portrait ? 70 : 78}px/1.05 ${F.display}`, letterSpacing: '-0.02em', color: C.crema, width: portrait ? 780 : 1400 }}>
-          <span style={{ display: 'inline-block', opacity: prog(t, 0, 0.05), transform: `scale(${lerp(1.3, 1, ease.expoOut(prog(t, 0, 0.3)))})`, transformOrigin: '0 50%' }}>Rich taste.</span>{' '}
+          <span style={{ display: 'inline-block', opacity: prog(t, 0, 0.05), transform: `scale(${lerp(1.3, 1, ease.expoOut(prog(t, 0, 0.3)))})`, transformOrigin: '0 50%' }}>{tr('Rich taste.')}</span>{' '}
           <em style={{ display: 'inline-block', fontWeight: 500, color: C.caramel, opacity: prog(t, 0.25, 0.05), transform: `translateY(${(1 - ease.backOut(prog(t, 0.25, 0.3))) * 40}px)` }}>
-            Strong opinions.
+            {tr('Strong opinions.')}
           </em>
         </At>
       }
       overlay={<div className="grain pointer-events-none absolute inset-0" style={{ opacity: 0.35, backgroundPosition: `${(t * 977) % 160}px ${(t * 613) % 160}px` }} />}
     >
+      {portrait && (
+        <At
+          key={Math.round(k)}
+          x={W / 2}
+          y={stripY + 330}
+          anchor="tc"
+          style={{
+            textAlign: 'center',
+            width: 820,
+            font: `italic 500 64px/1.15 ${F.display}`,
+            color: C.caramel,
+            opacity: clamp01(1 - Math.abs(k - Math.round(k)) * 3),
+          }}
+        >
+          “{FILMS[Math.round(k) % FILMS.length].take}”
+          <div style={{ marginTop: 18, font: `600 24px ${F.mono}`, letterSpacing: '0.24em', color: C.latte, fontStyle: 'normal' }}>
+            {FILMS[Math.round(k) % FILMS.length].title}
+          </div>
+        </At>
+      )}
       <div
         className="absolute"
         style={{ left: -200, width: W + 400, top: stripY - 230 + weave, height: 460, background: '#0a0604', transform: 'rotate(-2deg)' }}
@@ -515,7 +689,7 @@ export function Cinema(p: SceneProps) {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 10 }}>
-                  <FrameArt kind={i % FILMS.length} t={t} loop={loop} />
+                  <FrameArt kind={f.art} t={t} loop={loop} />
                 </div>
                 <div style={{ position: 'absolute', left: 16, bottom: 40, font: `800 24px ${F.sans}`, letterSpacing: '0.08em', color: f.fg }}>{f.title}</div>
                 <div style={{ position: 'absolute', left: 16, bottom: 14, font: `600 16px ${F.mono}`, color: f.accent }}>{f.take}</div>

@@ -1,22 +1,24 @@
 import { At, Flash, Stage, type SceneProps } from '../Stage';
 import { clamp01, ease, hit, lerp, prog, rand, shakes } from '../anim';
 import { C, F, gradText } from '../palette';
+import { tr } from '../../i18n';
 
 /* ---------------------------------------------------------- TORE UP (song only) */
 
 /**
  * Plays under the hook of "TORE UP", where the line lands every two beats
  * (one reel second here). Each card slams down on one "tore up" and is ripped
- * in half on the next, revealing what replaced it. Seven cards, fourteen hits.
+ * in half on the next, revealing what replaced it. Six cards, twelve hits,
+ * then four for the finale: eight bars, the whole hook.
  */
+// Only what no other slide says: the headline numbers have their own scenes.
 const CARDS = [
-  { label: 'NIGHTLY SUPPLY-PLAN RUN', old: '18 HOURS', now: '45 MIN' },
-  { label: 'SITE DATABASES', old: '136 OF THEM', now: 'ONE CLUSTER' },
-  { label: 'RULE CHANGES', old: '2-WEEK RELEASES', now: 'SAME DAY' },
-  { label: 'PER-NODE INGEST', old: 'SPARK, 1×', now: 'RUST, 3.8×' },
-  { label: 'MANUAL PLANNER OVERRIDES', old: '150 A WEEK', now: 'GONE' },
-  { label: 'FORECAST PIPELINE', old: '24 HOURS', now: 'UNDER 7H' },
-  { label: 'THE OLD WAY', old: 'MONOLITHIC CRON JOBS', now: '' },
+  { label: tr('SUPPLY-CHAIN RULE CHANGES'), old: tr('2-WEEK RELEASES'), now: tr('SAME DAY') },
+  { label: tr('FORECASTING PIPELINE'), old: tr('24 HOURS'), now: tr('UNDER 7H') },
+  { label: tr('PRODUCTION SPARK JOBS'), old: tr('UNTUNED'), now: tr('30–80% FASTER') },
+  { label: tr('FORECAST CYCLES'), old: tr('FIXED SCHEDULE'), now: tr('ON DEMAND') },
+  { label: tr('PRODUCTION DATABASES'), old: tr('TODAY’S LOAD'), now: tr('READY FOR 2×') },
+  { label: tr('THE OLD WAY'), old: tr('MONOLITHIC CRON JOBS'), now: '' },
 ];
 const PAPERS = [C.oat, C.crema, C.foam, C.latte];
 
@@ -38,15 +40,15 @@ export function TornUp(p: SceneProps) {
     ? { hx: 60, hy: 150, hs: 170, cx: 70, cy: 420, cw: 760, ch: 440, olds: 92, nowY: 640, nows: 132 }
     : { hx: 80, hy: 70, hs: 210, cx: 380, cy: 380, cw: 960, ch: 380, olds: 104, nowY: 520, nows: 150 };
 
-  const k = Math.min(13, Math.floor(t)); // hits so far, 0-based
-  const card = Math.floor(k / 2);
+  const k = Math.min(15, Math.floor(t)); // hits so far, 0-based
+  const card = Math.min(CARDS.length - 1, Math.floor(k / 2));
   const ripped = k % 2 === 1;
   const local = t - card * 2; // 0..2 within this card
-  const finale = t >= 13;
+  const finale = t >= 12;
   const word = hit(t, k, 9);
   const sh = shakes(
     t,
-    Array.from({ length: 14 }, (_, i) => [i, i % 2 ? 16 : 10] as [number, number]),
+    Array.from({ length: 16 }, (_, i) => [i, i % 2 ? 16 : 10] as [number, number]),
     0.16,
   );
 
@@ -69,7 +71,7 @@ export function TornUp(p: SceneProps) {
         </span>
       </div>
       <div style={{ font: `900 ${L.olds}px/0.95 ${F.sans}`, letterSpacing: '-0.05em', color: C.espresso }}>{c.old}</div>
-      <div style={{ font: `600 ${portrait ? 22 : 18}px ${F.mono}`, letterSpacing: '0.3em', color: C.cinnamon }}>BEFORE</div>
+      <div style={{ font: `600 ${portrait ? 22 : 18}px ${F.mono}`, letterSpacing: '0.3em', color: C.cinnamon }}>{tr('BEFORE')}</div>
     </div>
   );
 
@@ -90,7 +92,7 @@ export function TornUp(p: SceneProps) {
           whiteSpace: 'nowrap',
           transformOrigin: '0% 70%',
           transform: `scale(${1 + 0.1 * word}) rotate(${(k % 2 ? 1 : -1) * 1.5 * word}deg)`,
-          opacity: 1 - prog(t, 13, 0.08),
+          opacity: 1 - prog(t, 12, 0.08),
           ...(k % 2 ? gradText() : { color: C.crema }),
         }}
       >
@@ -100,7 +102,7 @@ export function TornUp(p: SceneProps) {
         x={W - (portrait ? 60 : 80)}
         y={portrait ? L.hy + L.hs + 20 : L.hy + 24}
         anchor="tr"
-        style={{ font: `700 ${portrait ? 30 : 34}px ${F.mono}`, color: C.caramel, letterSpacing: '0.1em', opacity: 1 - prog(t, 13, 0.08) }}
+        style={{ font: `700 ${portrait ? 30 : 34}px ${F.mono}`, color: C.caramel, letterSpacing: '0.1em', opacity: 1 - prog(t, 12, 0.08) }}
       >
         ×{String(k + 1).padStart(2, '0')}
       </At>
@@ -154,7 +156,7 @@ export function TornUp(p: SceneProps) {
           y={L.nowY}
           anchor="c"
           style={{
-            font: `italic 800 ${L.nows}px/1 ${F.display}`,
+            font: `italic 800 ${Math.min(L.nows, (portrait ? 1250 : 2300) / c.now.length)}px/1 ${F.display}`,
             color: C.caramel,
             whiteSpace: 'nowrap',
             transform: `scale(${lerp(2.2, 1, riseNow)})`,
@@ -175,7 +177,7 @@ export function TornUp(p: SceneProps) {
             font: `italic 800 ${portrait ? 190 : 260}px/1 ${F.display}`,
             letterSpacing: '-0.03em',
             whiteSpace: 'nowrap',
-            transform: `scale(${lerp(1.6, 1, ease.backOutHard(prog(t, 13, 0.25)))})`,
+            transform: `scale(${lerp(1.6, 1, ease.backOutHard(prog(t, 12, 0.25))) * (1 + 0.08 * (hit(t, 13, 9) + hit(t, 14, 9) + hit(t, 15, 9)))})`,
             ...gradText(),
           }}
         >

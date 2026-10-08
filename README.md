@@ -3,14 +3,14 @@
 </p>
 
 <p align="center">
-  <a href="https://yashaggarwal85d.github.io/yashaggarwal85d/"><img src="https://img.shields.io/badge/%E2%96%B6_Watch_the_48s_showreel-b8612f?style=for-the-badge" alt="Watch the 48-second showreel" /></a>
+  <a href="https://yashaggarwal85d.github.io/yashaggarwal85d/"><img src="https://img.shields.io/badge/%E2%96%B6_Watch_the_intro-b8612f?style=for-the-badge" alt="Watch the intro" /></a>
   <a href="https://www.linkedin.com/in/yashaggarwal85d/"><img src="https://img.shields.io/badge/LinkedIn-yashaggarwal85d-5a4032?style=for-the-badge&logo=data:image/svg%2bxml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9Ik0yMC40NSAyMC40NWgtMy41NnYtNS41N2MwLTEuMzMtLjAyLTMuMDQtMS44NS0zLjA0LTEuODYgMC0yLjE0IDEuNDUtMi4xNCAyLjk0djUuNjdIOS4zNVY5aDMuNDF2MS41NmguMDVjLjQ4LS45IDEuNjQtMS44NSAzLjM3LTEuODUgMy42IDAgNC4yNyAyLjM3IDQuMjcgNS40NnY2LjI4Wk01LjM0IDcuNDNhMi4wNiAyLjA2IDAgMSAxIDAtNC4xMyAyLjA2IDIuMDYgMCAwIDEgMCA0LjEzWk03LjEyIDIwLjQ1SDMuNTZWOWgzLjU2djExLjQ1WiIvPjwvc3ZnPg==" alt="LinkedIn" /></a>
   <a href="mailto:yashaggarwal85d@gmail.com"><img src="https://img.shields.io/badge/Email-say_hi-d49a57?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" /></a>
 </p>
 
 I build the **batch and streaming data platforms** behind semiconductor manufacturing and supply-chain planning at **Texas Instruments**: Python, SQL, PySpark, Kafka and Airflow at multi-terabyte scale, lakehouse modelling (Iceberg, Data Vault 2.0), and CI/CD on Kubernetes.
 
-Off the clock I'm usually somewhere between a black hole, a qubit and a rewatch of *Interstellar*. My [portfolio](https://yashaggarwal85d.github.io/yashaggarwal85d/) is a showreel cut bar for bar to Don Toliver's *TORE UP*. Move your mouse over it: the background is a keyboard.
+Off the clock I'm usually somewhere between a black hole, a qubit and a rewatch of *Interstellar*. My [portfolio](https://yashaggarwal85d.github.io/yashaggarwal85d/) opens with an intro cut bar for bar to Don Toliver's *TORE UP*. Move your mouse over it: the background is a keyboard.
 
 ### ☕ Freshly brewed numbers
 
@@ -71,20 +71,25 @@ Off the clock I'm usually somewhere between a black hole, a qubit and a rewatch 
 ![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white)
 ![Grafana](https://img.shields.io/badge/Grafana-F46800?style=flat-square&logo=grafana&logoColor=white)
 
+**AI**<br/>
+![AI agents](https://img.shields.io/badge/AI%20agents-b8612f?style=flat-square)
+![Model inference](https://img.shields.io/badge/Model%20inference-d49a57?style=flat-square)
+![LLM tooling](https://img.shields.io/badge/LLM%20tooling-5a4032?style=flat-square)
+
 ### 🌌 Off the clock
 
 | Interest | Why |
 |---|---|
 | 🕳️ **Astrophysics** | Black holes, general relativity, and how light bends around something it can't escape. |
 | ⚛️ **Quantum computing** | Qubits that are both answers until you look. |
-| ∑ **Maths** | *e*<sup>*iπ*</sup> + 1 = 0: five constants, one line, no notes. |
+| ∑ **Maths** | *e*<sup>*iπ*</sup> + 1 = 0: five constants, one line, no notes. And Navier–Stokes, the million-dollar question. |
 | 🎬 **Cinema** | Series, films and anime, with strong opinions about all of them. |
 | 📚 **Books** | Always one more chapter than planned. |
 | 🎹 **Piano** | Keys after dark: chords first, scales eventually. |
 | ✈️ **Travelling** | Window seat, always. Every new city is an unexplored dataset. |
 | 🍳 **Cooking** | No recipe, all taste. |
 
-**On the shelf:** 🔪 *Dexter* · 🪐 *Interstellar* · 🌀 *Inception* · ↺ *Re:Zero*
+**On the shelf:** 🔪 *Dexter* · 🪐 *Interstellar* · 🌀 *Inception* · ↺ *Re:Zero* · ⚡ *Harry Potter* · 💍 *The Hobbit* · ✨ *Star Wars*
 
 ### 🧑‍💻 A little more about me…
 
@@ -122,7 +127,7 @@ yash = {
 
 | | Repo | Description |
 |---|---|---|
-| 🎞️ | [Portfolio](./site) | This profile's website: a 48-second, 120 BPM showreel in React + three.js, on a mechanical-keyboard backdrop that reacts to your cursor. Try the Konami code. |
+| 🎞️ | [Portfolio](./site) | This profile's website: an animated intro cut to the beat, in React + three.js, on a mechanical-keyboard backdrop that reacts to your cursor. Try the Konami code. |
 | 📦 | [Data Structures & Algorithms](https://github.com/yashaggarwal85d/Data-structures-and-Algorithms) | Data-structure and algorithm implementations in C++. |
 | 📦 | [ProjectX1](https://github.com/yashaggarwal85d/ProjectX1) | A collaboration platform where team members and clients join projects and work through raised issues. |
 | 📦 | [Blockchain](https://github.com/yashaggarwal85d/Blockchain) | A web and mobile chat app with public, private and anonymous modes, backed by encrypted data on a blockchain. |

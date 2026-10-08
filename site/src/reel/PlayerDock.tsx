@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { ArrowDown, Pause, Play, Volume2, VolumeX } from 'lucide-react';
+import { ArrowDown, Pause, Play, RotateCcw, Volume2, VolumeX } from 'lucide-react';
 import type { Chapter } from './scenes';
 import type { ReelState } from './Showreel';
+import { tr } from '../i18n';
 
 type Props = {
   state: ReelState;
@@ -18,6 +19,8 @@ type Props = {
   position: number;
   clockText: string;
   onToggle: () => void;
+  /** replay from the very start */
+  onRestart: () => void;
   onSeek: (time: number) => void;
   onSound: () => void;
   onExplore: () => void;
@@ -29,11 +32,12 @@ export default function PlayerDock({
   compact,
   hidden = false,
   songMode = false,
-  songTitle = 'the song',
+  songTitle = tr('the song'),
   chapters,
   position,
   clockText,
   onToggle,
+  onRestart,
   onSeek,
   onSound,
   onExplore,
@@ -80,7 +84,7 @@ export default function PlayerDock({
             key={c.id}
             className="group min-w-0 flex-1 py-2 text-left"
             style={{ flexGrow: c.end - c.start }}
-            aria-label={`Jump to chapter ${i + 1}: ${c.label}`}
+            aria-label={tr('Jump to chapter {n}: {label}', { n: i + 1, label: c.label })}
             onClick={(e) => {
               const r = e.currentTarget.getBoundingClientRect();
               const f = (e.clientX - r.left) / r.width;
@@ -120,7 +124,7 @@ export default function PlayerDock({
           className="mx-auto mb-2 max-w-5xl text-right font-mono text-[11px] tracking-[0.12em] text-latte/70 transition-opacity duration-700"
           style={{ opacity: hint ? 1 : 0 }}
         >
-          SPACE pause · ← → chapters · R return by death · M sound · move the mouse, the keys respond
+          {tr('SPACE pause · ← → chapters · R return by death · M sound · move the mouse, the keys respond')}
         </p>
       )}
       <div
@@ -130,9 +134,18 @@ export default function PlayerDock({
         <button
           onClick={onToggle}
           className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-crema text-espresso transition hover:scale-105 active:scale-95"
-          aria-label={state.playing ? 'Pause showreel' : 'Play showreel'}
+          aria-label={state.playing ? tr('Pause the intro') : tr('Play the intro')}
         >
           {state.playing ? <Pause className="h-5 w-5" fill="currentColor" /> : <Play className="ml-0.5 h-5 w-5" fill="currentColor" />}
+        </button>
+
+        <button
+          onClick={onRestart}
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-crema/25 text-latte transition hover:rotate-[-45deg] hover:text-crema"
+          aria-label={tr('Replay the intro from the start')}
+          title={tr('Replay from the start')}
+        >
+          <RotateCcw className="h-4 w-4" />
         </button>
 
         <div className="min-w-0 flex-1">{segments}</div>
@@ -146,7 +159,7 @@ export default function PlayerDock({
               ))}
             </span>
             {state.loop > 0 && (
-              <span className="shrink-0 font-mono text-xs text-caramel" title="Return by Death count">
+              <span className="shrink-0 font-mono text-xs text-caramel" title={tr('Return by Death count')}>
                 ↺ ×{state.loop + 1}
               </span>
             )}
@@ -157,17 +170,25 @@ export default function PlayerDock({
           onClick={onSound}
           className="flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-crema/25 px-3 font-mono text-xs text-latte transition hover:text-crema"
           aria-pressed={state.sound}
-          aria-label={songMode ? `${state.sound ? 'Mute' : 'Unmute'} ${songTitle}` : state.sound ? 'Mute the beat' : 'Play a 120 BPM beat'}
+          aria-label={
+            songMode
+              ? state.sound
+                ? tr('Mute {title}', { title: songTitle })
+                : tr('Unmute {title}', { title: songTitle })
+              : state.sound
+                ? tr('Mute the beat')
+                : tr('Play a 120 BPM beat')
+          }
         >
           {state.sound ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-          {!compact && (songMode ? 'SONG' : state.sound ? 'ON' : 'OFF')}
+          {!compact && (songMode ? tr('SONG') : state.sound ? tr('ON') : tr('OFF'))}
         </button>
 
         <button
           onClick={onExplore}
           className="flex h-10 shrink-0 items-center gap-1.5 rounded-full bg-cinnamon px-4 text-sm font-semibold text-foam transition hover:brightness-110"
         >
-          Explore <ArrowDown className="h-4 w-4" />
+          {tr('Explore')} <ArrowDown className="h-4 w-4" />
         </button>
       </div>
     </div>

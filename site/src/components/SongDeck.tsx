@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { ExternalLink, Music2, Play, SkipForward, Volume2, VolumeX, X } from 'lucide-react';
 import { SONG_ENABLED, shouldAutoplaySong, song } from '../reel/song';
 import ScoreCard from './ScoreCard';
+import { tr } from '../i18n';
 
 /**
  * The soundtrack's visible home: a 200 × 200 card in the bottom-left corner.
@@ -51,7 +52,7 @@ function SongDeckInner() {
   // Say so (once) if TORE UP couldn't play and the score took over.
   const fellBack = song.fellBack;
   useEffect(() => {
-    if (fellBack) showToast('TORE UP wouldn’t load here, so the reel brewed its own score', 4200);
+    if (fellBack) showToast(tr('TORE UP wouldn’t load here, so the intro brewed its own score'), 4200);
   }, [fellBack]);
 
   // A ticker for the countdown while the run-up plays.
@@ -74,7 +75,7 @@ function SongDeckInner() {
       else if (e.key === '\\') song.resetOffset();
       else return;
       const ms = Math.round(song.nudgeBy * 1000);
-      showToast(`beat sync ${ms > 0 ? '+' : ''}${ms} ms`);
+      showToast(tr('beat sync {ms} ms', { ms: `${ms > 0 ? '+' : ''}${ms}` }));
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -108,7 +109,7 @@ function SongDeckInner() {
             exit={{ opacity: 0, scale: 1.12, filter: 'blur(10px)' }}
             transition={{ duration: 0.25 }}
           >
-            <p className="font-mono text-[11px] uppercase tracking-[0.35em] text-caramel">♪ Now playing</p>
+            <p className="font-mono text-[11px] uppercase tracking-[0.35em] text-caramel">{tr('♪ Now playing')}</p>
             <p className="mt-3 font-display text-5xl font-bold italic tracking-tight sm:text-7xl">{meta.title}</p>
             <p className="mt-2 font-mono text-xs text-latte">
               {meta.artist} · {meta.source}
@@ -121,11 +122,11 @@ function SongDeckInner() {
                 >
                   <span className="animate-ping-soft absolute inset-0 rounded-full bg-cinnamon/60" />
                   <Volume2 className="relative h-4 w-4" />
-                  <span className="relative">Unmute for the full experience</span>
+                  <span className="relative">{tr('Unmute for the full experience')}</span>
                 </button>
               ) : (
                 <span className="inline-flex items-center gap-2 rounded-full border border-crema/25 px-5 py-3 font-mono text-xs text-latte">
-                  <Volume2 className="h-4 w-4 text-caramel" /> sound on, good choice
+                  <Volume2 className="h-4 w-4 text-caramel" /> {tr('sound on, good choice')}
                 </span>
               )}
               {status !== 'loading' && (
@@ -133,7 +134,7 @@ function SongDeckInner() {
                   onClick={() => song.skipIntro()}
                   className="inline-flex items-center gap-1.5 rounded-full border border-crema/25 bg-espresso/60 px-4 py-3 text-sm text-latte backdrop-blur transition hover:text-crema"
                 >
-                  Skip <SkipForward className="h-4 w-4" />
+                  {tr('Skip')} <SkipForward className="h-4 w-4" />
                 </button>
               )}
             </div>
@@ -142,7 +143,7 @@ function SongDeckInner() {
                 <div className="h-full rounded-full bg-caramel" style={{ width: `${(status === 'loading' ? 0 : f.introProgress) * 100}%` }} />
               </div>
               {status === 'loading' ? (
-                <p className="mt-2 font-mono text-[11px] tracking-[0.2em] text-latte/80">CUEING THE TRACK…</p>
+                <p className="mt-2 font-mono text-[11px] tracking-[0.2em] text-latte/80">{tr('CUEING THE TRACK…')}</p>
               ) : countdown ? (
                 <motion.p
                   key={f.beatsToDrop}
@@ -154,7 +155,7 @@ function SongDeckInner() {
                   {f.beatsToDrop}
                 </motion.p>
               ) : (
-                <p className="mt-2 font-mono text-[11px] tracking-[0.2em] text-latte/80">THE BEAT DROPS IN {Math.ceil(f.toDrop)}</p>
+                <p className="mt-2 font-mono text-[11px] tracking-[0.2em] text-latte/80">{tr('THE BEAT DROPS IN {n}', { n: Math.ceil(f.toDrop) })}</p>
               )}
             </div>
           </motion.div>
@@ -177,7 +178,7 @@ function SongDeckInner() {
               className="relative inline-flex items-center gap-2 rounded-full bg-cinnamon px-4 py-2 text-sm font-semibold text-foam shadow-2xl transition hover:brightness-110"
             >
               <span className="animate-ping-soft absolute inset-0 rounded-full bg-cinnamon/50" />
-              <Volume2 className="relative h-4 w-4" /> <span className="relative">Sound on: it’s cut to the beat</span>
+              <Volume2 className="relative h-4 w-4" /> <span className="relative">{tr('Sound on: it’s cut to the beat')}</span>
             </button>
           </motion.div>
         )}
@@ -195,7 +196,11 @@ function SongDeckInner() {
           pointerEvents: showCard ? 'auto' : 'none',
           visibility: showCard ? 'visible' : 'hidden',
         }}
-        aria-label={yt ? `${meta.title} by ${meta.artist}, official audio on YouTube` : `${meta.title}, an original score playing live`}
+        aria-label={
+          yt
+            ? tr('{title} by {artist}, official audio on YouTube', { title: meta.title, artist: meta.artist })
+            : tr('{title}, an original score playing live', { title: meta.title })
+        }
       >
         {/* The player's host stays mounted (hidden) after a fallback so React never fights YouTube over it. */}
         <div className="h-full w-full" style={{ display: yt ? 'block' : 'none' }}>
@@ -214,10 +219,10 @@ function SongDeckInner() {
           <a href={meta.url} target="_blank" rel="noopener" className="min-w-0 flex-1 truncate font-mono text-[10.5px] text-latte hover:text-crema" title={`${meta.title} · ${meta.artist}`}>
             {meta.title} · {meta.artist}
           </a>
-          <button onClick={() => song.toggleMute()} className="text-latte hover:text-crema" aria-label={song.muted ? 'Unmute the music' : 'Mute the music'}>
+          <button onClick={() => song.toggleMute()} className="text-latte hover:text-crema" aria-label={song.muted ? tr('Unmute the music') : tr('Mute the music')}>
             {song.muted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
           </button>
-          <button onClick={() => song.stop()} className="text-latte hover:text-crema" aria-label="Stop the music">
+          <button onClick={() => song.stop()} className="text-latte hover:text-crema" aria-label={tr('Stop the music')}>
             <X className="h-3.5 w-3.5" />
           </button>
         </div>
@@ -236,13 +241,13 @@ function SongDeckInner() {
             }}
             className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition hover:bg-crema/10"
           >
-            <Play className="h-4 w-4 text-caramel" fill="currentColor" /> Play with {meta.title}
+            <Play className="h-4 w-4 text-caramel" fill="currentColor" /> {tr('Play with {title}', { title: meta.title })}
           </button>
           <a
             href={meta.url}
             target="_blank"
             rel="noopener"
-            aria-label={yt ? 'Open the song on YouTube' : 'Read the score’s source'}
+            aria-label={yt ? tr('Open the song on YouTube') : tr('Read the score’s source')}
             className="grid h-8 w-8 place-items-center rounded-full text-latte transition hover:text-crema"
           >
             <ExternalLink className="h-3.5 w-3.5" />

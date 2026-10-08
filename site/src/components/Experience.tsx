@@ -3,6 +3,7 @@ import { motion, useScroll, useSpring } from 'motion/react';
 import { ChevronDown, Code2, MapPin, Server, Workflow } from 'lucide-react';
 import { experience, type Job } from '../data';
 import { Section, SectionHeading, Tag } from './ui';
+import { tr } from '../i18n';
 
 const icons = { server: Server, workflow: Workflow, code: Code2 };
 const VISIBLE = 4;
@@ -62,7 +63,7 @@ function Entry({ job, side }: { job: Job; side: 'left' | 'right' }) {
             className="mt-3 inline-flex items-center gap-1 font-mono text-xs text-subtle transition hover:text-fg"
             aria-expanded={open}
           >
-            {open ? 'Show less' : `+${hidden} more`}
+            {open ? tr('Show less') : tr('+{n} more', { n: hidden })}
             <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />
           </button>
         )}
@@ -83,7 +84,7 @@ export default function Experience() {
 
   return (
     <Section id="experience">
-      <SectionHeading title="Experience" kicker="04 · Where I’ve built" />
+      <SectionHeading title={tr('Experience')} kicker={tr('04 · Where I’ve built')} />
       <div ref={ref} className="relative space-y-10 md:space-y-16">
         <div className="absolute bottom-0 left-5 top-0 w-px -translate-x-1/2 bg-line md:left-1/2" />
         <motion.div

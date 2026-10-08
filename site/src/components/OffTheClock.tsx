@@ -4,6 +4,7 @@ import { Plus } from 'lucide-react';
 import BlackHole from './BlackHole';
 import { euler, films, profile } from '../data';
 import { Reveal, SectionHeading } from './ui';
+import { tr } from '../i18n';
 
 /* ---------------------------------------------------------------- quantum */
 
@@ -51,8 +52,8 @@ function Qubit() {
 
   return (
     <div ref={ref} className="card flex h-full flex-col p-6">
-      <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-caramel">Quantum computing</p>
-      <h3 className="mt-2 font-display text-2xl font-bold leading-tight">One qubit, both answers.</h3>
+      <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-caramel">{tr('Quantum computing')}</p>
+      <h3 className="mt-2 font-display text-2xl font-bold leading-tight">{tr('One qubit, both answers.')}</h3>
       <svg viewBox="-100 -100 200 200" className="mx-auto my-3 w-44" aria-hidden>
         <circle r={R} fill="rgba(212,154,87,.07)" stroke="var(--latte)" strokeWidth={2} />
         <ellipse rx={R} ry={R * 0.26} fill="none" stroke="var(--latte)" strokeWidth={1.5} strokeDasharray="5 5" />
@@ -64,11 +65,9 @@ function Qubit() {
       </svg>
       <p className="font-mono text-xs text-muted">
         {result === null ? (
-          <>
-            odds · |0⟩ {Math.round(p0 * 100)}% · |1⟩ {Math.round((1 - p0) * 100)}%
-          </>
+          <>{tr('odds · |0⟩ {p0}% · |1⟩ {p1}%', { p0: Math.round(p0 * 100), p1: Math.round((1 - p0) * 100) })}</>
         ) : (
-          <>measured → |{result}⟩. The superposition is gone.</>
+          <>{tr('measured → |{result}⟩. The superposition is gone.', { result })}</>
         )}
       </p>
       <div className="mt-auto flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pt-4">
@@ -76,7 +75,7 @@ function Qubit() {
           onClick={measure}
           className="whitespace-nowrap rounded-full bg-caramel px-4 py-2 text-sm font-semibold text-espresso transition hover:brightness-110 active:scale-95"
         >
-          {result === null ? 'Measure' : 'Prepare again'}
+          {result === null ? tr('Measure') : tr('Prepare again')}
         </button>
         <span className="whitespace-nowrap font-mono text-[11px] text-subtle">
           |0⟩×{tally[0]} · |1⟩×{tally[1]}
@@ -96,15 +95,15 @@ function Euler() {
       onFocus={() => setK(key)}
       onClick={() => setK(key)}
       className={`rounded-md px-0.5 transition-colors ${k === key ? 'bg-cinnamon/15 text-cinnamon' : 'hover:text-cinnamon'} ${cls}`}
-      aria-label={`About ${key}`}
+      aria-label={tr('About {key}', { key })}
     >
       {label}
     </button>
   );
   return (
     <div className="flex h-full flex-col rounded-[1.25rem] bg-oat p-6 text-espresso shadow-[var(--shadow)]">
-      <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-cinnamon">Maths</p>
-      <h3 className="mt-2 font-display text-2xl font-bold leading-tight">The best line ever written.</h3>
+      <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-cinnamon">{tr('Maths')}</p>
+      <h3 className="mt-2 font-display text-2xl font-bold leading-tight">{tr('The best line ever written.')}</h3>
       <p className="my-5 whitespace-nowrap text-center font-display text-4xl font-bold sm:text-5xl md:text-4xl xl:text-5xl">
         {btn('e', 'e')}
         <sup className="text-[0.5em]">
@@ -128,7 +127,7 @@ function Euler() {
           {euler[k]}
         </motion.p>
       </AnimatePresence>
-      <p className="mt-2 font-mono text-[11px] text-taupe">hover or tab through the constants</p>
+      <p className="mt-2 font-mono text-[11px] text-taupe">{tr('hover or tab through the constants')}</p>
     </div>
   );
 }
@@ -140,9 +139,9 @@ function Shelf() {
   return (
     <div className="card flex flex-col gap-6 p-6 md:flex-row md:items-end md:p-8">
       <div className="md:w-56 md:shrink-0 md:self-stretch">
-        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-caramel">The shelf</p>
-        <h3 className="mt-2 font-display text-3xl font-bold leading-tight">Series, films, anime… and the rest.</h3>
-        <p className="mt-3 text-sm text-muted">Rich taste, strong opinions. Pull one off the shelf.</p>
+        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-caramel">{tr('The shelf')}</p>
+        <h3 className="mt-2 font-display text-3xl font-bold leading-tight">{tr('Series, films, anime… and the rest.')}</h3>
+        <p className="mt-3 text-sm text-muted">{tr('Rich taste, strong opinions. Pull one off the shelf.')}</p>
       </div>
       <div className="flex min-h-[15rem] flex-1 items-end gap-3 overflow-x-auto pb-2 [scrollbar-width:none]">
         {films.map((f, i) => {
@@ -197,10 +196,10 @@ function Shelf() {
           );
         })}
         <a
-          href={`mailto:${profile.email}?subject=${encodeURIComponent('A recommendation for your shelf')}`}
+          href={`mailto:${profile.email}?subject=${encodeURIComponent(tr('A recommendation for your shelf'))}`}
           className="grid h-44 w-[4.5rem] shrink-0 place-items-center rounded-xl border-2 border-dashed border-line-strong text-muted transition hover:border-caramel hover:text-caramel"
-          aria-label="Recommend me something to watch"
-          title="Recommend me something"
+          aria-label={tr('Recommend me something to watch')}
+          title={tr('Recommend me something')}
         >
           <Plus className="h-6 w-6" />
         </a>
@@ -215,20 +214,20 @@ export default function OffTheClock() {
   return (
     <section id="off-the-clock" className="roast relative z-10 py-20 md:py-28" style={{ background: 'var(--roast)' }}>
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
-        <SectionHeading kicker="07 · Off the clock" title="Things I can’t stop thinking about." />
+        <SectionHeading kicker={tr('07 · Off the clock')} title={tr('Things I can’t stop thinking about.')} />
         <div className="grid gap-4 md:grid-cols-4">
           <Reveal className="md:col-span-2 md:row-span-1">
             <div className="relative h-80 overflow-hidden rounded-[1.25rem] border border-line">
               <BlackHole interactive hole={{ x: 0.66, y: 0.52, r: 0.2 }} />
               <div className="pointer-events-none absolute left-6 top-6">
-                <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-caramel">Astrophysics</p>
+                <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-caramel">{tr('Astrophysics')}</p>
                 <h3 className="mt-2 font-display text-3xl font-bold leading-[1.05] text-crema">
-                  Black holes,
+                  {tr('Black holes,')}
                   <br />
-                  gently.
+                  {tr('gently.')}
                 </h3>
               </div>
-              <p className="pointer-events-none absolute bottom-5 left-6 font-mono text-[11px] text-latte">◎ move your cursor: light bends around it</p>
+              <p className="pointer-events-none absolute bottom-5 left-6 font-mono text-[11px] text-latte">{tr('◎ move your cursor: light bends around it')}</p>
             </div>
           </Reveal>
           <Reveal delay={0.08}>

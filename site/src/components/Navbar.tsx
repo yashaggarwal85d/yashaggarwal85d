@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Command, Menu } from 'lucide-react';
 import { sections } from '../data';
+import { tr } from '../i18n';
 
 const NAV = sections.filter((s) => s.nav);
 
@@ -40,7 +41,7 @@ export default function Navbar({ onOpenPalette }: { onOpenPalette: () => void })
         <a
           href="#reel"
           className={`grid h-10 w-10 place-items-center rounded-xl border font-display text-base font-bold italic backdrop-blur-xl transition-colors ${glass}`}
-          aria-label="Yash Aggarwal, back to the reel"
+          aria-label={tr('Yash Aggarwal, back to the intro')}
         >
           YA
         </a>
@@ -71,7 +72,7 @@ export default function Navbar({ onOpenPalette }: { onOpenPalette: () => void })
         <button
           onClick={onOpenPalette}
           className={`flex h-10 items-center gap-1.5 rounded-xl border px-3 backdrop-blur-xl transition-colors ${glass}`}
-          aria-label="Open chapter select"
+          aria-label={tr('Open chapter select')}
         >
           <Menu className="h-4 w-4 md:hidden" />
           <Command className="hidden h-4 w-4 md:block" />

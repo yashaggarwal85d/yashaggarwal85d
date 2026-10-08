@@ -1,82 +1,85 @@
 import { At, Flash, Stage, type SceneProps } from '../Stage';
-import { beatEnv, ease, hit, lerp, prog, rand } from '../anim';
+import { LOOP, beatEnv, ease, hit, lerp, mmss, prog, rand } from '../anim';
 import { C, F, gradText } from '../palette';
 import type { KbFrame } from '../types';
 import { profile } from '../../data';
+import { tr } from '../../i18n';
 
-/* ------------------------------------------------------------------ 13 */
+/* ------------------------------------------------------------- the journey */
 
 const NODES = [
-  { when: '2019 – 2023', title: 'Thapar Institute', desc: 'B.E. Computer Science · CGPA 9.07' },
-  { when: 'JAN 2023', title: 'Software Dev Intern', desc: 'Election platform for 10K+ employees' },
-  { when: 'JUN 2023', title: 'Data Engineer', desc: 'Spark runtimes cut 30–80%' },
-  { when: 'FEB 2025 → NOW', title: 'Data Engineer II', desc: 'Rust ETL · Iceberg lakehouse · global Kafka' },
-  { when: 'AUG 2026', title: 'TI HQ, Dallas', desc: 'Presented the Rust ETL architecture to global IT leadership' },
+  { year: '2019', when: '2019 – 2023', title: 'Thapar Institute', desc: tr('B.E. Computer Science & Engineering · CGPA 9.07 / 10') },
+  { year: '2023', when: tr('JAN 2023'), title: tr('Software Dev Intern'), desc: tr('Texas Instruments · my first production code') },
+  { year: '2023', when: tr('JUN 2023'), title: tr('Data Engineer'), desc: tr('Spark, Airflow and Oracle pipelines behind supply planning') },
+  { year: '2025', when: tr('FEB 2025 → NOW'), title: tr('Data Engineer II'), desc: tr('Batch and streaming platforms for semiconductor manufacturing') },
+  { year: tr('NEXT'), when: tr('NEXT'), title: tr('Your team?'), desc: tr('the next data platform worth building') },
 ];
-// Whip-pan cue points: dotted-quarter pushes, then holds on the last two.
-const CUES = [0, 0.75, 1.5, 2.0, 3.0];
-const BADGES = [
-  { at: 2.5, text: '★ HACKATHON WINNER ’24', bg: C.caramel, fg: C.espresso, rot: -6 },
-  { at: 3.0, text: '★ STAR OF THE QUARTER Q4 ’24', bg: C.espresso, fg: C.crema, rot: 5 },
-  { at: 3.5, text: '◉ MENTOR: 2 ENGINEERS + 3 INTERNS', bg: C.foam, fg: C.espresso, rot: -3 },
-];
+/** One stop per bar: the camera whips across and lands on each downbeat. */
+const STOP = 2;
+const WHIP = 0.2;
 
-export function Career(p: SceneProps) {
+export function Journey(p: SceneProps) {
   const { t, W, H, portrait } = p;
   const spacing = portrait ? 760 : 820;
   const lineY = H * (portrait ? 0.5 : 0.52);
-  let idx = 0;
-  CUES.forEach((c, i) => t >= c && (idx = i));
-  const whip = 0.18;
-  const k = ease.expoInOut(prog(t, CUES[idx], whip));
-  const fromX = (idx > 0 ? idx - 1 : 0) * spacing;
-  const camX = -lerp(fromX, idx * spacing, k);
-  const velocity = idx > 0 && t - CUES[idx] < whip ? Math.sin(Math.PI * k) : 0;
+  const idx = Math.max(0, Math.min(NODES.length - 1, Math.floor((t + WHIP) / STOP)));
+  const k = idx === 0 ? 1 : ease.expoInOut(prog(t, idx * STOP - WHIP, WHIP));
+  const camX = -lerp((idx > 0 ? idx - 1 : 0) * spacing, idx * spacing, k);
+  const velocity = idx > 0 && k < 1 ? Math.sin(Math.PI * k) : 0;
   const blur = velocity * 26;
+  const enter = ease.expoOut(prog(t, 0, 0.4));
 
   return (
     <Stage
       p={p}
       bg={C.oat}
-      cam={{ s: 1 + 0.015 * beatEnv(t, 9) }}
-      hud={BADGES.map((b, i) => {
-        const pop = ease.backOutHard(prog(t, b.at, 0.22));
-        const pos = portrait ? [[60, 190], [330, 300], [80, 1330]][i] : [[90, 110], [W - 640, 120], [W - 720, H - 160]][i];
-        return (
-          <At
-            key={i}
-            x={pos[0]}
-            y={pos[1]}
-            style={{
-              opacity: t >= b.at ? 1 : 0,
-              transform: `rotate(${b.rot}deg) scale(${lerp(1.7, 1, pop)})`,
-              background: b.bg,
-              color: b.fg,
-              border: `2px solid ${C.espresso}`,
-              borderRadius: 999,
-              padding: '10px 20px',
-              font: `700 ${portrait ? 22 : 20}px ${F.mono}`,
-              letterSpacing: '0.04em',
-              whiteSpace: 'nowrap',
-              boxShadow: `5px 5px 0 ${C.espresso}`,
-            }}
-          >
-            {b.text}
-          </At>
-        );
-      })}
+      cam={{ s: 1 + 0.015 * beatEnv(t, 9) + 0.03 * hit(t, idx * STOP, 7) }}
+      hud={
+        <At x={portrait ? 60 : 80} y={portrait ? 150 : 80} style={{ font: `700 ${portrait ? 24 : 22}px ${F.mono}`, letterSpacing: '0.3em', color: C.cinnamon, opacity: enter }}>
+          {tr('THE JOURNEY · {i}/{n}', { i: `0${idx + 1}`, n: `0${NODES.length}` })}
+        </At>
+      }
     >
       <svg width={0} height={0} className="absolute">
         <filter id="whip" x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation={`${blur} 0`} />
         </filter>
       </svg>
+      {/* the year, huge and faint, sliding slower than the line: parallax */}
+      {NODES.map((n, i) => {
+        const vis = i === idx ? k : i === idx - 1 ? 1 - k : 0;
+        if (vis <= 0.01) return null;
+        return (
+          <At
+            key={`y${i}`}
+            x={W - (portrait ? 40 : 60)}
+            y={H - (portrait ? 160 : 40)}
+            anchor={portrait ? 'rc' : 'bl'}
+            style={{
+              font: `italic 800 ${portrait ? 300 : 360}px/0.8 ${F.display}`,
+              letterSpacing: '-0.05em',
+              color: 'transparent',
+              WebkitTextStroke: `3px ${C.latte}`,
+              opacity: 0.55 * vis,
+              whiteSpace: 'nowrap',
+              transform: `translateX(${portrait ? 0 : -100}%) translateX(${(1 - vis) * (i === idx ? 160 : -160)}px)`,
+            }}
+          >
+            {n.year}
+          </At>
+        );
+      })}
       <div className="absolute inset-0" style={{ transform: `translateX(${camX}px)`, filter: blur > 0.5 ? 'url(#whip)' : undefined }}>
-        <div className="absolute" style={{ left: -W, width: W * 2 + spacing * NODES.length, top: lineY, height: 5, background: C.espresso }} />
+        <div
+          className="absolute"
+          style={{ left: -W, width: (W * 2 + spacing * NODES.length) * enter, top: lineY, height: 5, background: C.espresso }}
+        />
         {NODES.map((n, i) => {
           const x = W / 2 + i * spacing;
           const focus = i === idx;
-          const pulse = focus ? 1 + 0.15 * hit(t, CUES[i] + whip, 8) : 1;
+          const pulse = focus ? 1 + 0.18 * hit(t, i * STOP, 8) : 1;
+          // only the stop we're on speaks; the one we left fades as we whip away
+          const vis = i === idx ? k : i === idx - 1 ? 1 - k : 0;
           return (
             <div key={i}>
               <div
@@ -95,12 +98,23 @@ export function Career(p: SceneProps) {
               <At
                 x={x - (portrait ? 330 : 360)}
                 y={lineY - (portrait ? 330 : 300)}
-                style={{ width: portrait ? 680 : 760, opacity: focus ? 1 : 0.35, filter: focus ? undefined : 'blur(2px)' }}
+                style={{ width: portrait ? 680 : 760 }}
               >
-                <div style={{ font: `700 ${portrait ? 24 : 24}px ${F.mono}`, letterSpacing: '0.2em', color: C.cinnamon }}>{n.when}</div>
-                <div style={{ font: `800 ${portrait ? 84 : 96}px/1 ${F.display}`, letterSpacing: '-0.03em', color: C.espresso, marginTop: 10 }}>{n.title}</div>
+                <div style={{ font: `700 ${portrait ? 28 : 24}px ${F.mono}`, letterSpacing: '0.2em', color: C.cinnamon, opacity: 0.35 + 0.65 * vis }}>{n.when}</div>
+                <div
+                  style={{
+                    font: `800 ${portrait ? 96 : 104}px/1 ${F.display}`,
+                    letterSpacing: '-0.03em',
+                    color: C.espresso,
+                    marginTop: 10,
+                    opacity: vis,
+                    transform: `translateY(${(1 - vis) * 30}px)`,
+                  }}
+                >
+                  {n.title}
+                </div>
               </At>
-              <At x={x - (portrait ? 330 : 360)} y={lineY + 70} style={{ width: portrait ? 660 : 720, opacity: focus ? 1 : 0.3, font: `500 ${portrait ? 32 : 30}px/1.35 ${F.sans}`, color: C.mocha }}>
+              <At x={x - (portrait ? 330 : 360)} y={lineY + 70} style={{ width: portrait ? 660 : 720, opacity: vis, font: `500 ${portrait ? 36 : 30}px/1.35 ${F.sans}`, color: C.mocha }}>
                 {n.desc}
               </At>
             </div>
@@ -164,7 +178,7 @@ export function Cta(p: SceneProps) {
             textShadow: '0 6px 40px #000',
           }}
         >
-          Let’s build something
+          {tr('Let’s build something')}
         </div>
         <div
           style={{
@@ -174,7 +188,7 @@ export function Cta(p: SceneProps) {
             ...gradText(),
           }}
         >
-          that scales.
+          {tr('that scales.')}
         </div>
         <a
           href={`mailto:${profile.email}`}
@@ -261,10 +275,10 @@ export function LoopStinger(p: SceneProps) {
               transform: `scale(${lerp(1.2, 1, ease.expoOut(prog(t, 1.5, 0.2)))})`,
             }}
           >
-            ↺ RETURN BY DEATH
+            {tr('↺ RETURN BY DEATH')}
           </At>
           <At x={W / 2} y={H / 2 + 50} anchor="tc" style={{ font: `500 24px ${F.mono}`, letterSpacing: '0.24em', color: C.taupe, whiteSpace: 'nowrap' }}>
-            LOOP {String(loop + 2).padStart(2, '0')} · 00:48 → 00:00
+            {tr('LOOP {n} · {from} → 00:00', { n: String(loop + 2).padStart(2, '0'), from: mmss(LOOP) })}
           </At>
         </>
       )}

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { animate, motion, useInView } from 'motion/react';
 import { numbers, type Numeral } from '../data';
 import { Section, SectionHeading } from './ui';
+import { tr } from '../i18n';
 
 const TONES: Record<Numeral['tone'], { bg: string; fg: string; sub: string; border?: string }> = {
   espresso: { bg: 'var(--espresso)', fg: 'var(--crema)', sub: 'var(--latte)' },
@@ -55,8 +56,8 @@ function Card({ n, i, big }: { n: Numeral; i: number; big?: boolean }) {
         {big && (
           <div className="mt-6 space-y-2.5 font-mono text-xs">
             {[
-              { label: '~18h before', w: 100, bg: 'var(--mocha)' },
-              { label: '~45min after', w: 4.2, bg: 'var(--caramel)' },
+              { label: tr('~18h before'), w: 100, bg: 'var(--mocha)' },
+              { label: tr('~45min after'), w: 4.2, bg: 'var(--caramel)' },
             ].map((b, k) => (
               <div key={k} className="flex items-center gap-3">
                 <div className="h-3 flex-1 overflow-hidden rounded-full bg-crema/10">
@@ -86,7 +87,7 @@ function Card({ n, i, big }: { n: Numeral; i: number; big?: boolean }) {
 export default function Numbers() {
   return (
     <Section id="numbers">
-      <SectionHeading kicker="02 · The numbers" title="Receipts, not adjectives." />
+      <SectionHeading kicker={tr('02 · The numbers')} title={tr('Receipts, not adjectives.')} />
       <div className="grid auto-rows-auto gap-4 sm:grid-cols-2 md:grid-cols-4">
         {numbers.map((n, i) => (
           <Card key={n.label} n={n} i={i} big={i === 0} />

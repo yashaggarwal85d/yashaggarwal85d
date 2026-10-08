@@ -2,12 +2,13 @@ import type { ReactNode } from 'react';
 import { At, Stage, type SceneProps } from '../Stage';
 import { beatEnv, ease, lerp, prog } from '../anim';
 import { C, F } from '../palette';
+import { tr } from '../../i18n';
 
 const STATIONS = [
-  { name: 'Beans', tech: 'Kafka · MES / ERP' },
-  { name: 'Grind', tech: 'PySpark · Rust ETL' },
-  { name: 'Brew', tech: 'Iceberg · Data Vault 2.0' },
-  { name: 'Serve', tech: 'ClickHouse → planners' },
+  { name: tr('Beans'), tech: tr('Kafka · S3 landing zone') },
+  { name: tr('Grind'), tech: 'PySpark · Airflow' },
+  { name: tr('Brew'), tech: 'Iceberg · Data Vault 2.0' },
+  { name: tr('Serve'), tech: 'ClickHouse · FastAPI' },
 ];
 
 // Packet legs between stations; each lands on a downbeat-ish beat.
@@ -71,6 +72,7 @@ function Icon({ i, t }: { i: number; t: number }) {
 export function PourScene(p: SceneProps) {
   const { t, W, H, portrait } = p;
   const pos = packetAt(t);
+  const words = tr('How I brew data.').split(' ');
   const stations = portrait
     ? STATIONS.map((_, i) => ({ x: 300, y: 420 + i * 340 }))
     : STATIONS.map((_, i) => ({ x: 220 + i * 390, y: 500 }));
@@ -110,10 +112,10 @@ export function PourScene(p: SceneProps) {
       cam={{ s, x: camX, y: camY }}
       hud={
         <At x={portrait ? 60 : 80} y={portrait ? 110 : 70} style={{ font: `italic 700 ${portrait ? 96 : 104}px/1 ${F.display}`, letterSpacing: '-0.03em', color: C.espresso, whiteSpace: 'nowrap' }}>
-          {['How', 'I', 'brew', 'data.'].map((w, i) => {
+          {words.map((w, i) => {
             const k = ease.backOut(prog(t, i * 0.08, 0.35));
             return (
-              <span key={i} style={{ display: 'inline-block', marginRight: '0.22em', color: i === 3 ? C.cinnamon : undefined, opacity: Math.min(1, k * 2), transform: `translateY(${(1 - k) * -90}px)` }}>
+              <span key={i} style={{ display: 'inline-block', marginRight: '0.22em', color: i === words.length - 1 ? C.cinnamon : undefined, opacity: Math.min(1, k * 2), transform: `translateY(${(1 - k) * -90}px)` }}>
                 {w}
               </span>
             );

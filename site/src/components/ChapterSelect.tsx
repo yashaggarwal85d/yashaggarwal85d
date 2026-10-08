@@ -6,6 +6,7 @@ import { CHAPTERS } from '../reel/scenes';
 import { mmss } from '../reel/anim';
 import type { ReelControls } from '../reel/Showreel';
 import { GitHubIcon, LinkedInIcon } from './ui';
+import { tr } from '../i18n';
 
 type Item = { id: string; group: string; key?: string; label: string; sub?: string; meta?: ReactNode; icon?: ReactNode; run: () => void; keepOpen?: boolean };
 
@@ -15,6 +16,9 @@ type Props = {
   reel: RefObject<ReelControls | null>;
   onBeans: () => void;
 };
+
+/** `group` stays English (it is compared); this is what the header shows. */
+const GROUP_LABEL: Record<string, string> = { 'Intro chapters': tr('Intro chapters'), Explore: tr('Explore'), Actions: tr('Actions') };
 
 const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 
@@ -27,7 +31,7 @@ export default function ChapterSelect({ open, onClose, reel, onBeans }: Props) {
   const items = useMemo<Item[]>(() => {
     const chapters: Item[] = CHAPTERS.map((c, i) => ({
       id: `ch-${c.id}`,
-      group: 'Reel chapters',
+      group: 'Intro chapters',
       key: String(i + 1),
       label: c.label,
       sub: c.sub,
@@ -44,26 +48,26 @@ export default function ChapterSelect({ open, onClose, reel, onBeans }: Props) {
       {
         id: 'copy',
         group: 'Actions',
-        label: copied ? 'Copied!' : 'Copy email address',
+        label: copied ? tr('Copied!') : tr('Copy email address'),
         icon: <Copy className="h-4 w-4" />,
         keepOpen: true,
         run: () => navigator.clipboard?.writeText(profile.email).then(() => setCopied(true)),
       },
-      { id: 'mail', group: 'Actions', label: 'Send an email', icon: <Mail className="h-4 w-4" />, run: () => window.open(`mailto:${profile.email}`) },
-      { id: 'in', group: 'Actions', label: 'Open LinkedIn', icon: <LinkedInIcon />, run: () => window.open(profile.linkedin, '_blank', 'noopener') },
-      { id: 'gh', group: 'Actions', label: 'Open GitHub', icon: <GitHubIcon />, run: () => window.open(profile.github, '_blank', 'noopener') },
-      { id: 'sound', group: 'Actions', label: 'Toggle the 120 BPM beat', icon: <Volume2 className="h-4 w-4" />, run: () => reel.current?.toggleSound() },
+      { id: 'mail', group: 'Actions', label: tr('Send an email'), icon: <Mail className="h-4 w-4" />, run: () => window.open(`mailto:${profile.email}`) },
+      { id: 'in', group: 'Actions', label: tr('Open LinkedIn'), icon: <LinkedInIcon />, run: () => window.open(profile.linkedin, '_blank', 'noopener') },
+      { id: 'gh', group: 'Actions', label: tr('Open GitHub'), icon: <GitHubIcon />, run: () => window.open(profile.github, '_blank', 'noopener') },
+      { id: 'sound', group: 'Actions', label: tr('Toggle the 120 BPM beat'), icon: <Volume2 className="h-4 w-4" />, run: () => reel.current?.toggleSound() },
       {
         id: 'rbd',
         group: 'Actions',
-        label: 'Return by Death (restart the reel)',
+        label: tr('Return by Death (restart the intro)'),
         icon: <RotateCcw className="h-4 w-4" />,
         run: () => {
           scrollTo('reel');
           reel.current?.restart();
         },
       },
-      { id: 'beans', group: 'Actions', label: '☕ mode (or try the Konami code)', icon: <Coffee className="h-4 w-4" />, run: onBeans },
+      { id: 'beans', group: 'Actions', label: tr('☕ mode (or try the Konami code)'), icon: <Coffee className="h-4 w-4" />, run: onBeans },
     ];
     return [...chapters, ...pages, ...actions];
   }, [reel, copied, onBeans]);
@@ -117,7 +121,7 @@ export default function ChapterSelect({ open, onClose, reel, onBeans }: Props) {
           <motion.div
             role="dialog"
             aria-modal="true"
-            aria-label="Chapter select"
+            aria-label={tr('Chapter select')}
             className="w-full max-w-xl overflow-hidden rounded-3xl border border-crema/15 text-crema shadow-2xl"
             style={{ background: 'rgba(23,16,12,.96)' }}
             initial={{ y: -16, scale: 0.97 }}
@@ -133,21 +137,21 @@ export default function ChapterSelect({ open, onClose, reel, onBeans }: Props) {
                 ref={inputRef}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Chapter select: type, or press 1–5"
+                placeholder={tr('Chapter select: type, or press 1–5')}
                 className="h-14 flex-1 bg-transparent text-sm text-crema outline-none placeholder:text-latte/60"
               />
               <kbd className="rounded border border-crema/20 px-1.5 py-0.5 font-mono text-[10px] text-latte">ESC</kbd>
             </div>
             <ul className="max-h-[62vh] overflow-y-auto p-3">
-              {filtered.length === 0 && <li className="px-3 py-8 text-center text-sm text-latte">Nothing brewing under that name.</li>}
+              {filtered.length === 0 && <li className="px-3 py-8 text-center text-sm text-latte">{tr('Nothing brewing under that name.')}</li>}
               {filtered.map((item, i) => {
                 const header = item.group !== lastGroup ? item.group : null;
                 lastGroup = item.group;
                 const on = i === index;
-                const chapter = item.group === 'Reel chapters';
+                const chapter = item.group === 'Intro chapters';
                 return (
                   <li key={item.id}>
-                    {header && <p className="px-3 pb-2 pt-3 font-mono text-[10px] uppercase tracking-[0.25em] text-caramel">{header}</p>}
+                    {header && <p className="px-3 pb-2 pt-3 font-mono text-[10px] uppercase tracking-[0.25em] text-caramel">{GROUP_LABEL[header] ?? header}</p>}
                     <button
                       onMouseEnter={() => setIndex(i)}
                       onClick={() => runItem(item)}
@@ -171,7 +175,7 @@ export default function ChapterSelect({ open, onClose, reel, onBeans }: Props) {
               })}
             </ul>
             <p className="border-t border-crema/10 px-5 py-3 font-mono text-[10.5px] tracking-[0.12em] text-latte/70">
-              ↑↓ choose · ⏎ jump · 1–5 chapters anywhere · ↑↑↓↓←→←→BA
+              {tr('↑↓ choose · ⏎ jump · 1–5 chapters anywhere · ↑↑↓↓←→←→BA')}
             </p>
           </motion.div>
         </motion.div>

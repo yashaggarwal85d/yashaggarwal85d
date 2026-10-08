@@ -1,12 +1,13 @@
 import { Mail } from 'lucide-react';
 import { profile, sections } from '../data';
 import { GitHubIcon, LinkedInIcon } from './ui';
+import { tr } from '../i18n';
 
 export default function Footer() {
   const social = [
     { href: profile.github, label: 'GitHub', icon: <GitHubIcon /> },
     { href: profile.linkedin, label: 'LinkedIn', icon: <LinkedInIcon /> },
-    { href: `mailto:${profile.email}`, label: 'Email', icon: <Mail className="h-4 w-4" /> },
+    { href: `mailto:${profile.email}`, label: tr('Email'), icon: <Mail className="h-4 w-4" /> },
   ];
   return (
     <footer className="relative z-10 border-t border-line bg-[var(--bg)]/80 backdrop-blur-xl">
@@ -14,11 +15,11 @@ export default function Footer() {
         <div>
           <span className="font-mono text-lg font-bold text-spectrum">YA</span>
           <p className="mt-3 max-w-xs text-sm text-muted">
-            {'{'} Pipelines that finish before the coffee does. {'}'}
+            {'{'} {tr('Pipelines that finish before the coffee does.')} {'}'}
           </p>
         </div>
         <div>
-          <p className="font-mono text-xs font-semibold uppercase tracking-widest">Links</p>
+          <p className="font-mono text-xs font-semibold uppercase tracking-widest">{tr('Links')}</p>
           <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm text-muted">
             {sections.map((s) => (
               <li key={s.id}>
@@ -30,7 +31,7 @@ export default function Footer() {
           </ul>
         </div>
         <div>
-          <p className="font-mono text-xs font-semibold uppercase tracking-widest">Social</p>
+          <p className="font-mono text-xs font-semibold uppercase tracking-widest">{tr('Social')}</p>
           <div className="mt-3 flex gap-2">
             {social.map((s) => (
               <a
@@ -48,7 +49,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-line py-5 text-center text-xs text-subtle">
-        © {new Date().getFullYear()} {profile.name}. Move your cursor over the background: it’s a keyboard.
+        © {new Date().getFullYear()} {profile.name}. {tr('Move your cursor over the background: it’s a keyboard.')}
       </div>
     </footer>
   );

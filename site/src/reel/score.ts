@@ -1,6 +1,7 @@
 import { BEAT, LOOP, clamp01, mmss } from './anim';
-import { CHAPTERS } from './scenes';
+import { CHAPTERS, sceneAt } from './scenes';
 import type { SongFrame, SongStatus, TrackMeta } from './song';
+import { tr } from '../i18n';
 
 /**
  * "Cold Brew": an original drift-phonk score, synthesised live in the browser
@@ -9,7 +10,7 @@ import type { SongFrame, SongStatus, TrackMeta } from './song';
  * letter of YASH, an impact on the 24× stamp, the half-time drop under the
  * black hole, a whoosh per career whip, a tape-stop on the spinning top.
  *
- * Song time 0–4 s is the intro (pad, crackle, a muffled cowbell, a riser);
+ * Song time 0–12 s is the intro (pad, crackle, a muffled cowbell, a riser);
  * reel time 0 is the drop. After that the 48 s loop repeats forever.
  *
  * It mirrors SongController's surface so the reel and the deck drive it the
@@ -17,10 +18,10 @@ import type { SongFrame, SongStatus, TrackMeta } from './song';
  * (browsers need a gesture to start audio), then the audio clock itself.
  */
 
-export const INTRO = 4;
+export const INTRO = 12;
 const STEP = 0.125; // 16th notes at 120 BPM
 const STEPS_PER_LOOP = LOOP / STEP; // 384
-const INTRO_STEPS = INTRO / STEP; // 32
+const INTRO_STEPS = INTRO / STEP; // 96
 
 const F4 = 349.23;
 const F2 = 87.31;
@@ -44,17 +45,14 @@ const RIFF: Record<number, number>[] = [
 ];
 /** YASH: one stab per letter, climbing the F minor chord. */
 const LETTERS = [0, 3, 7, 12];
-/** Career whips (reel seconds) and how long each whip takes. */
-const WHIPS = [40.75, 41.5, 42.0, 43.0];
-const WHIP = 0.18;
 
 type Live = { n: AudioScheduledSourceNode; end: number };
 
 export const COLD_BREW: TrackMeta = {
   kind: 'synth',
   title: 'COLD BREW',
-  artist: 'original score',
-  source: 'synthesised live in your browser',
+  artist: tr('original score'),
+  source: tr('synthesised live in your browser'),
   url: 'https://github.com/yashaggarwal85d/yashaggarwal85d/blob/master/site/src/reel/score.ts',
   bpm: 120,
 };
@@ -249,7 +247,7 @@ export class ScoreController {
     if (this.live.length > 64) this.live = this.live.filter((v) => v.end > t);
   };
 
-  /** Everything that plays on one 16th step. `s` counts from the reel's first beat. */
+  /** Everything that plays on one 16th step. `s` counts from the reel's first beat. Cues follow the scenes, so reordering the reel keeps the score in place. */
   private step(s: number, w: number) {
     if (s < 0) return this.intro(s + INTRO_STEPS, w);
     const local = s % STEPS_PER_LOOP;
@@ -258,42 +256,82 @@ export class ScoreController {
     const i = local % 16;
     const t = local * STEP;
     const chord = bar % 4;
+    const sc = sceneAt(t);
+    const id = sc.id;
+    const lt = t - sc.start; // seconds into the scene, on the 16th grid
+    const sbar = Math.floor(lt / 2);
+    const lastBar = sbar === sc.dur / 2 - 1;
+    const at = (x: number) => Math.abs(lt - x) < 1e-6;
 
-    this.toneAt(w, bar === 12 || bar === 13 ? 1400 : bar === 23 ? 900 : 18000);
+    this.toneAt(w, id === 'pour' ? 1400 : id === 'loop' ? 900 : 18000);
 
-    // ---- one-off cues, by reel time -------------------------------------
-    if (t === 0 || t === 4 || t === 8 || t === 32 || t === 44) this.impact(w, t === 44 ? 1.25 : 1);
-    if (t === 0 || t === 4 || t === 20 || t === 32 || t === 44) this.crash(w, 0.55);
-    if (t === 9.5) {
-      this.impact(w, 1.1); // 24× stamp
-      this.clap(w, 1, 0.5);
-    }
-    if (t === 13.125 || t === 33.5) {
-      this.cowbell(w, 24, 0.9, 0.5);
-      this.crash(w, 0.3);
-    }
-    if (t === 18) {
-      this.impact(w, 1.15); // 136 → 1
-      this.crash(w, 0.6);
-    }
-    if (t === 16.75) this.riser(w, 1.25, 0.5);
-    if (t === 7.25) this.riser(w, 0.75, 0.55);
-    if (t === 27) this.riser(w, 1, 0.6);
-    if (t === 23) this.riser(w, 1, 0.35);
-    if (t === 28) {
-      this.impact(w, 1.3);
-      this.pad(w, PADS[0], 4, 0.16, 500, 3200);
-    }
-    for (const c of WHIPS) {
-      if (Math.abs(t - c) < 1e-6) {
-        this.whoosh(w, WHIP + 0.06);
-        this.clap(w + WHIP, 0.7, 0.3);
-        this.kick(w + WHIP, 0.8);
-      }
+    // ---- one-off cues ----------------------------------------------------
+    if (at(0) && ['cold-open', 'journey', 'domain', 'hours', 'quantum', 'shortlist'].includes(id)) this.impact(w, 1);
+    if (at(0) && ['cold-open', 'journey', 'domain', 'grid', 'quantum', 'shortlist'].includes(id)) this.crash(w, 0.55);
+    switch (id) {
+      case 'name':
+        if (at(2)) {
+          this.impact(w, 1);
+          this.crash(w, 0.55);
+        }
+        break;
+      case 'role':
+        if (at(1.25)) this.riser(w, 0.75, 0.55);
+        break;
+      case 'journey':
+        // the camera lands on each stop on its downbeat; a whoosh carries it there
+        if (i === 0 && lt > 0) {
+          this.clap(w, 0.7, 0.3);
+          this.crash(w, 0.3);
+        }
+        if (i === 14 && !lastBar) this.whoosh(w, 0.26);
+        break;
+      case 'domain':
+        if (i === 0 && lt > 0) {
+          this.cowbell(w, 24, 0.7, 0.45);
+          this.crash(w, 0.25);
+        }
+        break;
+      case 'pour':
+        if (lastBar && i === 8) this.riser(w, 1, 0.45);
+        break;
+      case 'hours':
+        if (at(1.5)) {
+          this.impact(w, 1.1); // the 24× stamp
+          this.clap(w, 1, 0.5);
+        }
+        break;
+      case 'rust':
+      case 'quantum':
+        if (at(id === 'rust' ? 1.125 : 1.5)) {
+          this.cowbell(w, 24, 0.9, 0.5);
+          this.crash(w, 0.3);
+        }
+        break;
+      case 'consolidate':
+        if (at(0.75)) this.riser(w, 1.25, 0.5);
+        if (at(2)) {
+          this.impact(w, 1.15); // 136 → 1
+          this.crash(w, 0.6);
+        }
+        break;
+      case 'grid':
+        if (at(3)) this.riser(w, 1, 0.6);
+        break;
+      case 'shortlist':
+        // a tick every two beats
+        if (i === 0 || i === 8) this.cowbell(w, [12, 15, 19, 24][(sbar * 2 + i / 8) % 4], 0.8, 0.3);
+        break;
+      case 'cta':
+        if (at(0)) {
+          this.impact(w, 1.25);
+          this.crash(w, 0.55);
+        }
+        break;
     }
 
     // ---- sections --------------------------------------------------------
-    if (bar === 1) {
+    if (id === 'name' && sbar === 0) {
       // YASH: four stabs, one per letter, then air.
       if (i % 4 === 0) {
         const n = LETTERS[i / 4];
@@ -304,15 +342,22 @@ export class ScoreController {
       } else if (i % 2 === 0) this.hat(w, 0.25);
       return;
     }
-    if (bar === 3 && i >= 10) {
+    if (id === 'role' && i >= 10) {
       // zooming into the A: drums drop out under the riser
       if (i === 10) this.bass(w, 0, 0.3, 12);
       return;
     }
-    if (bar === 14 || bar === 15) return this.blackHole(bar, i, w);
-    if (bar === 12 || bar === 13) return this.pour(bar, i, w, chord);
-    if (bar === 23) return this.stinger(i, w);
-    if (bar === 11 && i >= 8) {
+    if (id === 'black-hole') {
+      if (at(0)) {
+        this.impact(w, 1.3);
+        this.pad(w, PADS[0], 4, 0.16, 500, 3200);
+      }
+      return this.blackHole(sbar ? 15 : 14, i, w);
+    }
+    if (id === 'pour') return this.pour(bar, i, w, chord);
+    if (id === 'loop') return this.stinger(i, w);
+    if (id === 'grid' && lastBar && i >= 8) {
+      // the floor drops away before the black hole
       if (i === 8) {
         this.kick(w, 0.9);
         this.bass(w, ROOTS[chord], 0.9);
@@ -321,24 +366,25 @@ export class ScoreController {
       return;
     }
 
-    this.groove(bar, i, w, chord, bar === 22);
-    if (bar === 17 && i % 4 === 0) this.plink(w + 0.001, [12, 15, 19, 24][i / 4], 0.35);
+    const roll = ((id === 'cold-open' || id === 'consolidate') && sbar === 0) || (lastBar && ['journey', 'cinema', 'shortlist'].includes(id));
+    this.groove(bar, i, w, chord, id === 'cta', id === 'cinema' || id === 'cta', roll);
+    if ((id === 'maths' || id === 'navier') && i % 4 === 0) this.plink(w + 0.001, [12, 15, 19, 24][i / 4], 0.35);
   }
 
-  private groove(bar: number, i: number, w: number, chord: number, peak: boolean) {
+  private groove(bar: number, i: number, w: number, chord: number, peak: boolean, octave: boolean, roll: boolean) {
     const root = ROOTS[chord];
     // drums
     if (i === 0 || i === 8 || (i === 10 && bar % 2 === 1) || (peak && i === 14)) this.kick(w, i === 0 ? 1 : 0.85);
     if (i === 4 || i === 12) this.clap(w, 0.85, 0.12);
-    const roll = bar % 4 === 3 && i >= 12;
-    if (roll) {
+    const hatRoll = bar % 4 === 3 && i >= 12;
+    if (hatRoll) {
       this.hat(w, 0.3);
       this.hat(w + STEP / 2, 0.22);
     } else if (peak || i % 2 === 0) this.hat(w, i % 2 === 0 ? 0.32 : 0.16);
     else if (i % 4 === 3) this.hat(w, 0.12);
     if (i === 2 || i === 10) this.hat(w, 0.14, true);
-    // snare rolls into the next scene
-    if ((bar === 0 || bar === 19 || bar === 8) && i >= 12) this.clap(w, 0.25 + (i - 12) * 0.12, 0.05);
+    // snare roll into the next scene
+    if (roll && i >= 12) this.clap(w, 0.25 + (i - 12) * 0.12, 0.05);
     // 808
     if (i === 0) this.bass(w, root, 0.75);
     else if (i === 6) this.bass(w, root, 0.2);
@@ -347,25 +393,26 @@ export class ScoreController {
     else if (i === 14) this.bass(w, root, 0.25, 12);
     // the hook (an octave up for the finale and the watchlist)
     const note = RIFF[chord][i];
-    if (note !== undefined) this.cowbell(w, note + (peak || bar === 18 || bar === 19 ? 12 : 0), peak ? 0.75 : 0.6);
+    if (note !== undefined) this.cowbell(w, note + (octave ? 12 : 0), peak ? 0.75 : 0.6);
   }
 
   private intro(k: number, w: number) {
-    // k: 0..31 over 4 s: a muffled hook, then the door opens into the drop
+    // k: 0..95 over 12 s. The hook from another room, the door opening bar by
+    // bar, a heartbeat, then a riser and a roll into the drop.
     const bar = Math.floor(k / 16);
     const i = k % 16;
-    if (k === 0) {
-      this.crackle(w, INTRO);
-      this.pad(w, PADS[0], 2.1, 0.13, 300, 1400);
+    if (k === 0) this.crackle(w, INTRO);
+    if (i === 0 && bar % 2 === 0) {
+      const seg = bar / 2;
+      this.pad(w, PADS[seg], 4.1, 0.13, [300, 700, 1400][seg], [900, 2000, 4000][seg]);
     }
-    if (k === 16) {
-      this.pad(w, PADS[2], 2.0, 0.14, 900, 4000);
-      this.riser(w, 2, 0.7);
-    }
-    const note = RIFF[bar === 0 ? 0 : 2][i];
-    if (note !== undefined) this.cowbell(w, note, 0.4 + bar * 0.25, 0.22, bar === 0 ? 800 : 2400);
-    if (bar === 0 && i % 4 === 0) this.hat(w, 0.12);
-    if (bar === 1) {
+    const note = RIFF[bar % 4][i];
+    if (note !== undefined && bar >= 1) this.cowbell(w, note, 0.3 + bar * 0.08, 0.22, [0, 700, 1000, 1500, 2400, 3600][bar]);
+    if (bar >= 2 && bar <= 4 && (i === 0 || (bar >= 3 && i === 8))) this.kick(w, 0.3 + bar * 0.05);
+    if (bar >= 2 && bar <= 3 && i % 4 === 0) this.hat(w, 0.1 + bar * 0.02);
+    if (bar === 4 && i === 0) this.riser(w, 4, 0.7);
+    if (bar === 4 && i % 2 === 0) this.hat(w, 0.18);
+    if (bar === 5) {
       if (i < 8 && i % 2 === 0) this.hat(w, 0.2);
       if (i >= 8) {
         this.clap(w, 0.2 + (i - 8) * 0.07, 0.05);
@@ -378,10 +425,10 @@ export class ScoreController {
   private resumeIntro(pos: number, w: number) {
     const left = INTRO - pos;
     if (left > 1.2) this.crackle(w, left);
-    const seg = pos < 2 ? 0 : 1;
-    const end = [2.1, 4][seg];
-    if (end - pos > 0.4) this.pad(w, PADS[seg * 2], end - pos, 0.13, 600 + seg * 500, [1400, 4000][seg]);
-    if (seg === 1 && left > 0.4) this.riser(w, left, 0.7);
+    const seg = Math.min(2, Math.floor(pos / 4));
+    const end = (seg + 1) * 4 + 0.1;
+    if (end - pos > 0.4) this.pad(w, PADS[seg], end - pos, 0.13, [300, 700, 1400][seg], [900, 2000, 4000][seg]);
+    if (pos >= 8 && left > 0.4) this.riser(w, left, 0.7);
   }
 
   private pour(bar: number, i: number, w: number, chord: number) {
@@ -718,7 +765,7 @@ export class ScoreController {
     if (this.status === 'playing') this.pause();
     else this.play();
   }
-  /** `rewind`: a first unmute early in the first pass goes back to hear the drop. */
+  /** `rewind`: a first unmute early in the first pass goes back to the top of the reel. */
   unmute(rewind = false) {
     const ctx = this.ensureCtx();
     void ctx.resume();
@@ -728,7 +775,7 @@ export class ScoreController {
     if (!this.audioLive) {
       // Hand the clock over from performance.now() to the audio clock.
       const r = this.reelTime();
-      const pos = rewind && r >= 0 && r < 16 ? 0 : this.now();
+      const pos = rewind && r >= 0 && r < 16 ? INTRO : this.now();
       this.audioLive = true;
       this.seek(pos);
     }

@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform } from 'motion/react';
 import { ArrowUpRight, LayoutGrid } from 'lucide-react';
 import { profile, work, type Work as WorkItem } from '../data';
 import { SectionHeading, Tag } from './ui';
+import { tr } from '../i18n';
 
 function Compare({ c, colors }: { c: NonNullable<WorkItem['compare']>; colors: [string, string] }) {
   const max = Math.max(c.before, c.after);
@@ -79,10 +80,10 @@ function ExploreCard() {
       <span className="grid h-16 w-16 place-items-center rounded-2xl bg-chip text-accent transition-transform group-hover:rotate-6 group-hover:scale-110">
         <LayoutGrid className="h-7 w-7" />
       </span>
-      <h3 className="mt-5 text-xl font-bold">More on GitHub</h3>
-      <p className="mt-1 text-sm text-subtle">Side projects, experiments and DSA</p>
+      <h3 className="mt-5 text-xl font-bold">{tr('More on GitHub')}</h3>
+      <p className="mt-1 text-sm text-subtle">{tr('Side projects, experiments and DSA')}</p>
       <span className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-line-strong px-4 py-1.5 text-sm font-medium transition group-hover:border-accent">
-        Explore <ArrowUpRight className="h-4 w-4" />
+        {tr('Explore')} <ArrowUpRight className="h-4 w-4" />
       </span>
     </a>
   );
@@ -127,7 +128,7 @@ export default function Work() {
     return (
       <section id="work" className="relative py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <SectionHeading title="Featured Work" kicker="05 · Impact, in numbers" />
+          <SectionHeading title={tr('Featured Work')} kicker={tr('05 · Impact, in numbers')} />
         </div>
         <div ref={trackRef} className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-6 [scrollbar-width:none]">
           {cards}
@@ -140,7 +141,7 @@ export default function Work() {
     <section id="work" ref={sectionRef} className="relative" style={{ height: `calc(100vh + ${distance}px)` }}>
       <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden">
         <div className="mx-auto w-full max-w-6xl px-6">
-          <SectionHeading title="Featured Work" kicker="05 · Impact, in numbers" />
+          <SectionHeading title={tr('Featured Work')} kicker={tr('05 · Impact, in numbers')} />
         </div>
         <motion.div ref={trackRef} style={{ x }} className="flex gap-5 pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] pr-6">
           {cards}

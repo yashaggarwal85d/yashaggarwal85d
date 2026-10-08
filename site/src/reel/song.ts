@@ -1,6 +1,7 @@
 import { clamp01, mmss } from './anim';
-import type { Chapter } from './scenes';
+import { sceneById, type Chapter } from './scenes';
 import { ScoreController } from './score';
+import { tr } from '../i18n';
 
 /**
  * The soundtrack: Don Toliver's "TORE UP" (HARDSTONE PSYCHO), played through
@@ -22,9 +23,9 @@ import { ScoreController } from './score';
  *   bars 48–63  verse 1 and the hook again
  *   bars 64–81  outro
  *
- * Playback starts at 15 s (bar 9.7) so the wait is under 4 s. At bar 64 it
- * jumps back to bar 28, a drum cut-out that hides the seek, so the music loops
- * forever without the long intro or the outro.
+ * Playback starts at 6 s, a 12 s run-up to the drop. The reel runs from the
+ * cold open (bar 11) to the spinning top (bar 63); at bar 64 the song jumps
+ * back to bar 11 with it, so it never plays the outro.
  */
 
 /** `?song=score` previews the fallback score; `?song=off` turns music off. */
@@ -74,40 +75,50 @@ export const TORE_UP: TrackMeta & { videoId: string } = {
 };
 const SBAR = 240 / TORE_UP.bpm; // 1.548 s
 const DOWNBEAT = 0.013;
-const START = 15; // whole seconds: the IFrame API's `start` parameter
+const START = 6; // whole seconds: the IFrame API's `start` parameter
 const DROP = 12;
-const LOOP_FROM = 28;
-const LOOP_TO = 64;
-const REPEAT = 36; // bars 48–63 replay bars 12–27
+const LOOP_FROM = 11; // the cold open
+const LOOP_TO = 64; // after the spinning top
 const DURATION = 127;
 
 /**
- * Song bars → reel. One song bar is one reel bar (2 reel seconds) at speed 1,
- * so the reel's beat-synced motion rides the song's beat. Each entry runs
- * until the next one starts.
+ * Song bars → reel scenes. At speed 1 one song bar is one reel bar (2 reel
+ * seconds), so the reel's beat-synced motion rides the song's beat. Each
+ * entry runs until the next one starts.
  */
-type Seg = { bar: number; reel: number; speed: number };
+type Seg = { bar: number; scene: string; from?: number; speed?: number };
 const ARRANGEMENT: Seg[] = [
-  { bar: 12, reel: 2, speed: 1 }, // YASH: a letter per beat of the drop
-  { bar: 14, reel: 6, speed: 1 }, // Data Engineer
-  { bar: 15, reel: 8, speed: 1 }, // 18h → 45 min, the stamp on beat 4
-  { bar: 17, reel: 12, speed: 1 }, // Rust vs Spark
-  { bar: 19, reel: 16, speed: 1 }, // 136 → 1, slammed on the hook's first beat
-  { bar: 21, reel: 48, speed: 1 }, // TORE UP: one rip per "tore up"
-  { bar: 28, reel: 24, speed: 1 }, // the pour, while the drums are out
-  { bar: 30, reel: 40, speed: 1 }, // the drums slam back: career whips
-  { bar: 32, reel: 20, speed: 1 }, // rapid fire
-  { bar: 34, reel: 44, speed: 1 }, // let's build
-  { bar: 35, reel: 46, speed: 1 }, // the spinning top, cut to black as the drums die
-  { bar: 36, reel: 28, speed: 0.5 }, // off the clock, time-dilated through the bridge
-  { bar: 48, reel: 2, speed: 1 },
+  { bar: 11, scene: 'cold-open' }, // the vocal pickup lands on its last beat
+  { bar: 12, scene: 'name' }, // YASH: a letter per beat of the drop
+  { bar: 14, scene: 'role' },
+  { bar: 15, scene: 'journey' }, // five stops, one per bar
+  { bar: 20, scene: 'tore-up' }, // the hook: a rip per "tore up"
+  { bar: 28, scene: 'pour' }, // the drums drop out: a slow pour
+  { bar: 30, scene: 'domain' }, // the drums slam back: supply chain & manufacturing
+  { bar: 36, scene: 'black-hole', speed: 0.5 }, // the bridge, time-dilated
+  { bar: 40, scene: 'quantum', speed: 0.5 }, // the soft bass comes in
+  { bar: 42, scene: 'maths' },
+  { bar: 43, scene: 'navier', speed: 0.5 },
+  { bar: 45, scene: 'cinema' }, // a frame per beat
+  { bar: 48, scene: 'hours' }, // the drop again: the numbers
+  { bar: 50, scene: 'rust' },
+  { bar: 52, scene: 'grid' },
+  { bar: 54, scene: 'consolidate', speed: 0.5 }, // a slow swarm…
+  { bar: 56, scene: 'consolidate', from: 2 }, // …slammed on hook 2's first beat
+  { bar: 57, scene: 'shortlist' }, // a tick per "tore up"
+  { bar: 62, scene: 'cta' },
+  { bar: 63, scene: 'loop' }, // return by death: back to bar 11
+  { bar: LOOP_TO, scene: 'loop', from: 2 },
 ];
+const segReel = (s: Seg, x: number) => sceneById(s.scene).start + (s.from ?? 0) + (x - s.bar) * 2 * (s.speed ?? 1);
 
 const SONG_CHAPTERS: Chapter[] = [
-  { id: 'drop', label: 'Drop', sub: 'name · role · numbers', start: 12, end: 20 },
-  { id: 'tore-up', label: 'Tore up', sub: 'what I tore up', start: 20, end: 28 },
-  { id: 'back-to-back', label: 'Back to back', sub: 'pour · career · let’s build', start: 28, end: 36 },
-  { id: 'believe', label: 'Believe', sub: 'physics · maths · cinema', start: 36, end: 48 },
+  { id: 'journey', label: tr('Journey'), sub: tr('name · role · the journey'), start: 11, end: 20 },
+  { id: 'tore-up', label: tr('Tore up'), sub: tr('what I tore up'), start: 20, end: 28 },
+  { id: 'domain', label: tr('Domain'), sub: tr('supply chain & manufacturing'), start: 28, end: 36 },
+  { id: 'off', label: tr('Off the clock'), sub: tr('physics · maths · cinema'), start: 36, end: 48 },
+  { id: 'numbers', label: tr('Numbers'), sub: tr('the numbers'), start: 48, end: 57 },
+  { id: 'finale', label: tr('Finale'), sub: tr('why me · let’s build'), start: 57, end: 64 },
 ];
 
 // ---------------------------------------------------------------------------
@@ -248,7 +259,7 @@ class SongController extends Emitter {
   frame(): SongFrame {
     const b = this.bar();
     const beat = Math.floor((((b % 1) + 1) % 1) * 4);
-    if (b < DROP) {
+    if (b < DROP && (this.passes === 0 || b < LOOP_FROM)) {
       const startBar = (START - DOWNBEAT) / SBAR;
       return {
         reel: 0,
@@ -261,11 +272,11 @@ class SongController extends Emitter {
         introProgress: clamp01((b - startBar) / (DROP - startBar)),
       };
     }
-    const x = b >= DROP + REPEAT ? b - REPEAT : b;
+    const x = Math.min(b, LOOP_TO - 1e-3);
     let seg = ARRANGEMENT[0];
     for (const s of ARRANGEMENT) if (x >= s.bar) seg = s;
     return {
-      reel: seg.reel + (x - seg.bar) * 2 * seg.speed,
+      reel: segReel(seg, x),
       intro: false,
       pass: this.passes,
       dock: x,
@@ -409,7 +420,7 @@ class SongController extends Emitter {
     }
   }
 
-  /** From the end of the second hook back to verse 2's drum cut-out. */
+  /** After the spinning top: back to the cold open, the reel and the song together. */
   private loopBack(overshootBars: number) {
     this.passes += 1;
     this.seekSong(DOWNBEAT + this.nudgeBy + (LOOP_FROM + Math.max(0, overshootBars)) * SBAR);
@@ -440,7 +451,7 @@ class SongController extends Emitter {
     p.setVolume(90);
     this.muted = false;
     const b = this.bar();
-    if (rewind && this.passes === 0 && b >= DROP && b < LOOP_FROM) this.seekSong(START);
+    if (rewind && this.passes === 0 && b >= DROP && b < 20) this.seekSong(DOWNBEAT + this.nudgeBy + LOOP_FROM * SBAR);
     this.emit();
   }
   toggleMute() {
@@ -459,10 +470,9 @@ class SongController extends Emitter {
     p.seekTo(t, true);
     this.resetClock(t);
   }
-  /** Jump to a dock position (song bars 12–48), staying inside the loop once looping. */
+  /** Jump to a dock position (song bars 11–64). */
   seekDock(x: number) {
-    let bar = Math.max(DROP, Math.min(LOOP_TO - 0.01, x));
-    if (bar < LOOP_FROM && this.passes > 0) bar += REPEAT;
+    const bar = Math.max(LOOP_FROM, Math.min(LOOP_TO - 0.01, x));
     this.seekSong(DOWNBEAT + this.nudgeBy + bar * SBAR - 0.02);
     this.play();
   }
@@ -470,8 +480,9 @@ class SongController extends Emitter {
   seekReel(reelT: number) {
     for (let i = 0; i < ARRANGEMENT.length - 1; i++) {
       const s = ARRANGEMENT[i];
-      const len = (ARRANGEMENT[i + 1].bar - s.bar) * 2 * s.speed;
-      if (reelT >= s.reel && reelT < s.reel + len) return this.seekDock(s.bar + (reelT - s.reel) / (2 * s.speed));
+      const from = segReel(s, s.bar);
+      const len = segReel(s, ARRANGEMENT[i + 1].bar) - from;
+      if (reelT >= from && reelT < from + len) return this.seekDock(s.bar + (reelT - from) / (2 * (s.speed ?? 1)));
     }
     this.seekDock(DROP);
   }
@@ -493,9 +504,10 @@ class SongController extends Emitter {
   skipIntro() {
     this.seekDock(DROP);
   }
+  /** Back to the top of the reel (the cold open), not the run-up. */
   restart() {
     this.passes += 1;
-    this.seekSong(START);
+    this.seekSong(DOWNBEAT + this.nudgeBy + LOOP_FROM * SBAR);
     this.play();
   }
   startOver() {

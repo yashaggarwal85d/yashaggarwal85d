@@ -1,6 +1,7 @@
 import { At, Flash, Stage, type SceneProps } from '../Stage';
 import { BEAT, beatEnv, clamp01, ease, hit, lerp, prog, rand, scramble, shakes, typed } from '../anim';
 import { C, F, gradText } from '../palette';
+import { tr } from '../../i18n';
 
 /* ------------------------------------------------------------------ 04 */
 
@@ -26,7 +27,7 @@ export function Hours(p: SceneProps) {
       overlay={<Flash color={C.cinnamon} opacity={0.28 * hit(t, 1.5, 14)} />}
     >
       <At x={L.lx} y={L.ly} style={{ font: `600 ${portrait ? 26 : 22}px ${F.mono}`, letterSpacing: '0.25em', color: C.latte }}>
-        {typed('NIGHTLY SUPPLY-PLANNING RUN', t, 0, 50)}
+        {typed(tr('NIGHTLY SUPPLY-PLANNING RUN'), t, 0, 50)}
       </At>
 
       <svg className="absolute" style={{ left: L.cx - L.cr, top: L.cy - L.cr }} width={L.cr * 2} height={L.cr * 2} viewBox="-100 -100 200 200">
@@ -112,7 +113,7 @@ export function Hours(p: SceneProps) {
       </At>
 
       <At x={L.subX} y={L.subY} style={{ width: L.subW, font: `italic 400 ${portrait ? 44 : 46}px/1.2 ${F.display}`, color: C.crema }}>
-        {typed('so planners can replan intra-day.', t, 2.1, 30)}
+        {typed(tr('so planners can replan intra-day.'), t, 2.1, 30)}
       </At>
     </Stage>
   );
@@ -144,7 +145,7 @@ export function Rust(p: SceneProps) {
   return (
     <Stage p={p} bg={C.oat} cam={{ x: -40 * ease.sineInOut(prog(t, 2, 2)), s: 1 + 0.04 * ease.sineInOut(prog(t, 2, 2)) + 0.012 * beatEnv(t, 9) }}>
       <At x={L.lx} y={L.ly} style={{ font: `600 ${portrait ? 26 : 22}px ${F.mono}`, letterSpacing: '0.25em', color: C.mocha }}>
-        {typed('INGEST THROUGHPUT / NODE', t, 0, 50)}
+        {typed(tr('INGEST THROUGHPUT / NODE'), t, 0, 50)}
       </At>
       <At
         x={L.numX}
@@ -188,7 +189,7 @@ export function Rust(p: SceneProps) {
         y={portrait ? L.rustY + 60 : L.rustY + 8}
         style={{ font: `700 ${portrait ? 26 : 26}px ${F.mono}`, color: C.cinnamon, opacity: prog(t, 1.1, 0.2) }}
       >
-        1.5 GB/s per node
+        {tr('1.5 GB/s per node')}
       </At>
 
       {/* pour: the bar becomes a stream into the cup */}
@@ -211,13 +212,13 @@ export function Rust(p: SceneProps) {
           <rect x={60} y={230 - 166 * fill} width={240} height={166 * fill} fill={C.mocha} clipPath="url(#cupclip)" />
           <path d="M300 92 c 60 0 60 80 -12 80" fill="none" stroke={C.espresso} strokeWidth={7} />
           <text x={180} y={290} textAnchor="middle" fontFamily={F.sans} fontWeight={900} fontSize={52} fill={C.espresso} letterSpacing="-1.5">
-            {tb} TB/day
+            {tr('{tb} TB/day', { tb })}
           </text>
         </g>
       </svg>
 
       <At x={L.lineX} y={L.lineY} style={{ font: `italic 400 ${portrait ? 46 : 48}px/1.25 ${F.display}`, color: C.mocha, maxWidth: portrait ? 780 : 760 }}>
-        {['I wrote a Rust ETL engine.', 'Spark didn’t stand a chance.'].map((line, li) => (
+        {[tr('I wrote a Rust ETL engine.'), tr('Spark didn’t stand a chance.')].map((line, li) => (
           <div key={li}>
             {line.split(' ').map((w, wi) => {
               const k = ease.expoOut(prog(t, 2.5 + li * 0.5 + wi * 0.06, 0.35));
@@ -291,7 +292,7 @@ export function Consolidate(p: SceneProps) {
         {count}
       </At>
       <At x={84} y={L.labelY} style={{ font: `600 ${portrait ? 24 : 22}px ${F.mono}`, letterSpacing: '0.2em', color: C.latte, maxWidth: portrait ? 760 : 900 }}>
-        {typed('SITE DATABASES', t, 0.4, 40)}
+        {typed(tr('SITE DATABASES'), t, 0.4, 40)}
       </At>
       <svg className="absolute inset-0" width={W} height={H}>
         <defs>
@@ -329,7 +330,7 @@ export function Consolidate(p: SceneProps) {
         y={L.arrowY + (portrait ? 190 : 180)}
         style={{ font: `600 ${portrait ? 24 : 22}px ${F.mono}`, letterSpacing: '0.2em', color: C.latte }}
       >
-        {typed('ONE YUGABYTEDB CLUSTER', t, SLAM + 0.15, 90)}
+        {typed(tr('ONE YUGABYTEDB CLUSTER'), t, SLAM + 0.15, 90)}
       </At>
     </Stage>
   );
@@ -340,10 +341,10 @@ export function Consolidate(p: SceneProps) {
 type Cell = { value: (k: number) => string; label: string; bg: string; fg: string; sub: string; display?: boolean };
 
 const CELLS: Cell[] = [
-  { value: (k) => (k < 1 ? scramble('<1s', k, 0, 1) : '<1s'), label: 'P95 LATENCY', sub: 'MES & ERP streams, worldwide', bg: C.caramel, fg: C.espresso },
-  { value: (k) => `${Math.round(70 * k)}K+`, label: 'SKUS', sub: 'fulfilled on time', bg: C.oat, fg: C.espresso, display: true },
-  { value: (k) => `−${Math.round(150 * k)}`, label: 'OVERRIDES / WEEK', sub: 'manual planner fixes, gone', bg: C.cinnamon, fg: C.foam },
-  { value: (k) => `${Math.round(64 * k)} wks`, label: 'BUILD PLANS', sub: 'for every factory site', bg: C.roast, fg: C.crema, display: true },
+  { value: (k) => (k < 1 ? scramble('<1s', k, 0, 1) : '<1s'), label: tr('P95 LATENCY'), sub: tr('MES & ERP streams, worldwide'), bg: C.caramel, fg: C.espresso },
+  { value: (k) => `${Math.round(70 * k)}K+`, label: tr('SKUS'), sub: tr('fulfilled on time'), bg: C.oat, fg: C.espresso, display: true },
+  { value: (k) => `−${Math.round(150 * k)}`, label: tr('OVERRIDES / WEEK'), sub: tr('manual planner fixes, gone'), bg: C.cinnamon, fg: C.foam },
+  { value: (k) => tr('{n} wks', { n: Math.round(64 * k) }), label: tr('BUILD PLANS'), sub: tr('for every factory site'), bg: C.roast, fg: C.crema, display: true },
 ];
 
 // Where the splits sit when each cell is the hero: [column split, row split].

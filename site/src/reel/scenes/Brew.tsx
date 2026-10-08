@@ -3,6 +3,7 @@ import { At, Flash, Stage, type SceneProps } from '../Stage';
 import { BEAT, beatEnv, clamp01, ease, hit, prog, shakes, tw, typed } from '../anim';
 import { C, F, gradText } from '../palette';
 import type { Geo, KbFrame } from '../types';
+import { tr } from '../../i18n';
 
 const vignette = (
   <div
@@ -18,7 +19,7 @@ export function ColdOpen(p: SceneProps) {
   const beat = Math.floor(t / BEAT) % 4;
   const frames = Math.floor((time % 1) * 24);
   const tc = `00:00:${String(Math.floor(time)).padStart(2, '0')}:${String(frames).padStart(2, '0')}`;
-  const prompt = 'PRESS ANY KEY';
+  const prompt = tr('PRESS ANY KEY');
   const glitch = t > 1.72;
   const ring = prog(t, 0, 0.9);
 
@@ -37,7 +38,7 @@ export function ColdOpen(p: SceneProps) {
         />
       </svg>
       <At x={60} y={portrait ? 150 : 110} style={{ font: `600 ${portrait ? 26 : 20}px ${F.mono}`, letterSpacing: '0.14em', color: C.latte, whiteSpace: 'nowrap' }}>
-        <span style={{ color: C.cinnamon, opacity: beat % 2 === 0 ? 1 : 0.25 }}>● REC</span>&nbsp;&nbsp;{tc}
+        <span style={{ color: C.cinnamon, opacity: beat % 2 === 0 ? 1 : 0.25 }}>{tr('● REC')}</span>&nbsp;&nbsp;{tc}
       </At>
       <At x={W - 60} y={portrait ? 150 : 110} anchor="tr" style={{ font: `600 ${portrait ? 26 : 20}px ${F.mono}`, letterSpacing: '0.14em', color: C.latte, whiteSpace: 'nowrap' }}>
         120 BPM · 4/4
@@ -194,7 +195,7 @@ export function NameSlam(p: SceneProps) {
       </At>
 
       <At x={L.x + 14} y={L.monoY} style={{ font: `600 ${L.mono}px ${F.mono}`, letterSpacing: '0.3em', color: C.latte, whiteSpace: 'nowrap' }}>
-        {typed('DATA ENGINEER · TEXAS INSTRUMENTS', t, 2.55, 40)}
+        {typed(tr('DATA ENGINEER · TEXAS INSTRUMENTS'), t, 2.55, 40)}
         <span style={{ opacity: Math.floor(t * 4) % 2 ? 1 : 0, color: C.caramel }}>▍</span>
       </At>
     </Stage>
@@ -234,7 +235,7 @@ export function Role(p: SceneProps) {
   }, [L.x, L.y, W, H]);
 
   const zoom = ease.expoIn(prog(t, 1.45, 0.5));
-  const ticker = '@ TEXAS INSTRUMENTS ✦ BANGALORE ✦ 3+ YEARS ✦ PYSPARK ✦ KAFKA ✦ RUST ✦ ICEBERG ✦ AIRFLOW ✦ ';
+  const ticker = tr('@ TEXAS INSTRUMENTS ✦ BANGALORE ✦ 3+ YEARS ✦ PYSPARK ✦ KAFKA ✦ RUST ✦ ICEBERG ✦ AIRFLOW ✦ ');
 
   return (
     <Stage
@@ -249,7 +250,7 @@ export function Role(p: SceneProps) {
       }
     >
       <At x={L.x} y={L.y} style={{ font: `900 ${L.data}px/0.9 ${F.sans}`, letterSpacing: '-0.06em', whiteSpace: 'nowrap' }}>
-        {'DATA'.split('').map((ch, i) => {
+        {tr('DATA').split('').map((ch, i) => {
           const k = ease.expoOut(prog(t, 0.04 + i * 0.07, 0.35));
           return (
             <span
@@ -273,7 +274,7 @@ export function Role(p: SceneProps) {
         <circle cx={origin.x} cy={origin.y} r={46} fill="none" stroke={C.cinnamon} strokeWidth={3} opacity={tw(t, 0.6, 0.3, 0, 0.35)} />
       </svg>
       <At x={L.engX} y={L.engY} style={{ font: `italic 600 ${L.eng}px/1 ${F.display}`, letterSpacing: '-0.03em', color: C.cinnamon, whiteSpace: 'nowrap' }}>
-        {'Engineer'.split('').map((ch, i) => {
+        {tr('Engineer').split('').map((ch, i) => {
           const k = ease.expoOut(prog(t, 0.3 + i * 0.045, 0.45));
           return (
             <span

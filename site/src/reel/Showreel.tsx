@@ -8,6 +8,7 @@ import { song, shouldAutoplaySong } from './song';
 import type { KbDriver } from './kbDriver';
 import type { Geo } from './types';
 import PlayerDock from './PlayerDock';
+import { tr } from '../i18n';
 
 export type ReelState = {
   time: number;
@@ -352,7 +353,7 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
     <section
       id="reel"
       ref={sectionRef}
-      aria-label="Showreel"
+      aria-label={tr('Showreel')}
       className="relative z-10 h-[100svh] w-full select-none overflow-hidden"
       onTouchStart={(e) => (touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY })}
       onTouchEnd={(e) => {
@@ -382,9 +383,9 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
         />
       </div>
       <p className="sr-only">
-        A 48-second animated showreel of Yash Aggarwal’s work as a Data Engineer at Texas Instruments: the supply-planning run cut
-        from 18 hours to 45 minutes, a Rust ETL engine 3.8 times faster than Spark landing 16 TB a day, 136 site databases merged
-        into one, and interests in astrophysics, quantum computing, maths and cinema. Scroll down to explore the full portfolio.
+        {tr(
+          'An animated intro to Yash Aggarwal, Data Engineer at Texas Instruments: his journey from intern to Data Engineer II, the semiconductor supply chain and manufacturing data he works on, the numbers (a supply-planning run cut from 18 hours to 45 minutes, a Rust ETL engine 3.8 times faster than Spark, 136 databases merged into one), astrophysics, maths and cinema, and why he would be a good hire. Scroll down to explore the full portfolio.',
+        )}
       </p>
 
       <AnimatePresence>
@@ -399,7 +400,7 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
             role="status"
           >
             <span className="text-sm">
-              That’s the reel <span className="text-caramel">↺</span> it’ll keep looping.
+              {tr('That’s the intro')} <span className="text-caramel">↺</span> {tr('it’ll keep looping.')}
             </span>
             <button
               onClick={() => {
@@ -408,12 +409,12 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
               }}
               className="inline-flex items-center gap-1.5 rounded-full bg-cinnamon px-3.5 py-1.5 text-sm font-semibold text-foam transition hover:brightness-110"
             >
-              Scroll to explore
+              {tr('Scroll to explore')}
               <motion.span animate={{ y: [0, 3, 0] }} transition={{ repeat: Infinity, duration: 1 }}>
                 <ArrowDown className="h-4 w-4" />
               </motion.span>
             </button>
-            <button onClick={() => setScrollHint(false)} className="grid h-7 w-7 place-items-center rounded-full text-latte hover:text-crema" aria-label="Dismiss">
+            <button onClick={() => setScrollHint(false)} className="grid h-7 w-7 place-items-center rounded-full text-latte hover:text-crema" aria-label={tr('Dismiss')}>
               <X className="h-3.5 w-3.5" />
             </button>
           </motion.div>
@@ -431,6 +432,7 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
         position={song.engaged ? (frame.dock ?? 0) : frame.time}
         clockText={song.engaged ? song.clockText() : `${mmss(frame.time)} / ${mmss(LOOP)}`}
         onToggle={api.toggle}
+        onRestart={api.restart}
         onSeek={(time) => {
           if (song.engaged) return song.seekDock(time);
           api.seek(time);

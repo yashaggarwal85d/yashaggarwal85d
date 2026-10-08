@@ -15,6 +15,7 @@ import Footer from './components/Footer';
 import SongDeck from './components/SongDeck';
 import Showreel, { type ReelControls } from './reel/Showreel';
 import { createKbDriver } from './reel/kbDriver';
+import { tr } from './i18n';
 
 const KONAMI = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
 
@@ -32,7 +33,7 @@ export default function App() {
   const toggleBeans = useCallback(() => {
     const d = kb.current;
     d.beans = !d.beans;
-    say(d.beans ? '☕ mode: the keys are coffee beans now' : '☕ mode off: back to keycaps');
+    say(d.beans ? tr('☕ mode: the keys are coffee beans now') : tr('☕ mode off: back to keycaps'));
   }, [say]);
 
   useEffect(() => {

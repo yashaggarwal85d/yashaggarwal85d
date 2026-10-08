@@ -7,6 +7,8 @@ export default defineConfig({
   base: './',
   plugins: [react(), tailwindcss()],
   build: {
+    // main.tsx awaits the visitor's language before importing the app
+    target: 'es2022',
     chunkSizeWarningLimit: 900,
     rollupOptions: {
       output: { manualChunks: { three: ['three'] } },

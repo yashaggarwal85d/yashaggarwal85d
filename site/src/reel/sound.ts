@@ -1,4 +1,5 @@
 import { BAR, BEAT, LOOP } from './anim';
+import { sceneAt } from './scenes';
 
 /**
  * A tiny WebAudio drum machine locked to the reel clock. Off until the viewer
@@ -10,19 +11,21 @@ const LOOKAHEAD = 0.12;
 
 type Hit = { kick?: number; snare?: number; hat?: number; crash?: number };
 
-/** What plays on a given 8th-note step of the 48 s loop. */
+/** What plays on a given 8th-note step of the loop. */
 function pattern(step: number): Hit {
   const stepsPerBar = BAR / STEP;
-  const bar = Math.floor(step / stepsPerBar) % (LOOP / BAR);
+  const time = (step * STEP) % LOOP;
+  const scene = sceneAt(time);
+  const local = time - scene.start;
   const s = step % stepsPerBar; // 0..7
   const onBeat = s % 2 === 0;
   const beat = s / 2;
 
-  // Bar 24: the spinning top. Ticks only, then silence before the loop.
-  if (bar === 23) return s < 5 ? { hat: 0.25 } : {};
-  // Bars 15–16: half-time under the black hole.
-  if (bar === 14 || bar === 15) {
-    if (s === 0) return { kick: 1, crash: bar === 14 ? 0.5 : 0 };
+  // The spinning top: ticks only, then silence before the loop.
+  if (scene.id === 'loop') return s < 5 ? { hat: 0.25 } : {};
+  // Half-time under the black hole.
+  if (scene.id === 'black-hole') {
+    if (s === 0) return { kick: 1, crash: local < 0.01 ? 0.5 : 0 };
     if (s === 4) return { snare: 0.7 };
     return onBeat ? { hat: 0.25 } : {};
   }
@@ -30,7 +33,7 @@ function pattern(step: number): Hit {
   if (onBeat) hitOut.kick = beat === 0 ? 1 : 0.85;
   else hitOut.hat = 0.45;
   if (beat === 1 || beat === 3) hitOut.snare = s % 2 === 0 ? 0.8 : 0;
-  if (s === 0 && (bar === 0 || bar === 4 || bar === 22)) hitOut.crash = 0.6;
+  if (s === 0 && local < 0.01 && ['cold-open', 'journey', 'domain', 'hours', 'shortlist', 'cta'].includes(scene.id)) hitOut.crash = 0.6;
   return hitOut;
 }
 

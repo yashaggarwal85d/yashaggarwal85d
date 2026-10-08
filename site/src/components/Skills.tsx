@@ -3,8 +3,9 @@ import { AnimatePresence, motion } from 'motion/react';
 import { brandIcons } from '../brandIcons';
 import { skills, type Skill, type SkillGroup } from '../data';
 import { Section, SectionHeading } from './ui';
+import { tr } from '../i18n';
 
-const groups: ('All' | SkillGroup)[] = ['All', 'Languages', 'Processing', 'Lakehouse', 'Databases', 'Cloud & IaC', 'DevOps'];
+const groups: ('All' | SkillGroup)[] = ['All', 'Languages', 'Processing', 'Lakehouse', 'Databases', 'Cloud & IaC', 'DevOps', 'AI'];
 
 const luminance = (hex: string) => {
   const n = parseInt(hex.replace('#', ''), 16);
@@ -41,7 +42,7 @@ export default function Skills() {
 
   return (
     <Section id="skills">
-      <SectionHeading title="Skills" kicker="06 · The toolbox" />
+      <SectionHeading title={tr('Skills')} kicker={tr('06 · The toolbox')} />
       <div className="mb-6 flex flex-wrap gap-2">
         {groups.map((g) => (
           <button
@@ -54,7 +55,7 @@ export default function Skills() {
             {group === g && (
               <motion.span layoutId="skill-chip" className="absolute inset-0 -z-0 rounded-full bg-fg" transition={{ type: 'spring', stiffness: 400, damping: 32 }} />
             )}
-            <span className="relative">{g}</span>
+            <span className="relative">{tr(g)}</span>
           </button>
         ))}
       </div>

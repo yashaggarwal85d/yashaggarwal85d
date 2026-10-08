@@ -1,13 +1,14 @@
 import { GraduationCap, Presentation, Star, Trophy } from 'lucide-react';
 import { achievements } from '../data';
 import { Reveal, Section, SectionHeading } from './ui';
+import { tr } from '../i18n';
 
 const icons = { presentation: Presentation, trophy: Trophy, star: Star, grad: GraduationCap };
 
 export default function Achievements() {
   return (
     <Section id="achievements">
-      <SectionHeading title="Achievements" kicker="08 · Recognition" />
+      <SectionHeading title={tr('Achievements')} kicker={tr('08 · Recognition')} />
       <div className="grid gap-4 md:grid-cols-2">
         {achievements.map((a, i) => {
           const Icon = icons[a.icon];
