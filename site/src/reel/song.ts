@@ -1,26 +1,35 @@
 import { LOOP } from './anim';
 
 /**
- * The soundtrack: Tame Impala's official "Dracula (JENNIE Remix)" upload,
- * played through YouTube's embedded player (the audio is never hosted here).
- * When it plays, the song's clock drives the reel: 115 BPM is stretched onto
- * the reel's 120 BPM grid, starting at the first beat after the vocal intro.
+ * The soundtrack: Don Toliver's official upload of "Lose My Mind" (feat. Doja
+ * Cat), from the F1 soundtrack, played through YouTube's embedded player (the
+ * audio is never hosted here). When it plays, the song's clock drives the
+ * reel: 110 BPM is stretched onto the reel's 120 BPM grid, starting at the
+ * first beat after the intro.
+ *
+ * Tried first and refused by their owners for playback on other websites
+ * (YouTube error 150): Tame Impala's "Dracula" and Lady Gaga's "Judas".
  */
-/**
- * Off for now: both official uploads of "Dracula" refuse playback on other
- * websites (YouTube error 150), so the reel uses its own beat. Flip this on
- * for a track whose official upload allows embedding.
- */
-export const SONG_ENABLED = false;
+
+/** On for everyone once the beat-drop time is confirmed by ear. */
+const LIVE = false;
+
+/** `?song` in the address previews the soundtrack before it goes live. */
+export const SONG_ENABLED = LIVE || new URLSearchParams(window.location.search).has('song');
 
 export const SONG = {
-  videoId: '0UPDBODtxzw',
-  title: 'Dracula (JENNIE Remix)',
-  artist: 'Tame Impala ft. JENNIE',
-  url: 'https://www.youtube.com/watch?v=0UPDBODtxzw',
-  bpm: 115,
-  /** seconds into the video where the beat drops; tune with [ and ] */
-  firstBeat: 8.0,
+  videoId: 'WWEs82u37Mw',
+  title: 'Lose My Mind',
+  artist: 'Don Toliver ft. Doja Cat',
+  source: 'From F1® The Movie',
+  url: 'https://www.youtube.com/watch?v=WWEs82u37Mw',
+  bpm: 110,
+  /**
+   * Seconds into the video where the reel's first beat lands; tune with [ and ].
+   * Starts on the first sung line (18.19 s in synced lyrics), which sits on the
+   * song's two-bar grid.
+   */
+  firstBeat: 18.19,
 };
 
 /** Reel seconds per song second. */
@@ -185,10 +194,11 @@ class SongController {
           this.muted = true;
           if (opts.autoplay) {
             p.playVideo();
-            // Some browsers refuse even muted autoplay: hand control to the viewer.
+            // Muted autoplay can be refused, or the stream can stall: if the song
+            // hasn't actually started in 6 s, let the reel run and offer a button.
             this.startTimer = window.setTimeout(() => {
-              if (!this.engaged) this.set('blocked');
-            }, 4000);
+              if (this.status !== 'playing') this.block();
+            }, 6000);
           } else {
             this.set('blocked');
           }
@@ -249,6 +259,12 @@ class SongController {
       this.muted = muted;
       this.emit();
     }
+  }
+
+  private block() {
+    this.stopped = true;
+    this.player?.pauseVideo();
+    this.set('blocked');
   }
 
   // ---- controls ----------------------------------------------------------

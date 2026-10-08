@@ -3,6 +3,7 @@ import { ArrowDown, Pause, Play, Volume2, VolumeX } from 'lucide-react';
 import { CHAPTERS, chapterAt } from './scenes';
 import { LOOP, mmss } from './anim';
 import type { ReelState } from './Showreel';
+import { SONG } from './song';
 
 type Props = {
   state: ReelState;
@@ -137,10 +138,10 @@ export default function PlayerDock({ state, beat, compact, hidden = false, songM
           onClick={onSound}
           className="flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-crema/25 px-3 font-mono text-xs text-latte transition hover:text-crema"
           aria-pressed={state.sound}
-          aria-label={songMode ? (state.sound ? 'Mute Dracula' : 'Unmute Dracula') : state.sound ? 'Mute the beat' : 'Play a 120 BPM beat'}
+          aria-label={songMode ? `${state.sound ? 'Mute' : 'Unmute'} ${SONG.title}` : state.sound ? 'Mute the beat' : 'Play a 120 BPM beat'}
         >
           {state.sound ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-          {!compact && (songMode ? 'DRACULA' : state.sound ? 'ON' : 'OFF')}
+          {!compact && (songMode ? 'SONG' : state.sound ? 'ON' : 'OFF')}
         </button>
 
         <button

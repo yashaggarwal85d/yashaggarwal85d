@@ -20,6 +20,7 @@ function SongDeckInner() {
   const [, setTick] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
   const [vw, setVw] = useState(window.innerWidth);
+  const [vh, setVh] = useState(window.innerHeight);
 
   useEffect(() => {
     if (hostRef.current) song.mount(hostRef.current, { autoplay: shouldAutoplaySong() });
@@ -30,7 +31,10 @@ function SongDeckInner() {
     if (!el) return;
     const io = new IntersectionObserver(([e]) => setReelInView(e.intersectionRatio > 0.5), { threshold: [0, 0.5, 1] });
     io.observe(el);
-    const onResize = () => setVw(window.innerWidth);
+    const onResize = () => {
+      setVw(window.innerWidth);
+      setVh(window.innerHeight);
+    };
     window.addEventListener('resize', onResize);
     return () => {
       io.disconnect();
@@ -73,9 +77,13 @@ function SongDeckInner() {
   const introProgress = intro ? 1 - toDrop / song.offset : 0;
 
   // Player box: 16:9 and at least 200 px tall in the middle; a 200 × 200 card in the corner.
-  const bigW = Math.max(356, Math.min(640, vw * 0.46));
+  // Intro layout, top to bottom: navbar, title block (~96 px), player, controls (~150 px).
+  // The player is 16:9, at least 200 px tall (YouTube's minimum), and shrinks on short screens.
+  const bigH = Math.max(200, Math.min(360, vw * 0.46 * (9 / 16), vh - 400));
+  const bigW = (bigH * 16) / 9;
+  const bigTop = Math.max(176, (vh - bigH) / 2 + 24);
   const box = centred
-    ? { width: bigW, height: (bigW * 9) / 16, left: (vw - bigW) / 2, top: `calc(50vh - ${(bigW * 9) / 32}px - 20px)` }
+    ? { width: bigW, height: bigH, left: (vw - bigW) / 2, top: `${bigTop}px` }
     : { width: 200, height: 200, left: 16, top: `calc(100vh - 200px - ${reelInView ? (vw < 768 ? 150 : 170) : 72}px)` };
 
   return (
@@ -85,18 +93,20 @@ function SongDeckInner() {
         {centred && (
           <motion.div
             key="intro"
-            className="pointer-events-none fixed inset-0 z-30 flex flex-col items-center justify-center px-4 text-center text-crema"
+            className="pointer-events-none fixed inset-0 z-30 px-4 text-center text-crema"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 1.08, filter: 'blur(8px)' }}
             transition={{ duration: 0.45 }}
           >
-            <div style={{ transform: `translateY(-${(bigW * 9) / 32 + 70}px)` }}>
+            <div className="absolute inset-x-0" style={{ bottom: vh - bigTop + 18 }}>
               <p className="font-mono text-[11px] uppercase tracking-[0.35em] text-caramel">♪ Now playing</p>
-              <p className="mt-2 font-display text-3xl font-bold italic sm:text-4xl">Dracula</p>
-              <p className="mt-1 font-mono text-xs text-latte">{SONG.artist} · JENNIE Remix</p>
+              <p className="mt-2 font-display text-3xl font-bold italic sm:text-4xl">{SONG.title}</p>
+              <p className="mt-1 font-mono text-xs text-latte">
+                {SONG.artist} · {SONG.source}
+              </p>
             </div>
-            <div className="pointer-events-auto" style={{ transform: `translateY(${(bigW * 9) / 32 + 64}px)` }}>
+            <div className="pointer-events-auto absolute inset-x-0" style={{ top: bigTop + bigH + 22 }}>
               <div className="flex flex-wrap items-center justify-center gap-3">
                 {song.muted ? (
                   <button
@@ -154,7 +164,7 @@ function SongDeckInner() {
         >
           <Music2 className={`h-3.5 w-3.5 shrink-0 text-caramel ${playing ? 'animate-pulse' : ''}`} />
           <a href={SONG.url} target="_blank" rel="noopener" className="min-w-0 flex-1 truncate font-mono text-[10.5px] text-latte hover:text-crema" title={`${SONG.title} · ${SONG.artist}`}>
-            Dracula · Tame Impala ft. JENNIE
+            {SONG.title} · {SONG.artist}
           </a>
           <button onClick={() => song.toggleMute()} className="text-latte hover:text-crema" aria-label={song.muted ? 'Unmute the song' : 'Mute the song'}>
             {song.muted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
@@ -178,7 +188,7 @@ function SongDeckInner() {
             }}
             className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-medium transition hover:bg-crema/10"
           >
-            <Play className="h-4 w-4 text-caramel" fill="currentColor" /> Play with Dracula
+            <Play className="h-4 w-4 text-caramel" fill="currentColor" /> Play with {SONG.title}
           </button>
           <a href={SONG.url} target="_blank" rel="noopener" aria-label="Open the song on YouTube" className="grid h-8 w-8 place-items-center rounded-full text-latte transition hover:text-crema">
             <ExternalLink className="h-3.5 w-3.5" />
