@@ -1,6 +1,6 @@
 // All copy on the site comes from Yash's resume. Edit here, not in components.
 
-import { tr } from './i18n';
+import { num, tr } from './i18n';
 
 export const profile = {
   name: 'Yash Aggarwal',
@@ -187,9 +187,9 @@ export const work: Work[] = [
     title: tr('Rust ETL Engine'),
     description:
       tr('A Rust-based ETL engine that lands ~16 TB/day of factory and operational data at 1.5 GB/s per node on identical hardware.'),
-    metric: '3.8×',
+    metric: `${num(3.8, 1)}×`,
     metricLabel: tr('per-node throughput vs. previous Spark jobs'),
-    compare: { before: 1, after: 3.8, beforeLabel: 'Spark', afterLabel: 'Rust · 1.5 GB/s' },
+    compare: { before: 1, after: 3.8, beforeLabel: 'Spark', afterLabel: `Rust · ${num(1.5, 1)} GB/s` },
     gradient: ['#d49a57', '#b8612f'],
     tags: ['Rust', 'ETL', '16 TB/day'],
   },
@@ -330,9 +330,9 @@ export const numbers: Numeral[] = [
   { value: 3.8, decimals: 1, suffix: '×', label: tr('Rust vs Spark'), note: tr('per-node ingest, 1.5 GB/s on identical hardware'), tone: 'cinnamon' },
   { value: 6, prefix: '~', suffix: ' PB', label: tr('New data / year'), note: tr('Data Vault 2.0 on an Iceberg/ClickHouse lakehouse'), tone: 'crema' },
   { value: 1, prefix: '<', suffix: 's', label: tr('p95 latency'), note: tr('MES & ERP streams from sites worldwide'), tone: 'roast' },
-  { value: 70, suffix: 'K+', label: tr('SKUs'), note: tr('on-time fulfilment improved'), tone: 'oat' },
+  { value: 70, suffix: tr('K+'), label: tr('SKUs'), note: tr('on-time fulfilment improved'), tone: 'oat' },
   { value: 150, prefix: '−', suffix: '', label: tr('Overrides / week'), note: tr('manual planner fixes eliminated'), tone: 'oat' },
-  { value: 64, suffix: ' wks', label: tr('Build plans'), note: tr('factory plans for every site, from one engine'), tone: 'oat' },
+  { value: 64, suffix: tr(' wks'), label: tr('Build plans'), note: tr('factory plans for every site, from one engine'), tone: 'oat' },
 ];
 
 export type Film = { title: string; kind: 'Series' | 'Film' | 'Anime' | 'Books' | 'Music' | 'Travel' | 'Kitchen'; take: string; spine: string; ink: string };

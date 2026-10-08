@@ -93,6 +93,11 @@ export function tr(s: string, vars?: Record<string, string | number>) {
   return out;
 }
 
+/** A number in the visitor's format: 3.8 reads 3,8 in German. */
+export function num(v: number, decimals = 0) {
+  return new Intl.NumberFormat(lang, { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(v);
+}
+
 /** Switch language: remember it and reload so every string re-renders. */
 export function setLang(l: Lang) {
   try {

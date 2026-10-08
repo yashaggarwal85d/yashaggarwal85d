@@ -2,7 +2,8 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, use
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowDown, X } from 'lucide-react';
 import { BEAT, LOOP, clamp01, lerp, mmss } from './anim';
-import { CHAPTERS, SCENES, chapterAt, sceneAt } from './scenes';
+import { CHAPTERS, SCENES, chapterAt, sceneAt, sceneById } from './scenes';
+import { gate } from './gate';
 import { BeatSynth } from './sound';
 import { song, shouldAutoplaySong } from './song';
 import type { KbDriver } from './kbDriver';
@@ -45,10 +46,14 @@ const isTyping = (el: EventTarget | null) =>
 /** The song is still being fetched: hold the reel at the intro rather than start without it. */
 const songPending = () => song.status === 'loading';
 
+/** Where the intro ends: reaching the stinger counts as having watched it. */
+const END = sceneById('loop').start;
+
 export default function Showreel({ kb, controls, onExplore }: Props) {
   const sectionRef = useRef<HTMLElement>(null);
   const reduceMotion = useMemo(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches, []);
   useSyncExternalStore(song.subscribe, song.getVersion);
+  const locked = useSyncExternalStore(gate.subscribe, gate.getLocked);
 
   // `?t=12.5` deep-links to a paused moment of the reel.
   const startAt = useMemo(() => {
@@ -84,6 +89,7 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
   const [inView, setInView] = useState(true);
   const [scrollHint, setScrollHint] = useState(false);
   const hinted = useRef(false);
+  const [nudged, setNudged] = useState(false);
 
   useLayoutEffect(() => {
     const el = sectionRef.current;
@@ -225,6 +231,12 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
         }
       }
 
+      // Played through once: the rest of the page opens.
+      if (gate.locked && !c.intro && c.time >= END) {
+        gate.unlock();
+        showHint();
+      }
+
       // A natural wrap (not a jump) completes a loop.
       if (song.engaged) {
         /* the soundtrack counts its own loops */
@@ -308,6 +320,20 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
       window.removeEventListener('scroll', onScroll);
     };
   }, [scrollHint]);
+
+  // Trying to scroll before the intro is done: say how far along it is.
+  useEffect(() => {
+    let id = 0;
+    const off = gate.onNudge(() => {
+      setNudged(true);
+      window.clearTimeout(id);
+      id = window.setTimeout(() => setNudged(false), 2600);
+    });
+    return () => {
+      off();
+      window.clearTimeout(id);
+    };
+  }, []);
 
   // ---- shortcuts -----------------------------------------------------------
   useEffect(() => {
@@ -421,6 +447,30 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
         )}
       </AnimatePresence>
 
+      <AnimatePresence>
+        {locked && nudged && (
+          <motion.div
+            initial={{ opacity: 0, y: 24, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+            className="absolute inset-x-0 z-30 mx-auto w-max max-w-[calc(100vw-32px)] overflow-hidden rounded-full border border-crema/20 px-5 py-2.5 text-crema shadow-2xl backdrop-blur-xl"
+            style={{ bottom: size.vw < 768 ? 96 : 118, background: 'rgba(23,16,12,.86)' }}
+            role="status"
+          >
+            <span className="text-sm">
+              {tr('The page opens when the intro ends.')} <span className="text-latte">{tr('Stay for the drop.')}</span>
+            </span>
+            <span className="absolute inset-x-0 bottom-0 h-[3px] bg-crema/10">
+              <span
+                className="block h-full bg-caramel"
+                style={{ width: `${(frame.intro ? 0 : clamp01(frame.time / END)) * 100}%`, transition: 'width .25s linear' }}
+              />
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <PlayerDock
         state={dockState}
         beat={beat}
@@ -439,7 +489,7 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
           api.play();
         }}
         onSound={api.toggleSound}
-        onExplore={onExplore}
+        onExplore={() => (gate.locked ? gate.nudge() : onExplore())}
       />
     </section>
   );

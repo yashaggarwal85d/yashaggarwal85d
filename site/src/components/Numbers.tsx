@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { animate, motion, useInView } from 'motion/react';
 import { numbers, type Numeral } from '../data';
 import { Section, SectionHeading } from './ui';
-import { tr } from '../i18n';
+import { num, tr } from '../i18n';
 
 const TONES: Record<Numeral['tone'], { bg: string; fg: string; sub: string; border?: string }> = {
   espresso: { bg: 'var(--espresso)', fg: 'var(--crema)', sub: 'var(--latte)' },
@@ -24,7 +24,7 @@ function Count({ n, run }: { n: Numeral; run: boolean }) {
   return (
     <>
       {n.prefix}
-      {v.toFixed(n.decimals ?? 0)}
+      {num(v, n.decimals ?? 0)}
       {n.suffix}
     </>
   );
@@ -49,7 +49,7 @@ function Card({ n, i, big }: { n: Numeral; i: number; big?: boolean }) {
       </p>
       <div>
         <p
-          className={`${big ? 'text-[7.5rem] md:text-[10rem]' : 'text-6xl'} font-black leading-[0.9] tracking-[-0.06em] ${big ? 'text-crema-spectrum' : ''}`}
+          className={`${big ? 'text-[7.5rem] md:text-[10rem]' : `${(n.prefix ?? '') + num(n.value, n.decimals ?? 0) + n.suffix}`.length > 6 ? 'text-5xl' : 'text-6xl'} font-black leading-[0.9] tracking-[-0.06em] ${big ? 'text-crema-spectrum' : ''}`}
         >
           <Count n={n} run={inView} />
         </p>
