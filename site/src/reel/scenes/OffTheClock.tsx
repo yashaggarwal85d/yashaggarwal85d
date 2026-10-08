@@ -328,6 +328,112 @@ function FrameArt({ kind, t, loop }: { kind: number; t: number; loop: number }) 
       </svg>
     );
   }
+  if (kind === 4) {
+    // Books: one more chapter, a page always mid-turn.
+    const ph = (t * 0.9) % 1;
+    const turn = Math.cos(ph * Math.PI); // 1 → −1: right page sweeps to the left
+    return (
+      <svg width={S} height={230} viewBox="0 0 300 230">
+        <path d="M150 60 Q100 44 34 52 V192 Q100 184 150 200Z" fill={C.oat} stroke={C.mocha} strokeWidth={3} />
+        <path d="M150 60 Q200 44 266 52 V192 Q200 184 150 200Z" fill={C.crema} stroke={C.mocha} strokeWidth={3} />
+        <g stroke={C.taupe} strokeWidth={3} strokeLinecap="round" opacity={0.7}>
+          {[0, 1, 2, 3, 4].map((j) => (
+            <g key={j}>
+              <path d={`M52 ${82 + j * 22} H${128 - (j % 2) * 18}`} />
+              <path d={`M172 ${82 + j * 22} H${248 - ((j + 1) % 2) * 22}`} />
+            </g>
+          ))}
+        </g>
+        <path
+          d={`M150 60 Q${150 + 58 * turn} ${48 - 10 * Math.abs(turn)} ${150 + 116 * turn} 54 V194 Q${150 + 58 * turn} ${186 - 6 * Math.abs(turn)} 150 200Z`}
+          fill={turn > 0 ? C.foam : C.oat}
+          stroke={C.mocha}
+          strokeWidth={3}
+          opacity={0.95}
+        />
+        <path d="M150 58 V202" stroke={C.mocha} strokeWidth={4} />
+      </svg>
+    );
+  }
+  if (kind === 5) {
+    // Piano: keys pressed on the beat.
+    const melody = [0, 2, 4, 2, 5, 4, 2, 0];
+    const down = melody[Math.floor(t / (BEAT / 2)) % melody.length];
+    const black = [0, 1, 3, 4, 5];
+    return (
+      <svg width={S} height={230} viewBox="0 0 300 230">
+        {Array.from({ length: 7 }, (_, j) => (
+          <rect key={j} x={24 + j * 36} y={70 + (j === down ? 5 : 0)} width={34} height={140} rx={4} fill={j === down ? C.latte : C.foam} stroke={C.mocha} strokeWidth={2} />
+        ))}
+        {black.map((j) => (
+          <rect key={j} x={24 + j * 36 + 24} y={70} width={22} height={86} rx={3} fill={C.espresso} />
+        ))}
+        {[0, 1, 2].map((j) => {
+          const u = (t * 0.8 + j / 3) % 1;
+          return (
+            <text key={j} x={60 + j * 80 + Math.sin(u * 6 + j) * 10} y={60 - u * 50} fontSize={28} fill={C.caramel} opacity={1 - u} fontFamily={F.display}>
+              {j % 2 ? '♫' : '♪'}
+            </text>
+          );
+        })}
+      </svg>
+    );
+  }
+  if (kind === 6) {
+    // Travelling: a window-seat route, the plane always somewhere new.
+    const u = (t * 0.45) % 1;
+    const P = (v: number) => [(1 - v) ** 2 * 40 + 2 * (1 - v) * v * 150 + v * v * 262, (1 - v) ** 2 * 180 + 2 * (1 - v) * v * 10 + v * v * 168];
+    const [px, py] = P(u);
+    const [qx, qy] = P(Math.min(1, u + 0.01));
+    const ang = (Math.atan2(qy - py, qx - px) * 180) / Math.PI;
+    return (
+      <svg width={S} height={230} viewBox="0 0 300 230">
+        <path d="M40 180 Q150 10 262 168" fill="none" stroke={C.mocha} strokeWidth={3} strokeDasharray="2 10" strokeLinecap="round" />
+        {[
+          [40, 180],
+          [262, 168],
+        ].map(([x, y], j) => (
+          <g key={j} transform={`translate(${x} ${y})`}>
+            <path d="M0 0 C-14 -16 -14 -34 0 -34 C14 -34 14 -16 0 0Z" fill={C.cinnamon} />
+            <circle cy={-23} r={5} fill={C.crema} />
+          </g>
+        ))}
+        <g transform={`translate(${px} ${py}) rotate(${ang})`}>
+          <path d="M-18 0 L14 0 M2 0 L-8 -14 M2 0 L-8 14 M-16 0 L-21 -6 M-16 0 L-21 6" stroke={C.espresso} strokeWidth={5} strokeLinecap="round" />
+        </g>
+      </svg>
+    );
+  }
+  if (kind === 7) {
+    // Cooking: a flip, a sizzle, some steam.
+    const ph = (t * 0.85) % 1;
+    const air = ph < 0.6 ? Math.sin((ph / 0.6) * Math.PI) : 0;
+    const spin = ph < 0.6 ? (ph / 0.6) * 360 : 0;
+    return (
+      <svg width={S} height={230} viewBox="0 0 300 230">
+        {[0, 1, 2].map((j) => {
+          const v = (t * 0.6 + j / 3) % 1;
+          return (
+            <path
+              key={j}
+              d={`M${110 + j * 40} ${150 - v * 70} q8 -12 0 -24 q-8 -12 0 -24`}
+              fill="none"
+              stroke={C.foam}
+              strokeWidth={4}
+              strokeLinecap="round"
+              opacity={0.7 * Math.sin(v * Math.PI)}
+            />
+          );
+        })}
+        <g transform={`translate(150 ${168 - air * 110}) rotate(${spin})`}>
+          <ellipse rx={40} ry={9} fill={C.mocha} />
+          <ellipse rx={30} ry={5} cy={-2} fill={C.cinnamon} opacity={0.7} />
+        </g>
+        <ellipse cx={150} cy={182} rx={78} ry={18} fill={C.espresso} />
+        <path d="M226 180 L286 172" stroke={C.espresso} strokeWidth={12} strokeLinecap="round" />
+      </svg>
+    );
+  }
   // Re:Zero: Return by Death, with the reel's own loop counter.
   return (
     <svg width={S} height={230} viewBox="-150 -115 300 230">
@@ -347,6 +453,10 @@ const FILMS = [
   { title: 'INCEPTION', take: 'still spinning?', bg: C.oat, fg: C.espresso, accent: C.cinnamon },
   { title: 'DEXTER', take: 'methodical.', bg: C.foam, fg: C.espresso, accent: C.cherry },
   { title: 'RE:ZERO', take: 'return by death', bg: C.roast, fg: C.crema, accent: C.caramel },
+  { title: 'BOOKS', take: 'one more chapter', bg: C.cocoa, fg: C.crema, accent: C.caramel },
+  { title: 'PIANO', take: 'keys after dark', bg: C.void, fg: C.crema, accent: C.latte },
+  { title: 'TRAVELLING', take: 'window seat, always', bg: C.crema, fg: C.espresso, accent: C.cinnamon },
+  { title: 'COOKING', take: 'no recipe, all taste', bg: C.caramel, fg: C.espresso, accent: C.cherry },
 ];
 
 export function Cinema(p: SceneProps) {
@@ -358,7 +468,7 @@ export function Cinema(p: SceneProps) {
   const stripX = W / 2 - FW / 2 - k * (FW + GAP) - (FW + GAP) * 0;
   const weave = Math.sin(t * 31) * 2 + Math.sin(t * 17) * 1.5;
   const push = 1 + 0.08 * ease.cubicOut(clamp01((t % BEAT) / BEAT)) * (t > 0.5 ? 1 : 0);
-  const frames = [...FILMS, ...FILMS, ...FILMS];
+  const frames = [...FILMS, ...FILMS];
   const stripY = H / 2 + (portrait ? 40 : 60);
 
   return (
@@ -405,7 +515,7 @@ export function Cinema(p: SceneProps) {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 10 }}>
-                  <FrameArt kind={i % 4} t={t} loop={loop} />
+                  <FrameArt kind={i % FILMS.length} t={t} loop={loop} />
                 </div>
                 <div style={{ position: 'absolute', left: 16, bottom: 40, font: `800 24px ${F.sans}`, letterSpacing: '0.08em', color: f.fg }}>{f.title}</div>
                 <div style={{ position: 'absolute', left: 16, bottom: 14, font: `600 16px ${F.mono}`, color: f.accent }}>{f.take}</div>

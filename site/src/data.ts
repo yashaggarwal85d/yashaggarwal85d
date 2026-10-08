@@ -328,7 +328,7 @@ export const numbers: Numeral[] = [
   { value: 64, suffix: ' wks', label: 'Build plans', note: 'factory plans for every site, from one engine', tone: 'oat' },
 ];
 
-export type Film = { title: string; kind: 'Series' | 'Film' | 'Anime'; take: string; spine: string; ink: string };
+export type Film = { title: string; kind: 'Series' | 'Film' | 'Anime' | 'Books' | 'Music' | 'Travel' | 'Kitchen'; take: string; spine: string; ink: string };
 
 // Edit the takes freely: they are meant to sound like you.
 export const films: Film[] = [
@@ -336,6 +336,10 @@ export const films: Film[] = [
   { title: 'Interstellar', kind: 'Film', take: 'Relativity as a plot device and a gut punch. The docking scene lives rent-free.', spine: '#120c09', ink: '#d49a57' },
   { title: 'Inception', kind: 'Film', take: 'The top was still spinning. I’m choosing to believe it fell.', spine: '#f3eadb', ink: '#17100c' },
   { title: 'Re:Zero', kind: 'Anime', take: 'Return by Death is retry-with-backoff, with much worse consequences.', spine: '#e9d9bf', ink: '#17100c' },
+  { title: 'Books', kind: 'Books', take: 'Always one more chapter than I planned. Bookmarks are a suggestion.', spine: '#3b2a21', ink: '#e9d9bf' },
+  { title: 'Piano', kind: 'Music', take: 'Keys after dark. Chords first, scales eventually.', spine: '#0d0806', ink: '#c8ac8c' },
+  { title: 'Travelling', kind: 'Travel', take: 'Window seat, always. Every new city is an unexplored dataset.', spine: '#d49a57', ink: '#17100c' },
+  { title: 'Cooking', kind: 'Kitchen', take: 'No recipe, all taste. Mise en place is just good data hygiene.', spine: '#b8612f', ink: '#fbf7ef' },
 ];
 
 export const euler: Record<string, string> = {

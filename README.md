@@ -10,7 +10,7 @@
 
 I build the **batch and streaming data platforms** behind semiconductor manufacturing and supply-chain planning at **Texas Instruments**: Python, SQL, PySpark, Kafka and Airflow at multi-terabyte scale, lakehouse modelling (Iceberg, Data Vault 2.0), and CI/CD on Kubernetes.
 
-Off the clock I'm usually somewhere between a black hole, a qubit and a rewatch of *Interstellar*. My [portfolio](https://yashaggarwal85d.github.io/yashaggarwal85d/) is a 48-second showreel at 120 BPM. Move your mouse over it: the background is a keyboard.
+Off the clock I'm usually somewhere between a black hole, a qubit and a rewatch of *Interstellar*. My [portfolio](https://yashaggarwal85d.github.io/yashaggarwal85d/) is a showreel cut bar for bar to Don Toliver's *TORE UP*. Move your mouse over it: the background is a keyboard.
 
 ### ☕ Freshly brewed numbers
 
@@ -79,6 +79,10 @@ Off the clock I'm usually somewhere between a black hole, a qubit and a rewatch 
 | ⚛️ **Quantum computing** | Qubits that are both answers until you look. |
 | ∑ **Maths** | *e*<sup>*iπ*</sup> + 1 = 0: five constants, one line, no notes. |
 | 🎬 **Cinema** | Series, films and anime, with strong opinions about all of them. |
+| 📚 **Books** | Always one more chapter than planned. |
+| 🎹 **Piano** | Keys after dark: chords first, scales eventually. |
+| ✈️ **Travelling** | Window seat, always. Every new city is an unexplored dataset. |
+| 🍳 **Cooking** | No recipe, all taste. |
 
 **On the shelf:** 🔪 *Dexter* · 🪐 *Interstellar* · 🌀 *Inception* · ↺ *Re:Zero*
 

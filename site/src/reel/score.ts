@@ -1,5 +1,6 @@
-import { LOOP } from './anim';
-import type { SongStatus } from './song';
+import { BEAT, LOOP, clamp01, mmss } from './anim';
+import { CHAPTERS } from './scenes';
+import type { SongFrame, SongStatus, TrackMeta } from './song';
 
 /**
  * "Cold Brew": an original drift-phonk score, synthesised live in the browser
@@ -8,7 +9,7 @@ import type { SongStatus } from './song';
  * letter of YASH, an impact on the 24× stamp, the half-time drop under the
  * black hole, a whoosh per career whip, a tape-stop on the spinning top.
  *
- * Song time 0–8 s is the intro (pad, crackle, a muffled cowbell, a riser);
+ * Song time 0–4 s is the intro (pad, crackle, a muffled cowbell, a riser);
  * reel time 0 is the drop. After that the 48 s loop repeats forever.
  *
  * It mirrors SongController's surface so the reel and the deck drive it the
@@ -16,10 +17,10 @@ import type { SongStatus } from './song';
  * (browsers need a gesture to start audio), then the audio clock itself.
  */
 
-export const INTRO = 8;
+export const INTRO = 4;
 const STEP = 0.125; // 16th notes at 120 BPM
 const STEPS_PER_LOOP = LOOP / STEP; // 384
-const INTRO_STEPS = INTRO / STEP; // 64
+const INTRO_STEPS = INTRO / STEP; // 32
 
 const F4 = 349.23;
 const F2 = 87.31;
@@ -49,7 +50,18 @@ const WHIP = 0.18;
 
 type Live = { n: AudioScheduledSourceNode; end: number };
 
+export const COLD_BREW: TrackMeta = {
+  kind: 'synth',
+  title: 'COLD BREW',
+  artist: 'original score',
+  source: 'synthesised live in your browser',
+  url: 'https://github.com/yashaggarwal85d/yashaggarwal85d/blob/master/site/src/reel/score.ts',
+  bpm: 120,
+};
+
 export class ScoreController {
+  readonly meta = COLD_BREW;
+  readonly chapters = CHAPTERS;
   status: SongStatus = 'idle';
   muted = true;
   /** song seconds before the reel's first beat (fixed: the score is written to the reel) */
@@ -116,6 +128,27 @@ export class ScoreController {
 
   reelTime() {
     return this.now() - INTRO;
+  }
+
+  frame(): SongFrame {
+    const r = this.reelTime();
+    if (r < 0)
+      return {
+        reel: 0,
+        intro: true,
+        pass: 0,
+        dock: 0,
+        beat: Math.floor(((r + INTRO) / BEAT) % 4),
+        toDrop: -r,
+        beatsToDrop: Math.ceil(-r / BEAT - 1e-6),
+        introProgress: clamp01(1 + r / INTRO),
+      };
+    const reel = r % LOOP;
+    return { reel, intro: false, pass: Math.floor(r / LOOP), dock: reel, beat: Math.floor(reel / BEAT) % 4, toDrop: 0, beatsToDrop: 0, introProgress: 1 };
+  }
+
+  clockText() {
+    return `${mmss(this.frame().reel)} / ${mmss(LOOP)}`;
   }
 
   // ---- lifecycle ---------------------------------------------------------
@@ -239,11 +272,11 @@ export class ScoreController {
       this.cowbell(w, 24, 0.9, 0.5);
       this.crash(w, 0.3);
     }
-    if (t === 19.25) {
+    if (t === 18) {
       this.impact(w, 1.15); // 136 → 1
       this.crash(w, 0.6);
     }
-    if (t === 18) this.riser(w, 1.25, 0.5);
+    if (t === 16.75) this.riser(w, 1.25, 0.5);
     if (t === 7.25) this.riser(w, 0.75, 0.55);
     if (t === 27) this.riser(w, 1, 0.6);
     if (t === 23) this.riser(w, 1, 0.35);
@@ -305,7 +338,7 @@ export class ScoreController {
     else if (i % 4 === 3) this.hat(w, 0.12);
     if (i === 2 || i === 10) this.hat(w, 0.14, true);
     // snare rolls into the next scene
-    if ((bar === 0 || bar === 19 || bar === 9) && i >= 12) this.clap(w, 0.25 + (i - 12) * 0.12, 0.05);
+    if ((bar === 0 || bar === 19 || bar === 8) && i >= 12) this.clap(w, 0.25 + (i - 12) * 0.12, 0.05);
     // 808
     if (i === 0) this.bass(w, root, 0.75);
     else if (i === 6) this.bass(w, root, 0.2);
@@ -318,26 +351,22 @@ export class ScoreController {
   }
 
   private intro(k: number, w: number) {
-    // k: 0..63 over 8 s
+    // k: 0..31 over 4 s: a muffled hook, then the door opens into the drop
     const bar = Math.floor(k / 16);
     const i = k % 16;
     if (k === 0) {
       this.crackle(w, INTRO);
-      this.pad(w, PADS[0], 4.1, 0.13, 300, 1600);
+      this.pad(w, PADS[0], 2.1, 0.13, 300, 1400);
     }
-    if (k === 32) this.pad(w, PADS[1], 2.1, 0.13, 900, 2400);
-    if (k === 48) {
-      this.pad(w, PADS[2], 2.0, 0.14, 1400, 4000);
+    if (k === 16) {
+      this.pad(w, PADS[2], 2.0, 0.14, 900, 4000);
       this.riser(w, 2, 0.7);
     }
-    if (bar >= 1) {
-      // the hook from another room, the door opening bar by bar
-      const note = RIFF[bar % 4][i];
-      if (note !== undefined) this.cowbell(w, note, 0.35 + bar * 0.12, 0.22, [0, 700, 1500, 3200][bar]);
-    }
-    if (bar === 2 && i % 4 === 0) this.hat(w, 0.12);
-    if (bar === 3) {
-      if (i < 12 && i % 2 === 0) this.hat(w, 0.2);
+    const note = RIFF[bar === 0 ? 0 : 2][i];
+    if (note !== undefined) this.cowbell(w, note, 0.4 + bar * 0.25, 0.22, bar === 0 ? 800 : 2400);
+    if (bar === 0 && i % 4 === 0) this.hat(w, 0.12);
+    if (bar === 1) {
+      if (i < 8 && i % 2 === 0) this.hat(w, 0.2);
       if (i >= 8) {
         this.clap(w, 0.2 + (i - 8) * 0.07, 0.05);
         if (i >= 12) this.clap(w + STEP / 2, 0.3 + (i - 12) * 0.08, 0.05);
@@ -349,10 +378,10 @@ export class ScoreController {
   private resumeIntro(pos: number, w: number) {
     const left = INTRO - pos;
     if (left > 1.2) this.crackle(w, left);
-    const seg = pos < 4 ? 0 : pos < 6 ? 1 : 2;
-    const end = [4.1, 6.1, 8][seg];
-    if (end - pos > 0.4) this.pad(w, PADS[seg], end - pos, 0.13, 600 + seg * 500, [1600, 2400, 4000][seg]);
-    if (seg === 2 && left > 0.4) this.riser(w, left, 0.7);
+    const seg = pos < 2 ? 0 : 1;
+    const end = [2.1, 4][seg];
+    if (end - pos > 0.4) this.pad(w, PADS[seg * 2], end - pos, 0.13, 600 + seg * 500, [1400, 4000][seg]);
+    if (seg === 1 && left > 0.4) this.riser(w, left, 0.7);
   }
 
   private pour(bar: number, i: number, w: number, chord: number) {
@@ -689,7 +718,8 @@ export class ScoreController {
     if (this.status === 'playing') this.pause();
     else this.play();
   }
-  unmute() {
+  /** `rewind`: a first unmute early in the first pass goes back to hear the drop. */
+  unmute(rewind = false) {
     const ctx = this.ensureCtx();
     void ctx.resume();
     this.muted = false;
@@ -697,7 +727,8 @@ export class ScoreController {
     this.out.gain.setTargetAtTime(0.8, ctx.currentTime, 0.03);
     if (!this.audioLive) {
       // Hand the clock over from performance.now() to the audio clock.
-      const pos = this.now();
+      const r = this.reelTime();
+      const pos = rewind && r >= 0 && r < 16 ? 0 : this.now();
       this.audioLive = true;
       this.seek(pos);
     }
@@ -711,6 +742,24 @@ export class ScoreController {
       this.out.gain.setTargetAtTime(0, this.ctx.currentTime, 0.03);
     }
     this.emit();
+  }
+  seekDock(reelT: number) {
+    this.seekReel(reelT);
+  }
+  chapterIndex() {
+    const r = this.frame().reel;
+    let i = 0;
+    CHAPTERS.forEach((c, k) => {
+      if (r >= c.start) i = k;
+    });
+    return i;
+  }
+  stepChapter(dir: 1 | -1) {
+    const n = CHAPTERS.length;
+    const i = this.chapterIndex();
+    const into = this.frame().reel - CHAPTERS[i].start;
+    const to = dir === 1 ? i + 1 : into > 1 ? i : i - 1;
+    this.seekReel(CHAPTERS[((to % n) + n) % n].start);
   }
   seekReel(reelT: number) {
     const abs = Math.max(0, this.reelTime());

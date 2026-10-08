@@ -140,8 +140,8 @@ function Shelf() {
   return (
     <div className="card flex flex-col gap-6 p-6 md:flex-row md:items-end md:p-8">
       <div className="md:w-56 md:shrink-0 md:self-stretch">
-        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-caramel">Cinema shelf</p>
-        <h3 className="mt-2 font-display text-3xl font-bold leading-tight">Series, films, anime.</h3>
+        <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-caramel">The shelf</p>
+        <h3 className="mt-2 font-display text-3xl font-bold leading-tight">Series, films, anime… and the rest.</h3>
         <p className="mt-3 text-sm text-muted">Rich taste, strong opinions. Pull one off the shelf.</p>
       </div>
       <div className="flex min-h-[15rem] flex-1 items-end gap-3 overflow-x-auto pb-2 [scrollbar-width:none]">

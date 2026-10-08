@@ -4,6 +4,7 @@ import { Consolidate, Grid, Hours, Rust } from './Grind';
 import { PourScene } from './Pour';
 import { BlackHoleScene, Cinema, Maths, Quantum } from './OffTheClock';
 import { Career, Cta, ctaKb, LoopStinger } from './Serve';
+import { TornUp } from './TornUp';
 
 // Bars are 2 s at 120 BPM. Only frames 01, 02 and 14 show the keyboard.
 export const SCENES: SceneDef[] = [
@@ -18,10 +19,12 @@ export const SCENES: SceneDef[] = [
   { id: 'black-hole', title: 'Black holes', start: 28, dur: 4, Component: BlackHoleScene, poster: 3.4 },
   { id: 'quantum', title: 'Qubits', start: 32, dur: 2, Component: Quantum, poster: 1.9 },
   { id: 'maths', title: 'Euler’s identity', start: 34, dur: 2, Component: Maths, poster: 1.95 },
-  { id: 'cinema', title: 'The watchlist', start: 36, dur: 4, Component: Cinema, poster: 2.2 },
+  { id: 'cinema', title: 'Rich taste', start: 36, dur: 4, Component: Cinema, poster: 2.2 },
   { id: 'career', title: 'Career', start: 40, dur: 4, Component: Career, poster: 3.9 },
   { id: 'cta', title: 'Let’s build', start: 44, dur: 2, Component: Cta, kb: ctaKb, poster: 1.5 },
   { id: 'loop', title: 'Return by death', start: 46, dur: 2, Component: LoopStinger, poster: 1.0 },
+  // Past the loop: only the soundtrack's arrangement (song.ts) visits these.
+  { id: 'tore-up', title: 'Tore up', start: 48, dur: 14, Component: TornUp, poster: 9.5 },
 ];
 
 export type Chapter = { id: string; label: string; sub: string; start: number; end: number };

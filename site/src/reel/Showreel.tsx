@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type RefObject } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowDown, X } from 'lucide-react';
-import { BEAT, LOOP, clamp01, lerp } from './anim';
+import { BEAT, LOOP, clamp01, lerp, mmss } from './anim';
 import { CHAPTERS, SCENES, chapterAt, sceneAt } from './scenes';
 import { BeatSynth } from './sound';
 import { song, shouldAutoplaySong } from './song';
@@ -9,7 +9,16 @@ import type { KbDriver } from './kbDriver';
 import type { Geo } from './types';
 import PlayerDock from './PlayerDock';
 
-export type ReelState = { time: number; loop: number; playing: boolean; sound: boolean; intro: boolean };
+export type ReelState = {
+  time: number;
+  loop: number;
+  playing: boolean;
+  sound: boolean;
+  intro: boolean;
+  /** with a soundtrack: position on its chapters, and the beat within the bar */
+  dock?: number;
+  beat?: number;
+};
 
 export type ReelControls = {
   toggle: () => void;
@@ -44,7 +53,7 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
   const startAt = useMemo(() => {
     const raw = new URLSearchParams(window.location.search).get('t');
     const v = raw === null ? NaN : Number(raw);
-    return Number.isFinite(v) && v >= 0 && v < LOOP ? v : null;
+    return Number.isFinite(v) && v >= 0 && v < SCENES[SCENES.length - 1].start + SCENES[SCENES.length - 1].dur ? v : null;
   }, []);
   const holdStill = reduceMotion || startAt !== null;
   const waitForSong = useMemo(() => shouldAutoplaySong(), []);
@@ -59,6 +68,8 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
     intro: waitForSong,
     /** set by deliberate jumps so they are not mistaken for a loop */
     jumped: false,
+    dock: 0,
+    beat: 0,
   });
   const synth = useRef(new BeatSynth());
   const [frame, setFrame] = useState<ReelState>({
@@ -141,8 +152,8 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
       },
       restart: () => {
         c.jumped = true;
-        c.loop += 1;
         if (song.engaged) return song.restart();
+        c.loop += 1;
         api.seek(0);
         api.play();
       },
@@ -171,6 +182,13 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
 
   // ---- the master clock ----------------------------------------------------
   useEffect(() => {
+    // After the first full loop, nudge the viewer to scroll (once).
+    const showHint = () => {
+      if (!hinted.current && window.scrollY < window.innerHeight * 0.4) {
+        hinted.current = true;
+        setScrollHint(true);
+      }
+    };
     let raf = 0;
     let prev = performance.now();
     const loop = () => {
@@ -182,11 +200,16 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
       const before = c.time;
 
       if (song.engaged) {
-        // The song's position is the clock: intro first, then the reel on its beat grid.
-        const abs = song.reelTime();
-        c.intro = abs < 0;
-        c.time = abs < 0 ? 0 : abs % LOOP;
+        // The music is the clock: its arrangement says which reel moment plays on which beat.
+        const f = song.frame();
+        c.intro = f.intro;
+        c.time = f.reel;
+        c.dock = f.dock;
+        c.beat = f.beat;
         c.playing = song.status === 'playing';
+        if (f.pass > c.loop) showHint();
+        c.loop = f.pass;
+        c.jumped = false;
       } else if (waitForSong && songPending()) {
         c.intro = true;
       } else {
@@ -202,14 +225,13 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
       }
 
       // A natural wrap (not a jump) completes a loop.
-      if (!c.intro && c.time < before - LOOP / 2) {
+      if (song.engaged) {
+        /* the soundtrack counts its own loops */
+      } else if (!c.intro && c.time < before - LOOP / 2) {
         if (c.jumped) c.jumped = false;
         else {
           c.loop += 1;
-          if (!hinted.current && window.scrollY < window.innerHeight * 0.4) {
-            hinted.current = true;
-            setScrollHint(true);
-          }
+          showHint();
         }
       } else if (c.jumped && Math.abs(c.time - before) > 0.001 && c.time >= before) {
         c.jumped = false;
@@ -217,9 +239,9 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
 
       if (c.inView || song.engaged) {
         setFrame((f) =>
-          f.time === c.time && f.loop === c.loop && f.playing === c.playing && f.intro === c.intro
+          f.time === c.time && f.loop === c.loop && f.playing === c.playing && f.intro === c.intro && f.dock === c.dock
             ? f
-            : { ...f, time: c.time, loop: c.loop, playing: c.playing, intro: c.intro },
+            : { ...f, time: c.time, loop: c.loop, playing: c.playing, intro: c.intro, dock: c.dock, beat: c.beat },
         );
       }
       synth.current.tick(c.loop * LOOP + c.time, c.playing && !document.hidden && !song.engaged);
@@ -295,6 +317,8 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
       if ((key === ' ' || key === 'k') && c.inView) {
         e.preventDefault();
         api.toggle();
+      } else if ((key === 'arrowright' || key === 'arrowleft') && c.inView && song.engaged) {
+        song.stepChapter(key === 'arrowright' ? 1 : -1);
       } else if (key === 'arrowright' && c.inView) {
         api.chapter(chapterAt(c.time) + 1);
       } else if (key === 'arrowleft' && c.inView) {
@@ -319,7 +343,7 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
   const scene = sceneAt(frame.time);
   const local = frame.time - scene.start;
   const Scene = scene.Component;
-  const beat = Math.floor(frame.time / BEAT) % 4;
+  const beat = song.engaged ? (frame.beat ?? 0) : Math.floor(frame.time / BEAT) % 4;
   const dockState: ReelState = song.engaged
     ? { ...frame, playing: song.status === 'playing' || song.status === 'buffering', sound: !song.muted }
     : frame;
@@ -337,7 +361,10 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
         if (!s || clock.current.intro) return;
         const dx = e.changedTouches[0].clientX - s.x;
         const dy = e.changedTouches[0].clientY - s.y;
-        if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.4) api.chapter(chapterAt(clock.current.time) + (dx < 0 ? 1 : -1));
+        if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+          if (song.engaged) song.stepChapter(dx < 0 ? 1 : -1);
+          else api.chapter(chapterAt(clock.current.time) + (dx < 0 ? 1 : -1));
+        }
       }}
     >
       <div className="absolute inset-0" aria-hidden>
@@ -399,8 +426,13 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
         compact={size.vw < 768}
         hidden={!inView || frame.intro}
         songMode={song.engaged}
+        songTitle={song.meta.title}
+        chapters={song.engaged ? song.chapters : CHAPTERS}
+        position={song.engaged ? (frame.dock ?? 0) : frame.time}
+        clockText={song.engaged ? song.clockText() : `${mmss(frame.time)} / ${mmss(LOOP)}`}
         onToggle={api.toggle}
         onSeek={(time) => {
+          if (song.engaged) return song.seekDock(time);
           api.seek(time);
           api.play();
         }}

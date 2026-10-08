@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ArrowDown, Pause, Play, Volume2, VolumeX } from 'lucide-react';
-import { CHAPTERS, chapterAt } from './scenes';
-import { LOOP, mmss } from './anim';
+import type { Chapter } from './scenes';
 import type { ReelState } from './Showreel';
-import { SONG } from './song';
 
 type Props = {
   state: ReelState;
@@ -13,14 +11,37 @@ type Props = {
   hidden?: boolean;
   /** the song is driving the reel: the sound button mutes it */
   songMode?: boolean;
+  songTitle?: string;
+  /** the reel's chapters, or the soundtrack's */
+  chapters: Chapter[];
+  /** where we are, in `chapters` units */
+  position: number;
+  clockText: string;
   onToggle: () => void;
   onSeek: (time: number) => void;
   onSound: () => void;
   onExplore: () => void;
 };
 
-export default function PlayerDock({ state, beat, compact, hidden = false, songMode = false, onToggle, onSeek, onSound, onExplore }: Props) {
-  const current = chapterAt(state.time);
+export default function PlayerDock({
+  state,
+  beat,
+  compact,
+  hidden = false,
+  songMode = false,
+  songTitle = 'the song',
+  chapters,
+  position,
+  clockText,
+  onToggle,
+  onSeek,
+  onSound,
+  onExplore,
+}: Props) {
+  let current = 0;
+  chapters.forEach((c, i) => {
+    if (position >= c.start) current = i;
+  });
   const [hint, setHint] = useState(true);
   useEffect(() => {
     const id = setTimeout(() => setHint(false), 9000);
@@ -52,8 +73,8 @@ export default function PlayerDock({ state, beat, compact, hidden = false, songM
 
   const segments = (
     <div className="flex gap-1.5">
-      {CHAPTERS.map((c, i) => {
-        const fill = Math.max(0, Math.min(1, (state.time - c.start) / (c.end - c.start)));
+      {chapters.map((c, i) => {
+        const fill = Math.max(0, Math.min(1, (position - c.start) / (c.end - c.start)));
         return (
           <button
             key={c.id}
@@ -118,9 +139,7 @@ export default function PlayerDock({ state, beat, compact, hidden = false, songM
 
         {!compact && (
           <>
-            <span className="shrink-0 font-mono text-sm tabular-nums text-latte">
-              {mmss(state.time)} / {mmss(LOOP)}
-            </span>
+            <span className="shrink-0 font-mono text-sm tabular-nums text-latte">{clockText}</span>
             <span className="flex shrink-0 gap-1" aria-hidden>
               {[0, 1, 2, 3].map((i) => (
                 <i key={i} className="block h-2.5 w-2.5 rounded-full transition-colors" style={{ background: i === beat && state.playing ? '#b8612f' : 'rgba(233,217,191,.22)' }} />
@@ -138,7 +157,7 @@ export default function PlayerDock({ state, beat, compact, hidden = false, songM
           onClick={onSound}
           className="flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-crema/25 px-3 font-mono text-xs text-latte transition hover:text-crema"
           aria-pressed={state.sound}
-          aria-label={songMode ? `${state.sound ? 'Mute' : 'Unmute'} ${SONG.title}` : state.sound ? 'Mute the beat' : 'Play a 120 BPM beat'}
+          aria-label={songMode ? `${state.sound ? 'Mute' : 'Unmute'} ${songTitle}` : state.sound ? 'Mute the beat' : 'Play a 120 BPM beat'}
         >
           {state.sound ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
           {!compact && (songMode ? 'SONG' : state.sound ? 'ON' : 'OFF')}

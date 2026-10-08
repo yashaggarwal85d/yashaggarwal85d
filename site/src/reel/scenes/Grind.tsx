@@ -236,26 +236,29 @@ export function Rust(p: SceneProps) {
 
 /* ------------------------------------------------------------------ 06 */
 
+/** The merge lands on the downbeat of the scene's second bar (the hook, under TORE UP). */
+const SLAM = 2;
+
 export function Consolidate(p: SceneProps) {
   const { t, W, H, portrait } = p;
   const L = portrait
     ? { cols: 8, ox: 90, oy: 560, gap: 40, core: [640, 860] as const, numS: 210, numY: 120, labelY: 370, arrowY: 1150 }
     : { cols: 17, ox: 100, oy: 430, gap: 40, core: [1200, 440] as const, numS: 230, numY: 50, labelY: 320, arrowY: 590 };
   const [cx, cy] = L.core;
-  const count = Math.round(136 * ease.expoOut(prog(t, 0, 0.8)));
-  const swarm = ease.cubicIn(prog(t, 2, 1));
-  const implode = ease.expoIn(prog(t, 3, 0.25));
-  const merged = t >= 3.25;
-  const pop = ease.backOutHard(prog(t, 3.25, 0.3));
-  const sh = shakes(t, [[3.25, 14]], 0.2);
+  const count = Math.round(136 * ease.expoOut(prog(t, 0, 0.5)));
+  const swarm = ease.cubicIn(prog(t, 0.75, 1));
+  const implode = ease.expoIn(prog(t, SLAM - 0.25, 0.25));
+  const merged = t >= SLAM;
+  const pop = ease.backOutHard(prog(t, SLAM, 0.3));
+  const sh = shakes(t, [[SLAM, 14]], 0.2);
 
   const dots = [];
   if (!merged) {
     for (let i = 0; i < 136; i++) {
       const c = i % L.cols;
       const r = Math.floor(i / L.cols);
-      const gx = L.ox + c * L.gap + Math.sin(t * 2 + i) * 5 * prog(t, 1, 0.5);
-      const gy = L.oy + r * L.gap + Math.cos(t * 1.7 + i * 1.3) * 5 * prog(t, 1, 0.5);
+      const gx = L.ox + c * L.gap + Math.sin(t * 2 + i) * 5 * prog(t, 0.4, 0.3);
+      const gy = L.oy + r * L.gap + Math.cos(t * 1.7 + i * 1.3) * 5 * prog(t, 0.4, 0.3);
       const ang = rand(i) * Math.PI * 2 + t * (2.2 + rand(i, 3) * 2);
       const rad = (90 + rand(i, 7) * 220) * (1 - swarm * 0.55);
       const sx = cx + Math.cos(ang) * rad;
@@ -281,8 +284,8 @@ export function Consolidate(p: SceneProps) {
     <Stage
       p={p}
       bg={C.espresso}
-      cam={{ x: sh[0], y: sh[1], s: 1 + 0.06 * hit(t, 3.25, 5) + 0.012 * beatEnv(t, 9) }}
-      overlay={<Flash color={C.foam} opacity={0.55 * hit(t, 3.25, 9)} />}
+      cam={{ x: sh[0], y: sh[1], s: 1 + 0.06 * hit(t, SLAM, 5) + 0.012 * beatEnv(t, 9) }}
+      overlay={<Flash color={C.foam} opacity={0.55 * hit(t, SLAM, 9)} />}
     >
       <At x={80} y={L.numY} style={{ font: `900 ${L.numS}px/1 ${F.sans}`, letterSpacing: '-0.06em', color: C.crema }}>
         {count}
@@ -298,13 +301,13 @@ export function Consolidate(p: SceneProps) {
             <stop offset="1" stopColor={C.cinnamon} stopOpacity="0" />
           </radialGradient>
         </defs>
-        <circle cx={cx} cy={cy} r={120 + 200 * swarm + 120 * hit(t, 3.25, 3)} fill="url(#coreGlow)" opacity={0.15 + 0.35 * swarm + 0.4 * hit(t, 3.25, 3)} />
+        <circle cx={cx} cy={cy} r={120 + 200 * swarm + 120 * hit(t, SLAM, 3)} fill="url(#coreGlow)" opacity={0.15 + 0.35 * swarm + 0.4 * hit(t, SLAM, 3)} />
         {dots}
         {merged && (
           <>
             <circle cx={cx} cy={cy} r={78 * pop * (1 + 0.04 * beatEnv(t, 10))} fill={C.foam} />
             <circle cx={cx} cy={cy} r={78 * pop} fill="none" stroke={C.caramel} strokeWidth={12} />
-            <circle cx={cx} cy={cy} r={78 + 260 * prog(t, 3.25, 0.6)} fill="none" stroke={C.caramel} strokeWidth={4} opacity={1 - prog(t, 3.25, 0.6)} />
+            <circle cx={cx} cy={cy} r={78 + 260 * prog(t, SLAM, 0.6)} fill="none" stroke={C.caramel} strokeWidth={4} opacity={1 - prog(t, SLAM, 0.6)} />
           </>
         )}
       </svg>
@@ -314,8 +317,8 @@ export function Consolidate(p: SceneProps) {
         style={{
           font: `italic 800 ${portrait ? 150 : 170}px/1 ${F.display}`,
           color: C.caramel,
-          opacity: prog(t, 3.3, 0.05),
-          transform: `scale(${lerp(2.2, 1, ease.backOutHard(prog(t, 3.3, 0.22)))})`,
+          opacity: prog(t, SLAM + 0.05, 0.05),
+          transform: `scale(${lerp(2.2, 1, ease.backOutHard(prog(t, SLAM + 0.05, 0.22)))})`,
           transformOrigin: '20% 60%',
         }}
       >
@@ -326,7 +329,7 @@ export function Consolidate(p: SceneProps) {
         y={L.arrowY + (portrait ? 190 : 180)}
         style={{ font: `600 ${portrait ? 24 : 22}px ${F.mono}`, letterSpacing: '0.2em', color: C.latte }}
       >
-        {typed('ONE YUGABYTEDB CLUSTER', t, 3.4, 90)}
+        {typed('ONE YUGABYTEDB CLUSTER', t, SLAM + 0.15, 90)}
       </At>
     </Stage>
   );
