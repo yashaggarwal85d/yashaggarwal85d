@@ -60,7 +60,7 @@ const d: Record<string, string> = {
   "Brew": "淹れる",
   "Build plans": "生産計画",
   "Builds with AI agents and model inference, every day": "AIエージェントとモデル推論を毎日の開発に活用",
-  "Built and launched an internal election platform for 10K+ employees, with hierarchical authorisation.": "1万人以上の社員が使う社内選挙プラットフォームを、階層型の権限管理付きで構築・リリース。",
+  "Built and launched an internal election platform for 10K+ employees, with hierarchical authorisation.": "10K+名の社員が使う社内選挙プラットフォームを、階層型の権限管理付きで構築・リリース。",
   "Built with planners, yield and logistics teams": "計画・歩留まり・物流チームと共に構築",
   "CGPA 9.07 / 10": "CGPA 9.07 / 10",
   "CGPA out of 10": "CGPA（10点満点）",
