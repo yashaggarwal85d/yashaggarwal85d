@@ -3,22 +3,22 @@ import { clamp01, ease, hit, lerp, prog, rand, shakes } from '../anim';
 import { C, F, gradText } from '../palette';
 import { tr } from '../../i18n';
 
-/* ---------------------------------------------------------- TORE UP (song only) */
+/* ---------------------------------------------------------- TORE UP: the numbers */
 
 /**
- * Plays under the hook of "TORE UP", where the line lands every two beats
- * (one reel second here). Each card slams down on one "tore up" and is ripped
- * in half on the next, revealing what replaced it. Six cards, twelve hits,
- * then four for the finale: eight bars, the whole hook.
+ * The headline numbers, under the hook of "TORE UP", where the line lands every
+ * two beats (one reel second here). Each card slams down the old number on one
+ * "tore up" and is ripped in half on the next, revealing what replaced it.
+ * Seven cards, fourteen hits, then two for the finale: eight bars, the whole hook.
  */
-// Only what no other slide says: the headline numbers have their own scenes.
 const CARDS = [
-  { label: tr('SUPPLY-CHAIN RULE CHANGES'), old: tr('2-WEEK RELEASES'), now: tr('SAME DAY') },
-  { label: tr('FORECASTING PIPELINE'), old: tr('24 HOURS'), now: tr('UNDER 7H') },
-  { label: tr('PRODUCTION SPARK JOBS'), old: tr('UNTUNED'), now: tr('30–80% FASTER') },
-  { label: tr('FORECAST CYCLES'), old: tr('FIXED SCHEDULE'), now: tr('ON DEMAND') },
-  { label: tr('PRODUCTION DATABASES'), old: tr('TODAY’S LOAD'), now: tr('READY FOR 2×') },
-  { label: tr('THE OLD WAY'), old: tr('MONOLITHIC CRON JOBS'), now: '' },
+  { label: tr('NIGHTLY SUPPLY-PLANNING RUN'), old: tr('~18 HOURS'), now: tr('~45 MIN'), note: tr('24× faster: cron jobs rebuilt as PySpark services') },
+  { label: tr('INGEST PER NODE'), old: tr('SPARK, 1×'), now: tr('RUST, 3.8×'), note: tr('1.5 GB/s per node, on identical hardware') },
+  { label: tr('SITE DATABASES'), old: tr('136 OF THEM'), now: tr('ONE CLUSTER'), note: tr('one source of truth for every site') },
+  { label: tr('SUPPLY-CHAIN RULE CHANGES'), old: tr('2-WEEK RELEASES'), now: tr('SAME DAY'), note: tr('validated, staged, fully audited') },
+  { label: tr('FORECASTING PIPELINE'), old: tr('24 HOURS'), now: tr('UNDER 7H'), note: tr('and planners rerun it on demand') },
+  { label: tr('MANUAL PLANNER OVERRIDES'), old: tr('~150 A WEEK'), now: tr('ZERO'), note: tr('on-time fulfilment up across 70K+ SKUs') },
+  { label: tr('PRODUCTION SPARK JOBS'), old: tr('UNTUNED'), now: tr('30–80% FASTER'), note: tr('partitioning, skew and memory, tuned') },
 ];
 const PAPERS = [C.oat, C.crema, C.foam, C.latte];
 
@@ -44,7 +44,7 @@ export function TornUp(p: SceneProps) {
   const card = Math.min(CARDS.length - 1, Math.floor(k / 2));
   const ripped = k % 2 === 1;
   const local = t - card * 2; // 0..2 within this card
-  const finale = t >= 12;
+  const finale = t >= 14;
   const word = hit(t, k, 9);
   const sh = shakes(
     t,
@@ -92,7 +92,7 @@ export function TornUp(p: SceneProps) {
           whiteSpace: 'nowrap',
           transformOrigin: '0% 70%',
           transform: `scale(${1 + 0.1 * word}) rotate(${(k % 2 ? 1 : -1) * 1.5 * word}deg)`,
-          opacity: 1 - prog(t, 12, 0.08),
+          opacity: 1 - prog(t, 14, 0.08),
           ...(k % 2 ? gradText() : { color: C.crema }),
         }}
       >
@@ -102,7 +102,7 @@ export function TornUp(p: SceneProps) {
         x={W - (portrait ? 60 : 80)}
         y={portrait ? L.hy + L.hs + 20 : L.hy + 24}
         anchor="tr"
-        style={{ font: `700 ${portrait ? 30 : 34}px ${F.mono}`, color: C.caramel, letterSpacing: '0.1em', opacity: 1 - prog(t, 12, 0.08) }}
+        style={{ font: `700 ${portrait ? 30 : 34}px ${F.mono}`, color: C.caramel, letterSpacing: '0.1em', opacity: 1 - prog(t, 14, 0.08) }}
       >
         ×{String(k + 1).padStart(2, '0')}
       </At>
@@ -166,6 +166,22 @@ export function TornUp(p: SceneProps) {
           {c.now}
         </At>
       )}
+      {ripped && !finale && (
+        <At
+          x={W / 2}
+          y={L.nowY + (portrait ? 90 : 105)}
+          anchor="tc"
+          style={{
+            font: `500 ${portrait ? 30 : 30}px ${F.sans}`,
+            color: C.latte,
+            whiteSpace: 'nowrap',
+            opacity: clamp01((local - 1.12) / 0.12) * (1 - prog(local, 1.85, 0.15)),
+            transform: `translateY(${(1 - clamp01((local - 1.12) / 0.2)) * 14}px)`,
+          }}
+        >
+          {c.note}
+        </At>
+      )}
 
       {/* the last rip: the old way is gone */}
       {finale && (
@@ -177,7 +193,7 @@ export function TornUp(p: SceneProps) {
             font: `italic 800 ${portrait ? 190 : 260}px/1 ${F.display}`,
             letterSpacing: '-0.03em',
             whiteSpace: 'nowrap',
-            transform: `scale(${lerp(1.6, 1, ease.backOutHard(prog(t, 12, 0.25))) * (1 + 0.08 * (hit(t, 13, 9) + hit(t, 14, 9) + hit(t, 15, 9)))})`,
+            transform: `scale(${lerp(1.6, 1, ease.backOutHard(prog(t, 14, 0.25))) * (1 + 0.1 * hit(t, 15, 9))})`,
             ...gradText(),
           }}
         >

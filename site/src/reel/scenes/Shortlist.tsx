@@ -6,22 +6,22 @@ import { tr } from '../../i18n';
 /* ---------------------------------------------------------- the shortlist */
 
 /**
- * What recruiters and hiring managers scan for first, ticked off one per hit
- * (every two beats): fit, stack, ownership, leadership, communication,
- * collaboration, reliability, AI, recognition, logistics. Nothing here is
- * repeated from another slide.
+ * The ten things that make a recruiter stop scrolling, ticked off one per hit
+ * (every two beats): impact, scope, influence, visibility, growth, wins,
+ * recognition, leadership, AI and availability. All from the resume; nothing
+ * here repeats another slide.
  */
 const ITEMS = [
-  { k: tr('FIT'), v: tr('Data engineer, batch and streaming, 3+ years at a Fortune 500') },
-  { k: tr('STACK'), v: tr('Python · SQL · PySpark · Kafka · Airflow · Kubernetes') },
-  { k: tr('OWNERSHIP'), v: tr('Drove the data track of a 20-engineer programme') },
-  { k: tr('LEADERSHIP'), v: tr('Mentored 2 engineers and 3 interns') },
-  { k: tr('COMMUNICATION'), v: tr('Presented to global IT leadership at TI HQ, Dallas') },
-  { k: tr('COLLABORATION'), v: tr('Built with planners, yield and logistics teams') },
-  { k: tr('RELIABILITY'), v: tr('On call for production, sized for growth') },
+  { k: tr('IMPACT'), v: tr('Changed how a Fortune 500 plans its supply chain: same-day replans') },
+  { k: tr('SCOPE'), v: tr('Drove the data track of a 20-engineer modernisation programme') },
+  { k: tr('INFLUENCE'), v: tr('My benchmarks became TI’s reference for its global data pipelines') },
+  { k: tr('VISIBILITY'), v: tr('Picked by the Director of IT to brief global IT leadership in Dallas') },
+  { k: tr('GROWTH'), v: tr('Intern to Data Engineer II in two years') },
+  { k: tr('WINNER'), v: tr('Won TI India’s tech hackathon leading an AI supply-chain simulator') },
+  { k: tr('RECOGNITION'), v: tr('Star of the Quarter, for planning algorithms and mentorship') },
+  { k: tr('LEADERSHIP'), v: tr('Mentors 2 engineers and 3 interns') },
   { k: tr('AI'), v: tr('Builds with AI agents and model inference, every day') },
-  { k: tr('RECOGNITION'), v: tr('Hackathon winner ’24 · Star of the Quarter') },
-  { k: tr('AVAILABILITY'), v: tr('Ready to relocate · notice 1–2 months · fluent English') },
+  { k: tr('AVAILABILITY'), v: tr('Ready to relocate · notice period 1–2 months') },
 ];
 
 export function Shortlist(p: SceneProps) {

@@ -4,7 +4,7 @@
 export const BPM = 120;
 export const BEAT = 60 / BPM; // 0.5 s
 export const BAR = BEAT * 4; // 2 s
-export const LOOP = 86; // 43 bars (scenes/index.ts)
+export const LOOP = 112; // 56 bars (scenes/index.ts)
 
 export const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;

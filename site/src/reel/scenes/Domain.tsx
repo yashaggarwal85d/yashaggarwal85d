@@ -8,8 +8,9 @@ import { tr } from '../../i18n';
 
 /**
  * Where the data lives: the semiconductor supply chain, one stage per bar.
- * Bar 1 names the domain; bars 2–6 light up demand → fab → assembly →
- * planning → delivery, with data packets streaming along the line.
+ * Bars 1–2 name the domain (under the song's drum cut-out); bars 3–7 light up
+ * demand → fab → assembly → planning → delivery, with data packets streaming
+ * along the line; bar 8 says where I fit in.
  */
 const STAGES = [
   { label: tr('DEMAND'), note: tr('forecasts and ML demand signals') },
@@ -66,7 +67,7 @@ function Icon({ i }: { i: number }): ReactNode {
 
 export function Domain(p: SceneProps) {
   const { t, W, H, portrait } = p;
-  const shown = Math.min(STAGES.length, Math.max(0, Math.floor(t / 2))); // stage k lands on bar k + 1
+  const shown = Math.min(STAGES.length, Math.max(0, Math.floor((t - 2) / 2))); // stage k lands on bar k + 2
   const pos = (k: number) => (portrait ? { x: 150, y: 560 + k * 205 } : { x: 190 + k * 305, y: 540 });
   const words = [
     { at: 0, text: tr('Supply chain &'), italic: false },
@@ -121,7 +122,11 @@ export function Domain(p: SceneProps) {
           );
         })}
         <div style={{ marginTop: 14, font: `600 ${portrait ? 24 : 22}px ${F.mono}`, letterSpacing: '0.2em', color: C.mocha }}>
-          {typed(tr('SEMICONDUCTORS · FROM FORECAST TO FACTORY TO CUSTOMER'), t, 1.0, 70)}
+          {t < 14 ? (
+            typed(tr('SEMICONDUCTORS · FROM FORECAST TO FACTORY TO CUSTOMER'), t, 1.0, 70)
+          ) : (
+            <span style={{ color: C.cinnamon }}>{typed(tr('I BUILD THE DATA PLATFORMS BEHIND ALL OF IT.'), t, 14, 60)}</span>
+          )}
         </div>
       </At>
 
@@ -131,7 +136,7 @@ export function Domain(p: SceneProps) {
           if (k === 0) return null;
           const a = pos(k - 1);
           const b = pos(k);
-          const draw = ease.cubicOut(prog(t, 2 * (k + 1) - 0.5, 0.5));
+          const draw = ease.cubicOut(prog(t, 2 * (k + 2) - 0.5, 0.5));
           return (
             <line
               key={k}
@@ -161,7 +166,7 @@ export function Domain(p: SceneProps) {
       </svg>
 
       {STAGES.map((s, k) => {
-        const at = 2 * (k + 1);
+        const at = 2 * (k + 2);
         if (t < at - 0.05) return null;
         const pop = ease.backOutHard(prog(t, at, 0.25));
         const ring = prog(t, at, 0.5);

@@ -24,7 +24,7 @@ import { tr } from '../i18n';
  *   bars 64–81  outro
  *
  * Playback starts at 6 s, a 12 s run-up to the drop. The reel runs from the
- * cold open (bar 11) to the spinning top (bar 66); at bar 67 the song jumps
+ * cold open (bar 11) to the spinning top (bar 68); at bar 69 the song jumps
  * back to bar 11 with it, so most of the outro never plays.
  */
 
@@ -78,7 +78,7 @@ const DOWNBEAT = 0.013;
 const START = 6; // whole seconds: the IFrame API's `start` parameter
 const DROP = 12;
 const LOOP_FROM = 11; // the cold open
-const LOOP_TO = 67; // after the spinning top (three bars into the outro)
+const LOOP_TO = 69; // after the spinning top (five bars into the outro)
 const DURATION = 127;
 
 /**
@@ -92,33 +92,32 @@ const ARRANGEMENT: Seg[] = [
   { bar: 12, scene: 'name' }, // YASH: a letter per beat of the drop
   { bar: 14, scene: 'role' },
   { bar: 15, scene: 'journey' }, // five stops, one per bar
-  { bar: 20, scene: 'tore-up' }, // the hook: a rip per "tore up"
-  { bar: 28, scene: 'pour' }, // the drums drop out: a slow pour
-  { bar: 30, scene: 'domain' }, // the drums slam back: supply chain & manufacturing
+  { bar: 20, scene: 'tore-up' }, // the hook: a number ripped per "tore up"
+  { bar: 28, scene: 'domain' }, // its title under the drum cut-out, stages as they slam back
   { bar: 36, scene: 'black-hole', speed: 0.5 }, // the bridge, time-dilated
-  { bar: 40, scene: 'quantum', speed: 0.5 }, // the soft bass comes in
-  { bar: 42, scene: 'maths' },
-  { bar: 43, scene: 'navier', speed: 0.5 },
-  { bar: 45, scene: 'cinema' }, // a frame per beat
-  { bar: 48, scene: 'hours' }, // the drop again: the numbers
-  { bar: 50, scene: 'rust' },
-  { bar: 52, scene: 'grid' },
-  { bar: 54, scene: 'consolidate', speed: 0.5 }, // a slow swarm…
-  { bar: 56, scene: 'consolidate', from: 2 }, // …slammed on hook 2's first beat
-  { bar: 57, scene: 'shortlist' }, // a tick per "tore up"
-  { bar: 62, scene: 'cta' }, // the ask, held for four bars
-  { bar: 66, scene: 'loop' }, // return by death: back to bar 11
+  { bar: 40, scene: 'quantum' }, // the soft bass comes in
+  { bar: 41, scene: 'maths' },
+  { bar: 42, scene: 'navier' },
+  { bar: 43, scene: 'cinema' }, // a frame per beat
+  { bar: 46, scene: 'morning' }, // the alarm rings on bar 47's downbeat…
+  { bar: 48, scene: 'built' }, // …and the drop is back to work
+  { bar: 50, scene: 'pour' },
+  { bar: 52, scene: 'toolbox' },
+  { bar: 54, scene: 'grid' },
+  { bar: 56, scene: 'shortlist' }, // hook 2: a tick per "tore up"
+  { bar: 61, scene: 'cta' }, // the ask, held for seven bars
+  { bar: 68, scene: 'loop' }, // return by death: back to bar 11
   { bar: LOOP_TO, scene: 'loop', from: 2 },
 ];
 const segReel = (s: Seg, x: number) => sceneById(s.scene).start + (s.from ?? 0) + (x - s.bar) * 2 * (s.speed ?? 1);
 
 const SONG_CHAPTERS: Chapter[] = [
   { id: 'journey', label: tr('Journey'), sub: tr('name · role · the journey'), start: 11, end: 20 },
-  { id: 'tore-up', label: tr('Tore up'), sub: tr('what I tore up'), start: 20, end: 28 },
+  { id: 'numbers', label: tr('Numbers'), sub: tr('the numbers'), start: 20, end: 28 },
   { id: 'domain', label: tr('Domain'), sub: tr('supply chain & manufacturing'), start: 28, end: 36 },
-  { id: 'off', label: tr('Off the clock'), sub: tr('physics · maths · cinema'), start: 36, end: 48 },
-  { id: 'numbers', label: tr('Numbers'), sub: tr('the numbers'), start: 48, end: 57 },
-  { id: 'finale', label: tr('Finale'), sub: tr('why me · let’s build'), start: 57, end: 67 },
+  { id: 'off', label: tr('Off the clock'), sub: tr('physics · maths · cinema'), start: 36, end: 46 },
+  { id: 'work', label: tr('Back to work'), sub: tr('what I build · the toolbox · the scale'), start: 46, end: 56 },
+  { id: 'finale', label: tr('Finale'), sub: tr('why me · let’s build'), start: 56, end: 69 },
 ];
 
 // ---------------------------------------------------------------------------

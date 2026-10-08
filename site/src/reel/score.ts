@@ -266,8 +266,8 @@ export class ScoreController {
     this.toneAt(w, id === 'pour' ? 1400 : id === 'loop' ? 900 : 18000);
 
     // ---- one-off cues ----------------------------------------------------
-    if (at(0) && ['cold-open', 'journey', 'domain', 'hours', 'quantum', 'shortlist'].includes(id)) this.impact(w, 1);
-    if (at(0) && ['cold-open', 'journey', 'domain', 'grid', 'quantum', 'shortlist'].includes(id)) this.crash(w, 0.55);
+    if (at(0) && ['cold-open', 'journey', 'quantum', 'shortlist', 'built'].includes(id)) this.impact(w, 1);
+    if (at(0) && ['cold-open', 'journey', 'grid', 'quantum', 'shortlist', 'built'].includes(id)) this.crash(w, 0.55);
     switch (id) {
       case 'name':
         if (at(2)) {
@@ -286,33 +286,53 @@ export class ScoreController {
         }
         if (i === 14 && !lastBar) this.whoosh(w, 0.26);
         break;
+      case 'tore-up': {
+        // a card slams on one hit and is ripped on the next, every two beats
+        if (i % 8 === 0) {
+          const k = sbar * 2 + i / 8;
+          if (k >= 14) {
+            if (k === 14) this.impact(w, 1.2);
+            this.crash(w, 0.5);
+          } else if (k % 2 === 0) {
+            this.kick(w, 1);
+            this.clap(w, 0.9, 0.2);
+          } else {
+            this.crash(w, 0.35);
+            this.cowbell(w, 24, 0.8, 0.3);
+            this.whoosh(w, 0.2);
+          }
+        }
+        break;
+      }
       case 'domain':
-        if (i === 0 && lt > 0) {
+        if (at(4)) this.impact(w, 1);
+        if (i === 0 && sbar >= 2 && sbar <= 6) {
           this.cowbell(w, 24, 0.7, 0.45);
           this.crash(w, 0.25);
         }
         break;
+      case 'morning':
+        // a clock ticking on the beats, then the alarm on the downbeat
+        if (sbar === 0 && i % 4 === 0) this.hat(w, 0.3, false, 6000);
+        if (at(2)) {
+          this.impact(w, 1);
+          this.crash(w, 0.5);
+        }
+        if (sbar === 1 && i < 4) this.cowbell(w, i % 2 ? 31 : 24, 0.7, 0.1);
+        break;
+      case 'built':
+        if (i % 4 === 0) this.cowbell(w, [12, 15, 19, 24][(sbar * 4 + i / 4) % 4] + (sbar ? 12 : 0), 0.6, 0.2);
+        break;
+      case 'toolbox':
+        if (sbar === 0 && i < 12) this.hat(w + STEP / 2, 0.18);
+        break;
       case 'pour':
         if (lastBar && i === 8) this.riser(w, 1, 0.45);
         break;
-      case 'hours':
-        if (at(1.5)) {
-          this.impact(w, 1.1); // the 24× stamp
-          this.clap(w, 1, 0.5);
-        }
-        break;
-      case 'rust':
       case 'quantum':
-        if (at(id === 'rust' ? 1.125 : 1.5)) {
+        if (at(1.5)) {
           this.cowbell(w, 24, 0.9, 0.5);
           this.crash(w, 0.3);
-        }
-        break;
-      case 'consolidate':
-        if (at(0.75)) this.riser(w, 1.25, 0.5);
-        if (at(2)) {
-          this.impact(w, 1.15); // 136 → 1
-          this.crash(w, 0.6);
         }
         break;
       case 'grid':
@@ -355,6 +375,13 @@ export class ScoreController {
       return this.blackHole(sbar ? 15 : 14, i, w);
     }
     if (id === 'pour') return this.pour(bar, i, w, chord);
+    if ((id === 'domain' && sbar < 2) || (id === 'morning' && sbar === 0)) {
+      // calm: the drums drop out (the song's cut-out, and the night before the alarm)
+      if (i === 0) this.bass(w, ROOTS[chord], 1.6);
+      const note = RIFF[chord][i];
+      if (note !== undefined) this.cowbell(w, note, 0.4, 0.22, 1800);
+      return;
+    }
     if (id === 'loop') return this.stinger(i, w);
     if (id === 'grid' && lastBar && i >= 8) {
       // the floor drops away before the black hole
@@ -366,7 +393,7 @@ export class ScoreController {
       return;
     }
 
-    const roll = ((id === 'cold-open' || id === 'consolidate') && sbar === 0) || (lastBar && ['journey', 'cinema', 'shortlist'].includes(id));
+    const roll = (id === 'cold-open' && sbar === 0) || (lastBar && ['journey', 'cinema', 'shortlist', 'grid'].includes(id)) || (id === 'domain' && sbar === 1);
     this.groove(bar, i, w, chord, id === 'cta', id === 'cinema' || id === 'cta', roll);
     if ((id === 'maths' || id === 'navier') && i % 4 === 0) this.plink(w + 0.001, [12, 15, 19, 24][i / 4], 0.35);
   }
