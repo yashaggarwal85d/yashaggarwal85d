@@ -1,14 +1,16 @@
 import { LOOP } from './anim';
 
 /**
- * The soundtrack: Don Toliver's official upload of "Lose My Mind" (feat. Doja
- * Cat), from the F1 soundtrack, played through YouTube's embedded player (the
- * audio is never hosted here). When it plays, the song's clock drives the
- * reel: 110 BPM is stretched onto the reel's 120 BPM grid, starting at the
- * first beat after the intro.
+ * The soundtrack: Don Toliver's official audio upload of "TORE UP" (from
+ * HARDSTONE PSYCHO), played through YouTube's embedded player (the audio is
+ * never hosted here). When it plays, the song's clock drives the reel: its
+ * 155 BPM grid replaces the reel's 120, starting at the first beat after the
+ * intro. The audio upload shows only the cover art, so the player card stays
+ * at YouTube's minimum size (200 × 200) with no video.
  *
- * Tried first and refused by their owners for playback on other websites
- * (YouTube error 150): Tame Impala's "Dracula" and Lady Gaga's "Judas".
+ * Tried earlier: "Dracula" (Tame Impala) and "Judas" (Lady Gaga) refuse
+ * playback on other websites (YouTube error 150); "Lose My Mind" worked but
+ * didn't suit the reel.
  */
 
 /** On for everyone once the beat-drop time is confirmed by ear. */
@@ -18,18 +20,20 @@ const LIVE = false;
 export const SONG_ENABLED = LIVE || new URLSearchParams(window.location.search).has('song');
 
 export const SONG = {
-  videoId: 'WWEs82u37Mw',
-  title: 'Lose My Mind',
-  artist: 'Don Toliver ft. Doja Cat',
-  source: 'From F1® The Movie',
-  url: 'https://www.youtube.com/watch?v=WWEs82u37Mw',
-  bpm: 110,
+  videoId: 'jQGqtCalg9Y',
+  title: 'TORE UP',
+  artist: 'Don Toliver',
+  source: 'HARDSTONE PSYCHO',
+  url: 'https://www.youtube.com/watch?v=jQGqtCalg9Y',
+  /** Tunebat and Beatsource agree on 155 */
+  bpm: 155,
   /**
-   * Seconds into the video where the reel's first beat lands; tune with [ and ].
-   * Starts on the first sung line (18.19 s in synced lyrics), which sits on the
-   * song's two-bar grid.
+   * Seconds into the upload where the reel's first beat lands; tune with [ and ].
+   * Starts on the first verse line (18.16 s in synced lyrics).
    */
-  firstBeat: 18.19,
+  firstBeat: 18.16,
+  /** length in seconds, used until the player reports its own */
+  duration: 127,
 };
 
 /** Reel seconds per song second. */
@@ -126,7 +130,7 @@ class SongController {
   offset = readOffset();
   /** completed passes through the song, for the loop counter */
   passes = 0;
-  duration = 211;
+  duration = SONG.duration;
   private player: YTPlayer | null = null;
   private anchorSong = 0;
   private anchorPerf = 0;
