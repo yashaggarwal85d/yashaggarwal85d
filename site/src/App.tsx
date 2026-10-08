@@ -12,6 +12,7 @@ import OffTheClock from './components/OffTheClock';
 import Achievements from './components/Achievements';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import SongDeck from './components/SongDeck';
 import Showreel, { type ReelControls } from './reel/Showreel';
 import { createKbDriver } from './reel/kbDriver';
 
@@ -71,6 +72,7 @@ export default function App() {
         <Contact />
       </main>
       <Footer />
+      <SongDeck />
       <ChapterSelect open={paletteOpen} onClose={() => setPaletteOpen(false)} reel={reel} onBeans={toggleBeans} />
       <AnimatePresence>
         {toast && (

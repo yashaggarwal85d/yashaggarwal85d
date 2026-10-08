@@ -1,12 +1,15 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type RefObject } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { ArrowDown, X } from 'lucide-react';
 import { BEAT, LOOP, clamp01, lerp } from './anim';
 import { CHAPTERS, SCENES, chapterAt, sceneAt } from './scenes';
 import { BeatSynth } from './sound';
+import { song, shouldAutoplaySong } from './song';
 import type { KbDriver } from './kbDriver';
 import type { Geo } from './types';
 import PlayerDock from './PlayerDock';
 
-export type ReelState = { time: number; loop: number; playing: boolean; sound: boolean };
+export type ReelState = { time: number; loop: number; playing: boolean; sound: boolean; intro: boolean };
 
 export type ReelControls = {
   toggle: () => void;
@@ -29,9 +32,13 @@ const smooth = (v: number) => v * v * (3 - 2 * v);
 const isTyping = (el: EventTarget | null) =>
   el instanceof HTMLElement && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
 
+/** The song is still being fetched: hold the reel at the intro rather than start without it. */
+const songPending = () => song.status === 'loading';
+
 export default function Showreel({ kb, controls, onExplore }: Props) {
   const sectionRef = useRef<HTMLElement>(null);
   const reduceMotion = useMemo(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches, []);
+  useSyncExternalStore(song.subscribe, song.getVersion);
 
   // `?t=12.5` deep-links to a paused moment of the reel.
   const startAt = useMemo(() => {
@@ -40,6 +47,7 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
     return Number.isFinite(v) && v >= 0 && v < LOOP ? v : null;
   }, []);
   const holdStill = reduceMotion || startAt !== null;
+  const waitForSong = useMemo(() => shouldAutoplaySong(), []);
 
   const clock = useRef({
     time: startAt ?? (reduceMotion ? SCENES[1].start + SCENES[1].poster : 0),
@@ -48,11 +56,22 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
     userPaused: holdStill,
     autoPaused: false,
     inView: true,
+    intro: waitForSong,
+    /** set by deliberate jumps so they are not mistaken for a loop */
+    jumped: false,
   });
   const synth = useRef(new BeatSynth());
-  const [frame, setFrame] = useState<ReelState>({ time: clock.current.time, loop: 0, playing: clock.current.playing, sound: false });
+  const [frame, setFrame] = useState<ReelState>({
+    time: clock.current.time,
+    loop: 0,
+    playing: clock.current.playing,
+    sound: false,
+    intro: clock.current.intro,
+  });
   const [size, setSize] = useState({ vw: window.innerWidth, vh: window.innerHeight });
   const [inView, setInView] = useState(true);
+  const [scrollHint, setScrollHint] = useState(false);
+  const hinted = useRef(false);
 
   useLayoutEffect(() => {
     const el = sectionRef.current;
@@ -80,15 +99,16 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
 
   const publish = useCallback(() => {
     const c = clock.current;
-    setFrame((f) => ({ ...f, time: c.time, loop: c.loop, playing: c.playing }));
+    setFrame((f) => ({ ...f, time: c.time, loop: c.loop, playing: c.playing, intro: c.intro }));
   }, []);
 
-  // ---- controls -------------------------------------------------------
+  // ---- controls: routed to the song when it is driving the reel -----------
   const api = useMemo<ReelControls>(() => {
     const c = clock.current;
     const s = synth.current;
     return {
       play: () => {
+        if (song.engaged) return song.play();
         c.playing = true;
         c.userPaused = false;
         c.autoPaused = false;
@@ -96,13 +116,21 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
         publish();
       },
       pause: () => {
+        if (song.engaged) return song.pause();
         c.playing = false;
         c.userPaused = true;
         publish();
       },
-      toggle: () => (c.playing ? api.pause() : api.play()),
+      toggle: () => {
+        if (song.engaged) return song.toggle();
+        if (c.playing) api.pause();
+        else api.play();
+      },
       seek: (time) => {
-        c.time = ((time % LOOP) + LOOP) % LOOP;
+        c.jumped = true;
+        const t = ((time % LOOP) + LOOP) % LOOP;
+        if (song.engaged) return song.seekReel(t);
+        c.time = t;
         s.resync();
         publish();
       },
@@ -112,16 +140,25 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
         api.play();
       },
       restart: () => {
+        c.jumped = true;
         c.loop += 1;
+        if (song.engaged) return song.restart();
         api.seek(0);
         api.play();
       },
       toggleSound: () => {
+        if (song.engaged) return song.toggleMute();
         if (s.enabled) s.disable();
         else s.enable();
         setFrame((f) => ({ ...f, sound: !f.sound }));
       },
-      getState: () => ({ time: c.time, loop: c.loop, playing: c.playing, sound: s.enabled }),
+      getState: () => ({
+        time: c.time,
+        loop: c.loop,
+        playing: song.engaged ? song.status === 'playing' : c.playing,
+        sound: song.engaged ? !song.muted : s.enabled,
+        intro: c.intro,
+      }),
     };
   }, [publish]);
 
@@ -132,7 +169,7 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
     };
   }, [api, controls]);
 
-  // ---- the master clock -------------------------------------------------
+  // ---- the master clock ----------------------------------------------------
   useEffect(() => {
     let raf = 0;
     let prev = performance.now();
@@ -142,15 +179,50 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
       const dt = Math.min(0.1, (now - prev) / 1000);
       prev = now;
       const c = clock.current;
-      if (c.playing && !document.hidden) {
-        c.time += dt;
-        if (c.time >= LOOP) {
-          c.time -= LOOP;
-          c.loop += 1;
+      const before = c.time;
+
+      if (song.engaged) {
+        // The song's position is the clock: intro first, then the reel on its beat grid.
+        const abs = song.reelTime();
+        c.intro = abs < 0;
+        c.time = abs < 0 ? 0 : abs % LOOP;
+        c.playing = song.status === 'playing';
+      } else if (waitForSong && songPending()) {
+        c.intro = true;
+      } else {
+        if (c.intro) {
+          // The song never arrived (blocked or failed): start the reel on its own.
+          c.intro = false;
+          c.time = 0;
         }
-        setFrame((f) => ({ ...f, time: c.time, loop: c.loop }));
+        if (c.playing && !document.hidden) {
+          c.time += dt;
+          if (c.time >= LOOP) c.time -= LOOP;
+        }
       }
-      synth.current.tick(c.loop * LOOP + c.time, c.playing && !document.hidden);
+
+      // A natural wrap (not a jump) completes a loop.
+      if (!c.intro && c.time < before - LOOP / 2) {
+        if (c.jumped) c.jumped = false;
+        else {
+          c.loop += 1;
+          if (!hinted.current && window.scrollY < window.innerHeight * 0.4) {
+            hinted.current = true;
+            setScrollHint(true);
+          }
+        }
+      } else if (c.jumped && Math.abs(c.time - before) > 0.001 && c.time >= before) {
+        c.jumped = false;
+      }
+
+      if (c.inView || song.engaged) {
+        setFrame((f) =>
+          f.time === c.time && f.loop === c.loop && f.playing === c.playing && f.intro === c.intro
+            ? f
+            : { ...f, time: c.time, loop: c.loop, playing: c.playing, intro: c.intro },
+        );
+      }
+      synth.current.tick(c.loop * LOOP + c.time, c.playing && !document.hidden && !song.engaged);
 
       // Keyboard choreography: the reel owns it at the top of the page, the
       // explore pages take over (oat palette, idle wave) as you scroll away.
@@ -159,10 +231,10 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
         const vh = window.innerHeight;
         const e = smooth(clamp01((window.scrollY - 0.35 * vh) / (0.5 * vh)));
         const scene = sceneAt(c.time);
-        const f = scene.kb?.(c.time - scene.start, geoRef.current);
-        d.visible = Math.max(f ? 1 - e : 0, e);
+        const f = c.intro ? null : scene.kb?.(c.time - scene.start, geoRef.current);
+        d.visible = Math.max(f || c.intro ? 1 - e : 0, e);
         d.light = e;
-        d.idleWave = e > 0.5;
+        d.idleWave = e > 0.5 || c.intro;
         d.socketFloor = lerp(0.05, 0.16, e);
         d.pump = f ? f.pump * (1 - e) : 0;
         d.shockR = f ? f.shockR : -1;
@@ -173,9 +245,9 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
     };
     loop();
     return () => cancelAnimationFrame(raf);
-  }, [kb]);
+  }, [kb, waitForSong]);
 
-  // ---- pause when scrolled away ------------------------------------------
+  // ---- pause when scrolled away (the song keeps playing: it is the soundtrack) --
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
@@ -184,6 +256,7 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
         const c = clock.current;
         c.inView = entry.intersectionRatio >= 0.35;
         setInView(c.inView);
+        if (song.engaged) return;
         if (!c.inView && c.playing) {
           c.playing = false;
           c.autoPaused = true;
@@ -201,7 +274,19 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
     return () => io.disconnect();
   }, [publish]);
 
-  // ---- shortcuts ---------------------------------------------------------
+  // The scroll hint gets out of the way once you scroll, or after a while.
+  useEffect(() => {
+    if (!scrollHint) return;
+    const id = window.setTimeout(() => setScrollHint(false), 9000);
+    const onScroll = () => window.scrollY > 80 && setScrollHint(false);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.clearTimeout(id);
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, [scrollHint]);
+
+  // ---- shortcuts -----------------------------------------------------------
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey || isTyping(e.target)) return;
@@ -228,13 +313,16 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
     return () => window.removeEventListener('keydown', onKey);
   }, [api]);
 
-  // ---- swipe between chapters on touch screens ----------------------------
+  // ---- swipe between chapters on touch screens --------------------------------
   const touch = useRef<{ x: number; y: number } | null>(null);
 
   const scene = sceneAt(frame.time);
   const local = frame.time - scene.start;
   const Scene = scene.Component;
   const beat = Math.floor(frame.time / BEAT) % 4;
+  const dockState: ReelState = song.engaged
+    ? { ...frame, playing: song.status === 'playing' || song.status === 'buffering', sound: !song.muted }
+    : frame;
 
   return (
     <section
@@ -246,14 +334,21 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
       onTouchEnd={(e) => {
         const s = touch.current;
         touch.current = null;
-        if (!s) return;
+        if (!s || clock.current.intro) return;
         const dx = e.changedTouches[0].clientX - s.x;
         const dy = e.changedTouches[0].clientY - s.y;
         if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.4) api.chapter(chapterAt(clock.current.time) + (dx < 0 ? 1 : -1));
       }}
     >
       <div className="absolute inset-0" aria-hidden>
-        <Scene key={scene.id} t={local} time={frame.time} loop={frame.loop} W={W} H={H} portrait={portrait} fit={fit} />
+        {frame.intro ? (
+          <div
+            className="absolute inset-0"
+            style={{ background: 'radial-gradient(ellipse at center, rgba(23,16,12,.55) 0%, rgba(23,16,12,.25) 45%, rgba(0,0,0,.7) 100%)' }}
+          />
+        ) : (
+          <Scene key={scene.id} t={local} time={frame.time} loop={frame.loop} W={W} H={H} portrait={portrait} fit={fit} />
+        )}
         <div
           className="grain pointer-events-none absolute inset-0"
           style={{ opacity: 0.08, backgroundPosition: `${(frame.time * 977) % 160}px ${(frame.time * 613) % 160}px` }}
@@ -264,11 +359,46 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
         from 18 hours to 45 minutes, a Rust ETL engine 3.8 times faster than Spark landing 16 TB a day, 136 site databases merged
         into one, and interests in astrophysics, quantum computing, maths and cinema. Scroll down to explore the full portfolio.
       </p>
+
+      <AnimatePresence>
+        {scrollHint && inView && (
+          <motion.div
+            initial={{ opacity: 0, y: 24, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+            className="absolute inset-x-0 z-30 mx-auto flex w-max max-w-[calc(100vw-32px)] items-center gap-2 rounded-full border border-crema/20 py-1.5 pl-4 pr-1.5 text-crema shadow-2xl backdrop-blur-xl"
+            style={{ bottom: size.vw < 768 ? 96 : 118, background: 'rgba(23,16,12,.86)' }}
+            role="status"
+          >
+            <span className="text-sm">
+              That’s the reel <span className="text-caramel">↺</span> it’ll keep looping.
+            </span>
+            <button
+              onClick={() => {
+                setScrollHint(false);
+                onExplore();
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full bg-cinnamon px-3.5 py-1.5 text-sm font-semibold text-foam transition hover:brightness-110"
+            >
+              Scroll to explore
+              <motion.span animate={{ y: [0, 3, 0] }} transition={{ repeat: Infinity, duration: 1 }}>
+                <ArrowDown className="h-4 w-4" />
+              </motion.span>
+            </button>
+            <button onClick={() => setScrollHint(false)} className="grid h-7 w-7 place-items-center rounded-full text-latte hover:text-crema" aria-label="Dismiss">
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <PlayerDock
-        state={frame}
+        state={dockState}
         beat={beat}
         compact={size.vw < 768}
-        hidden={!inView}
+        hidden={!inView || frame.intro}
+        songMode={song.engaged}
         onToggle={api.toggle}
         onSeek={(time) => {
           api.seek(time);

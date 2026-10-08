@@ -10,13 +10,15 @@ type Props = {
   compact: boolean;
   /** the reel has scrolled away */
   hidden?: boolean;
+  /** the song is driving the reel: the sound button mutes it */
+  songMode?: boolean;
   onToggle: () => void;
   onSeek: (time: number) => void;
   onSound: () => void;
   onExplore: () => void;
 };
 
-export default function PlayerDock({ state, beat, compact, hidden = false, onToggle, onSeek, onSound, onExplore }: Props) {
+export default function PlayerDock({ state, beat, compact, hidden = false, songMode = false, onToggle, onSeek, onSound, onExplore }: Props) {
   const current = chapterAt(state.time);
   const [hint, setHint] = useState(true);
   useEffect(() => {
@@ -135,10 +137,10 @@ export default function PlayerDock({ state, beat, compact, hidden = false, onTog
           onClick={onSound}
           className="flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-crema/25 px-3 font-mono text-xs text-latte transition hover:text-crema"
           aria-pressed={state.sound}
-          aria-label={state.sound ? 'Mute the beat' : 'Play a 120 BPM beat'}
+          aria-label={songMode ? (state.sound ? 'Mute Dracula' : 'Unmute Dracula') : state.sound ? 'Mute the beat' : 'Play a 120 BPM beat'}
         >
           {state.sound ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
-          {!compact && (state.sound ? 'ON' : 'OFF')}
+          {!compact && (songMode ? 'DRACULA' : state.sound ? 'ON' : 'OFF')}
         </button>
 
         <button

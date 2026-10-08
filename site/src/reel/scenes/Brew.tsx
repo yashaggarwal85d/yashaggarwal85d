@@ -36,10 +36,10 @@ export function ColdOpen(p: SceneProps) {
           opacity={(1 - ring) * 0.6}
         />
       </svg>
-      <At x={60} y={56} style={{ font: `600 ${portrait ? 26 : 20}px ${F.mono}`, letterSpacing: '0.14em', color: C.latte, whiteSpace: 'nowrap' }}>
+      <At x={60} y={portrait ? 150 : 110} style={{ font: `600 ${portrait ? 26 : 20}px ${F.mono}`, letterSpacing: '0.14em', color: C.latte, whiteSpace: 'nowrap' }}>
         <span style={{ color: C.cinnamon, opacity: beat % 2 === 0 ? 1 : 0.25 }}>● REC</span>&nbsp;&nbsp;{tc}
       </At>
-      <At x={W - 60} y={56} anchor="tr" style={{ font: `600 ${portrait ? 26 : 20}px ${F.mono}`, letterSpacing: '0.14em', color: C.latte, whiteSpace: 'nowrap' }}>
+      <At x={W - 60} y={portrait ? 150 : 110} anchor="tr" style={{ font: `600 ${portrait ? 26 : 20}px ${F.mono}`, letterSpacing: '0.14em', color: C.latte, whiteSpace: 'nowrap' }}>
         120 BPM · 4/4
       </At>
       <At
