@@ -2,12 +2,14 @@ import { At, Flash, Stage, type SceneProps } from '../Stage';
 import { clamp01, ease, hit, lerp, prog, rand, shakes } from '../anim';
 import { C, F, gradText } from '../palette';
 import { tr } from '../../i18n';
+import { hook } from '../hook';
 
 /* ---------------------------------------------------------- TORE UP: the numbers */
 
 /**
- * The headline numbers, under the hook of "TORE UP", where the line lands every
- * two beats (one reel second here). Each card slams down the old number on one
+ * The headline numbers, under the song's hook, where the line lands every two
+ * beats (one reel second here). With TORE UP playing the word on screen is the
+ * one being sung; with the original score it's REBUILT. Each card slams down the old number on one
  * "tore up" and is ripped in half on the next, revealing what replaced it.
  * Seven cards, fourteen hits, then two for the finale: eight bars, the whole hook.
  */
@@ -40,6 +42,11 @@ export function TornUp(p: SceneProps) {
     ? { hx: 60, hy: 150, hs: 170, cx: 70, cy: 420, cw: 760, ch: 440, olds: 92, nowY: 640, nows: 132 }
     : { hx: 80, hy: 70, hs: 210, cx: 380, cy: 380, cw: 960, ch: 380, olds: 104, nowY: 520, nows: 150 };
 
+  const word0 = hook.toreUp ? 'TORE UP' : tr('REBUILT');
+  const fin = hook.toreUp ? 'TORE UP.' : tr('REBUILT.');
+  // Longer words (other languages) shrink to fit the stage; ~0.62 em per glyph
+  // is this italic's widest case (W, M), so nothing ever runs off the edge.
+  const fitH = (size: number, text: string, maxW: number) => Math.min(size, maxW / ([...text].length * 0.62));
   const k = Math.min(15, Math.floor(t)); // hits so far, 0-based
   const card = Math.min(CARDS.length - 1, Math.floor(k / 2));
   const ripped = k % 2 === 1;
@@ -87,7 +94,7 @@ export function TornUp(p: SceneProps) {
         x={L.hx}
         y={L.hy}
         style={{
-          font: `italic 800 ${L.hs}px/0.9 ${F.display}`,
+          font: `italic 800 ${fitH(L.hs, word0, portrait ? 780 : 1150)}px/0.9 ${F.display}`,
           letterSpacing: '-0.03em',
           whiteSpace: 'nowrap',
           transformOrigin: '0% 70%',
@@ -96,7 +103,7 @@ export function TornUp(p: SceneProps) {
           ...(k % 2 ? gradText() : { color: C.crema }),
         }}
       >
-        TORE UP
+        {word0}
       </At>
       <At
         x={W - (portrait ? 60 : 80)}
@@ -190,14 +197,14 @@ export function TornUp(p: SceneProps) {
           y={portrait ? 900 : 560}
           anchor="c"
           style={{
-            font: `italic 800 ${portrait ? 190 : 260}px/1 ${F.display}`,
+            font: `italic 800 ${fitH(portrait ? 190 : 260, fin, portrait ? 800 : 1440)}px/1 ${F.display}`,
             letterSpacing: '-0.03em',
             whiteSpace: 'nowrap',
             transform: `scale(${lerp(1.6, 1, ease.backOutHard(prog(t, 14, 0.25))) * (1 + 0.1 * hit(t, 15, 9))})`,
             ...gradText(),
           }}
         >
-          TORE UP.
+          {fin}
         </At>
       )}
     </Stage>

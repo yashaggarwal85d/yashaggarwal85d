@@ -92,13 +92,16 @@ export default function KeyboardBackground({ driver }: Props) {
     let width = host.clientWidth;
     let height = host.clientHeight;
 
+    // Phones: fewer pixels and no MSAA. It's a soft background, and it keeps
+    // the intro smooth on mid-range GPUs.
+    const touch = window.matchMedia('(pointer: coarse)').matches;
     let renderer: THREE.WebGLRenderer;
     try {
-      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer = new THREE.WebGLRenderer({ antialias: !touch, powerPreference: 'high-performance' });
     } catch {
       return; // no WebGL: the page still works on its plain background
     }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, touch ? 1.25 : 2));
     renderer.setSize(width, height);
     renderer.setClearColor(CLEAR_DARK);
     host.appendChild(renderer.domElement);
@@ -362,6 +365,26 @@ export default function KeyboardBackground({ driver }: Props) {
       return true;
     };
 
+    // If the GPU can't keep up (a weak phone), render fewer pixels until it can.
+    // It only ever steps down, and ignores the first second of start-up.
+    const SIZES = [3, 5, 8];
+    const born = performance.now();
+    let slowSum = 0;
+    let slowN = 0;
+    const adapt = (dtMs: number) => {
+      if (performance.now() - born < 1000) return;
+      slowSum += dtMs;
+      if (++slowN < 45) return;
+      const avg = slowSum / slowN;
+      slowSum = slowN = 0;
+      const cur = renderer.getPixelRatio();
+      if (avg <= 22 || cur <= 0.75) return;
+      const next = Math.max(0.75, cur - 0.25);
+      renderer.setPixelRatio(next);
+      renderer.setSize(width, height);
+      dotMats.forEach((m, b) => (m.uniforms.uSize.value = SIZES[b] * next * 0.75));
+    };
+
     const frame = () => {
       raf = requestAnimationFrame(frame);
       const now = performance.now();
@@ -369,6 +392,7 @@ export default function KeyboardBackground({ driver }: Props) {
         prev = now;
         return;
       }
+      adapt(now - prev);
       const d = driver.current;
       if (!d) return;
       const dt = Math.min(0.1, (now - prev) / 1000);

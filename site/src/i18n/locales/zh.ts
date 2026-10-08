@@ -238,6 +238,8 @@ const d: Record<string, string> = {
   "Quantum computing": "量子计算",
   "Qubits": "量子比特",
   "RAW LANDING": "原始落地区",
+  "REBUILT": "重建",
+  "REBUILT.": "重建。",
   "RECOGNITION": "荣誉",
   "RUST, 3.8×": "RUST，3.8×",
   "Raised per-node ingest throughput 3.8× over the previous Spark jobs (1.5 GB/s on identical hardware) by building a Rust-based ETL engine that now lands ~16 TB/day of factory and operational data.": "构建基于 Rust 的 ETL 引擎，单节点摄取吞吐量比原有 Spark 任务提升 3.8×（相同硬件上 1.5 GB/s），如今每天落地 ~16 TB 工厂与运营数据。",

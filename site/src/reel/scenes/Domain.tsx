@@ -9,17 +9,19 @@ import { tr } from '../../i18n';
 /**
  * Where the data lives: the semiconductor supply chain, one stage per bar.
  * Bars 1–2 name the domain (under the song's drum cut-out); bars 3–7 light up
- * demand → fab → assembly → planning → delivery, with data packets streaming
- * along the line; bar 8 says where I fit in.
+ * the chain in the order it runs: demand → planning → wafer fab → assembly &
+ * test → delivery, with data packets streaming along the line; bar 8 says
+ * where I fit in.
  */
 const STAGES = [
-  { label: tr('DEMAND'), note: tr('forecasts and ML demand signals') },
-  { label: tr('WAFER FAB'), note: tr('MES streams from fabs around the world') },
-  { label: tr('ASSEMBLY & TEST'), note: tr('start signals from fab to assembly') },
-  { label: tr('PLANNING'), note: tr('supply plans and factory build plans') },
-  { label: tr('DELIVERY'), note: tr('the right chip, to the right customer') },
+  { icon: 0, label: tr('DEMAND'), note: tr('forecasts and ML demand signals') },
+  { icon: 3, label: tr('PLANNING'), note: tr('supply plans and factory build plans') },
+  { icon: 1, label: tr('WAFER FAB'), note: tr('MES streams from fabs around the world') },
+  { icon: 2, label: tr('ASSEMBLY & TEST'), note: tr('start signals from fab to assembly') },
+  { icon: 4, label: tr('DELIVERY'), note: tr('the right chip, to the right customer') },
 ];
 
+/** 0 demand, 1 wafer, 2 packaged chip, 3 plan, 4 truck */
 function Icon({ i }: { i: number }): ReactNode {
   const s = { fill: 'none', stroke: C.espresso, strokeWidth: 6, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
   if (i === 0)
@@ -178,7 +180,7 @@ export function Domain(p: SceneProps) {
               <circle r={80 + 70 * ring} fill="none" stroke={C.cinnamon} strokeWidth={4} opacity={1 - ring} />
               <g transform={`scale(${pop * (live ? 1 + 0.05 * beatEnv(t, 10) : 0.92)})`}>
                 <circle r={74} fill={live ? C.caramel : C.crema} stroke={C.espresso} strokeWidth={5} />
-                <Icon i={k} />
+                <Icon i={s.icon} />
               </g>
             </svg>
             <At

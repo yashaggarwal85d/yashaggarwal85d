@@ -2,6 +2,7 @@ import { clamp01, mmss } from './anim';
 import { sceneById, type Chapter } from './scenes';
 import { ScoreController } from './score';
 import { tr } from '../i18n';
+import { hook } from './hook';
 
 /**
  * The soundtrack: Don Toliver's "TORE UP" (HARDSTONE PSYCHO), played through
@@ -631,6 +632,7 @@ class Soundtrack extends Emitter {
   active: Track;
   private yt: SongController | null = null;
   private autoplay = false;
+  private mounted = false;
   /** TORE UP couldn't play and the score took over */
   fellBack = false;
 
@@ -641,6 +643,8 @@ class Soundtrack extends Emitter {
       const yt = new SongController();
       yt.subscribe(() => {
         if (yt.status === 'failed' && this.active === yt) this.fallBack();
+        // The hook word on screen follows the music actually playing.
+        hook.toreUp = this.active === yt && yt.engaged;
         this.emit();
       });
       this.yt = yt;
@@ -673,7 +677,9 @@ class Soundtrack extends Emitter {
   get meta(): TrackMeta {
     return this.active.meta;
   }
-  get status() {
+  get status(): SongStatus {
+    // Before it mounts (the page is still settling) it's on its way: hold the intro.
+    if (!this.mounted && shouldAutoplaySong()) return 'loading';
     return this.active.status;
   }
   get muted() {
@@ -696,6 +702,8 @@ class Soundtrack extends Emitter {
   }
   mount(el: HTMLElement | null, opts: { autoplay: boolean }) {
     this.autoplay = opts.autoplay;
+    this.mounted = true;
+    this.emit();
     return this.active.mount(el, opts);
   }
   play(withSound = false) {

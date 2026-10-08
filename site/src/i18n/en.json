@@ -237,6 +237,8 @@
   "Quantum computing",
   "Qubits",
   "RAW LANDING",
+  "REBUILT",
+  "REBUILT.",
   "RECOGNITION",
   "RUST, 3.8×",
   "Raised per-node ingest throughput 3.8× over the previous Spark jobs (1.5 GB/s on identical hardware) by building a Rust-based ETL engine that now lands ~16 TB/day of factory and operational data.",

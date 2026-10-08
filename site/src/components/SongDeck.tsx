@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ExternalLink, Music2, Play, SkipForward, Volume2, VolumeX, X } from 'lucide-react';
 import { SONG_ENABLED, shouldAutoplaySong, song } from '../reel/song';
+import { whenSettled } from '../reel/settle';
 import { tr } from '../i18n';
 
 /**
@@ -24,8 +25,15 @@ function SongDeckInner() {
   const toastTimer = useRef(0);
   const [vw, setVw] = useState(window.innerWidth);
 
+  // Start once the page has settled, so the countdown never stutters.
   useEffect(() => {
-    song.mount(hostRef.current, { autoplay: shouldAutoplaySong() });
+    let live = true;
+    void whenSettled().then(() => {
+      if (live) void song.mount(hostRef.current, { autoplay: shouldAutoplaySong() });
+    });
+    return () => {
+      live = false;
+    };
   }, []);
 
   useEffect(() => {

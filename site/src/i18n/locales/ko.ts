@@ -238,6 +238,8 @@ const d: Record<string, string> = {
   "Quantum computing": "양자 컴퓨팅",
   "Qubits": "큐비트",
   "RAW LANDING": "원시 랜딩",
+  "REBUILT": "재구축",
+  "REBUILT.": "재구축.",
   "RECOGNITION": "수상",
   "RUST, 3.8×": "RUST, 3.8×",
   "Raised per-node ingest throughput 3.8× over the previous Spark jobs (1.5 GB/s on identical hardware) by building a Rust-based ETL engine that now lands ~16 TB/day of factory and operational data.": "현재 하루 ~16 TB의 공장·운영 데이터를 적재하는 Rust 기반 ETL 엔진을 구축해, 노드당 수집 처리량을 기존 Spark 작업 대비 3.8× 높였습니다(동일 하드웨어에서 1.5 GB/s).",

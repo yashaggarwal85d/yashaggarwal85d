@@ -238,6 +238,8 @@ const d: Record<string, string> = {
   "Quantum computing": "Calcolo quantistico",
   "Qubits": "Qubit",
   "RAW LANDING": "DATI GREZZI",
+  "REBUILT": "RICOSTRUITO",
+  "REBUILT.": "RICOSTRUITO.",
   "RECOGNITION": "RICONOSCIMENTI",
   "RUST, 3.8×": "RUST, 3,8×",
   "Raised per-node ingest throughput 3.8× over the previous Spark jobs (1.5 GB/s on identical hardware) by building a Rust-based ETL engine that now lands ~16 TB/day of factory and operational data.": "Aumentato di 3,8× il throughput di ingestione per nodo rispetto ai precedenti job Spark (1,5 GB/s a parità di hardware) costruendo un motore ETL in Rust che oggi acquisisce ~16 TB/giorno di dati di fabbrica e operativi.",
