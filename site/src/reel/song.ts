@@ -1,40 +1,75 @@
 import { LOOP } from './anim';
+import { ScoreController } from './score';
 
 /**
- * The soundtrack: Don Toliver's official audio upload of "TORE UP" (from
- * HARDSTONE PSYCHO), played through YouTube's embedded player (the audio is
- * never hosted here). When it plays, the song's clock drives the reel: its
- * 155 BPM grid replaces the reel's 120, starting at the first beat after the
- * intro. The audio upload shows only the cover art, so the player card stays
- * at YouTube's minimum size (200 × 200) with no video.
+ * The soundtrack, in two flavours the reel can run on:
  *
- * Tried earlier: "Dracula" (Tame Impala) and "Judas" (Lady Gaga) refuse
- * playback on other websites (YouTube error 150); "Lose My Mind" worked but
- * didn't suit the reel.
+ * - `score`: "Cold Brew", an original drift-phonk score synthesised live in the
+ *   browser (score.ts), written hit-for-hit against the reel at 120 BPM.
+ * - `crown`: Linkin Park's official audio of "Heavy Is the Crown", played
+ *   through YouTube's embedded player (the audio is never hosted here). Its
+ *   clock drives the reel: the song's 128 BPM grid replaces the reel's 120,
+ *   starting at the first verse. YouTube requires the player to stay visible,
+ *   so it sits in a 200 × 200 card (the smallest size YouTube allows).
+ *
+ * Tried earlier and dropped: "Dracula", "Judas", "Believer", "Harder Better
+ * Faster Stronger" and others refuse playback on other sites (YouTube error
+ * 150); "Lose My Mind" and "TORE UP" worked but didn't suit the reel.
  */
 
-/** On for everyone once the beat-drop time is confirmed by ear. */
+/** On for everyone once a track is chosen and its beat-drop time confirmed by ear. */
 const LIVE = false;
+const DEFAULT_TRACK = 'score';
 
-/** `?song` in the address previews the soundtrack before it goes live. */
-export const SONG_ENABLED = LIVE || new URLSearchParams(window.location.search).has('song');
-
-export const SONG = {
-  videoId: 'jQGqtCalg9Y',
-  title: 'TORE UP',
-  artist: 'Don Toliver',
-  source: 'HARDSTONE PSYCHO',
-  url: 'https://www.youtube.com/watch?v=jQGqtCalg9Y',
-  /** Tunebat and Beatsource agree on 155 */
-  bpm: 155,
-  /**
-   * Seconds into the upload where the reel's first beat lands; tune with [ and ].
-   * Starts on the first verse line (18.16 s in synced lyrics).
-   */
-  firstBeat: 18.16,
+type Track = {
+  kind: 'youtube' | 'synth';
+  /** YouTube video id (youtube tracks) */
+  videoId: string;
+  title: string;
+  artist: string;
+  source: string;
+  url: string;
+  bpm: number;
+  /** seconds into the track where the reel's first beat lands; tune with [ and ] */
+  firstBeat: number;
   /** length in seconds, used until the player reports its own */
-  duration: 127,
+  duration: number;
 };
+
+const TRACKS: Record<string, Track> = {
+  score: {
+    kind: 'synth',
+    videoId: '',
+    title: 'COLD BREW',
+    artist: 'original score',
+    source: 'synthesised live in your browser',
+    url: 'https://github.com/yashaggarwal85d/yashaggarwal85d/blob/master/site/src/reel/score.ts',
+    bpm: 120,
+    firstBeat: 8,
+    duration: Infinity,
+  },
+  crown: {
+    kind: 'youtube',
+    videoId: 'ZAt8oxY0GQo',
+    title: 'Heavy Is the Crown',
+    artist: 'Linkin Park',
+    source: 'FROM ZERO',
+    url: 'https://www.youtube.com/watch?v=ZAt8oxY0GQo',
+    // Synced lyrics put one line per bar from 0:29.96 on, 1.87 s apart: 128 BPM (as SongBPM lists).
+    bpm: 128,
+    // The first verse line (22.35 s in synced lyrics).
+    firstBeat: 22.35,
+    duration: 168,
+  },
+};
+
+const requested = new URLSearchParams(window.location.search).get('song');
+
+/** `?song=score` or `?song=crown` previews a soundtrack before it goes live. */
+export const SONG_ENABLED = LIVE || requested !== null;
+
+export const SONG_ID = requested && TRACKS[requested] ? requested : DEFAULT_TRACK;
+export const SONG = TRACKS[SONG_ID];
 
 /** Reel seconds per song second. */
 export const WARP = SONG.bpm / 120;
@@ -111,7 +146,7 @@ function loadYouTubeApi(timeoutMs = 9000) {
   return apiPromise;
 }
 
-const OFFSET_KEY = 'reel-song-offset';
+const OFFSET_KEY = `reel-song-offset:${SONG_ID}`;
 const readOffset = () => {
   const fromUrl = Number(new URLSearchParams(window.location.search).get('offset'));
   if (Number.isFinite(fromUrl) && fromUrl > 0) return fromUrl;
@@ -174,8 +209,8 @@ class SongController {
   }
 
   // ---- lifecycle ---------------------------------------------------------
-  async mount(el: HTMLElement, opts: { autoplay: boolean }) {
-    if (this.player || this.status === 'loading') return;
+  async mount(el: HTMLElement | null, opts: { autoplay: boolean }) {
+    if (!el || this.player || this.status === 'loading') return;
     this.set('loading');
     let YT: YTNamespace;
     try {
@@ -363,7 +398,14 @@ class SongController {
   }
 }
 
-export const song = new SongController();
+export type Soundtrack = Pick<
+  SongController,
+  | 'status' | 'muted' | 'offset' | 'engaged' | 'subscribe' | 'getVersion' | 'now' | 'reelTime' | 'mount' | 'play' | 'pause' | 'toggle'
+  | 'unmute' | 'toggleMute' | 'seekReel' | 'skipIntro' | 'restart' | 'startOver' | 'stop' | 'nudge' | 'resetOffset'
+>;
+
+export const score = SONG.kind === 'synth' ? new ScoreController() : null;
+export const song: Soundtrack = score ?? new SongController();
 
 /** Autoplay the (muted) song unless the viewer prefers calm or deep-linked a frame. */
 export const shouldAutoplaySong = () =>

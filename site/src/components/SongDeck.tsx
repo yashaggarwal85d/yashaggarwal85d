@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ExternalLink, Music2, Play, SkipForward, Volume2, VolumeX, X } from 'lucide-react';
-import { SONG, SONG_ENABLED, WARP, shouldAutoplaySong, song } from '../reel/song';
+import { SONG, SONG_ENABLED, WARP, score, shouldAutoplaySong, song } from '../reel/song';
+import ScoreCard from './ScoreCard';
 
 /**
- * The soundtrack's visible home: one YouTube player that never remounts, kept
- * at the minimum size YouTube allows (200 × 200) in the bottom-left corner.
+ * The soundtrack's visible home: a 200 × 200 card in the bottom-left corner.
+ * For a YouTube track it holds the player (which never remounts) at the
+ * minimum size YouTube allows; for the original score, a live visualiser.
  * During the intro the middle of the screen carries the title, the unmute ask
  * and a countdown to the drop. YouTube's terms require the player to stay
  * visible while it plays, so stopping the music hides it.
@@ -23,7 +25,7 @@ function SongDeckInner() {
   const [vw, setVw] = useState(window.innerWidth);
 
   useEffect(() => {
-    if (hostRef.current) song.mount(hostRef.current, { autoplay: shouldAutoplaySong() });
+    song.mount(hostRef.current, { autoplay: shouldAutoplaySong() });
   }, []);
 
   useEffect(() => {
@@ -47,8 +49,9 @@ function SongDeckInner() {
     return () => window.clearInterval(id);
   }, [intro]);
 
-  // [ and ] nudge the beat alignment by 20 ms; \ resets it.
+  // [ and ] nudge the beat alignment by 20 ms; \ resets it. (The score needs none.)
   useEffect(() => {
+    if (score) return;
     let hide = 0;
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
@@ -143,9 +146,9 @@ function SongDeckInner() {
           pointerEvents: showPlayer ? 'auto' : 'none',
           visibility: status === 'failed' || status === 'idle' || status === 'blocked' ? 'hidden' : 'visible',
         }}
-        aria-label={`${SONG.title} by ${SONG.artist}, official audio on YouTube`}
+        aria-label={score ? `${SONG.title}, an original score playing live` : `${SONG.title} by ${SONG.artist}, official audio on YouTube`}
       >
-        <div ref={hostRef} className="h-full w-full" />
+        {score ? <ScoreCard score={score} /> : <div ref={hostRef} className="h-full w-full" />}
       </div>
 
       {/* Caption under the card. */}
@@ -182,7 +185,7 @@ function SongDeckInner() {
           >
             <Play className="h-4 w-4 text-caramel" fill="currentColor" /> Play with {SONG.title}
           </button>
-          <a href={SONG.url} target="_blank" rel="noopener" aria-label="Open the song on YouTube" className="grid h-8 w-8 place-items-center rounded-full text-latte transition hover:text-crema">
+          <a href={SONG.url} target="_blank" rel="noopener" aria-label={score ? 'Read the score’s source' : 'Open the song on YouTube'} className="grid h-8 w-8 place-items-center rounded-full text-latte transition hover:text-crema">
             <ExternalLink className="h-3.5 w-3.5" />
           </a>
         </div>
