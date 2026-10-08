@@ -1,6 +1,5 @@
 import type { SceneDef } from '../types';
 import { ColdOpen, coldOpenKb, NameSlam, nameSlamKb, Role } from './Brew';
-import { Grid } from './Grind';
 import { Built, Morning, Toolbox } from './Work';
 import { PourScene } from './Pour';
 import { BlackHoleScene, Cinema, Maths, NavierStokes, Quantum } from './OffTheClock';
@@ -26,13 +25,12 @@ export const SCENES: SceneDef[] = [
   { id: 'navier', title: 'Navier–Stokes', start: 58, dur: 2, Component: NavierStokes, poster: 1.95 },
   { id: 'cinema', title: tr('Rich taste'), start: 60, dur: 6, Component: Cinema, poster: 2.2 },
   { id: 'morning', title: tr('The next morning'), start: 66, dur: 4, Component: Morning, poster: 3.6 },
-  { id: 'built', title: tr('What I build'), start: 70, dur: 4, Component: Built, poster: 3.9 },
-  { id: 'pour', title: tr('How I brew data'), start: 74, dur: 4, Component: PourScene, poster: 3.9 },
-  { id: 'toolbox', title: tr('The toolbox'), start: 78, dur: 4, Component: Toolbox, poster: 3.2 },
-  { id: 'grid', title: tr('The scale'), start: 82, dur: 4, Component: Grid, poster: 1.9 },
+  { id: 'built', title: tr('What I can do for you'), start: 70, dur: 6, Component: Built, poster: 5.8 },
+  { id: 'pour', title: tr('How I brew data'), start: 76, dur: 6, Component: PourScene, poster: 5.9 },
+  { id: 'toolbox', title: tr('The toolbox'), start: 82, dur: 4, Component: Toolbox, poster: 3.2 },
   { id: 'shortlist', title: tr('Why me'), start: 86, dur: 10, Component: Shortlist, poster: 9.6 },
-  { id: 'cta', title: tr('Let’s build'), start: 96, dur: 14, Component: Cta, kb: ctaKb, poster: 3.2 },
-  { id: 'loop', title: tr('Return by death'), start: 110, dur: 2, Component: LoopStinger, poster: 1.0 },
+  { id: 'cta', title: tr('Let’s build'), start: 96, dur: 18, Component: Cta, kb: ctaKb, poster: 3.2 },
+  { id: 'loop', title: tr('Return by death'), start: 114, dur: 2, Component: LoopStinger, poster: 1.0 },
 ];
 
 export const sceneById = (id: string) => SCENES.find((s) => s.id === id)!;
@@ -45,8 +43,8 @@ export const CHAPTERS: Chapter[] = [
   { id: 'numbers', label: tr('Numbers'), sub: tr('the numbers'), start: 18, end: 34 },
   { id: 'domain', label: tr('Domain'), sub: tr('supply chain & manufacturing'), start: 34, end: 50 },
   { id: 'off', label: tr('Off the clock'), sub: tr('physics · maths · cinema'), start: 50, end: 66 },
-  { id: 'work', label: tr('Back to work'), sub: tr('what I build · the toolbox · the scale'), start: 66, end: 86 },
-  { id: 'serve', label: tr('Serve'), sub: tr('why me · let’s talk'), start: 86, end: 112 },
+  { id: 'work', label: tr('Back to work'), sub: tr('what I offer · the pipeline · the toolbox'), start: 66, end: 86 },
+  { id: 'serve', label: tr('Serve'), sub: tr('why me · let’s talk'), start: 86, end: 116 },
 ];
 
 export const sceneAt = (time: number) => {

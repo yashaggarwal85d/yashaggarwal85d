@@ -263,11 +263,11 @@ export class ScoreController {
     const lastBar = sbar === sc.dur / 2 - 1;
     const at = (x: number) => Math.abs(lt - x) < 1e-6;
 
-    this.toneAt(w, id === 'pour' ? 1400 : id === 'loop' ? 900 : 18000);
+    this.toneAt(w, id === 'loop' ? 900 : 18000);
 
     // ---- one-off cues ----------------------------------------------------
     if (at(0) && ['cold-open', 'journey', 'quantum', 'shortlist', 'built'].includes(id)) this.impact(w, 1);
-    if (at(0) && ['cold-open', 'journey', 'grid', 'quantum', 'shortlist', 'built'].includes(id)) this.crash(w, 0.55);
+    if (at(0) && ['cold-open', 'journey', 'quantum', 'shortlist', 'built', 'pour'].includes(id)) this.crash(w, 0.55);
     switch (id) {
       case 'name':
         if (at(2)) {
@@ -321,22 +321,24 @@ export class ScoreController {
         if (sbar === 1 && i < 4) this.cowbell(w, i % 2 ? 31 : 24, 0.7, 0.1);
         break;
       case 'built':
-        if (i % 4 === 0) this.cowbell(w, [12, 15, 19, 24][(sbar * 4 + i / 4) % 4] + (sbar ? 12 : 0), 0.6, 0.2);
+        // an offer lands every two beats
+        if (i % 8 === 0) {
+          this.cowbell(w, [12, 15, 19, 24, 27, 31][Math.min(5, sbar * 2 + i / 8)], 0.75, 0.3);
+          this.clap(w, 0.6, 0.2);
+        }
         break;
       case 'toolbox':
         if (sbar === 0 && i < 12) this.hat(w + STEP / 2, 0.18);
         break;
       case 'pour':
-        if (lastBar && i === 8) this.riser(w, 1, 0.45);
+        // a stage lands every two beats
+        if (i % 8 === 0) this.cowbell(w, [7, 12, 15, 19, 24, 27][Math.min(5, sbar * 2 + i / 8)], 0.7, 0.25);
         break;
       case 'quantum':
         if (at(1.5)) {
           this.cowbell(w, 24, 0.9, 0.5);
           this.crash(w, 0.3);
         }
-        break;
-      case 'grid':
-        if (at(3)) this.riser(w, 1, 0.6);
         break;
       case 'shortlist':
         // a tick every two beats
@@ -374,7 +376,6 @@ export class ScoreController {
       }
       return this.blackHole(sbar ? 15 : 14, i, w);
     }
-    if (id === 'pour') return this.pour(bar, i, w, chord);
     if ((id === 'domain' && sbar < 2) || (id === 'morning' && sbar === 0)) {
       // calm: the drums drop out (the song's cut-out, and the night before the alarm)
       if (i === 0) this.bass(w, ROOTS[chord], 1.6);
@@ -383,17 +384,8 @@ export class ScoreController {
       return;
     }
     if (id === 'loop') return this.stinger(i, w);
-    if (id === 'grid' && lastBar && i >= 8) {
-      // the floor drops away before the black hole
-      if (i === 8) {
-        this.kick(w, 0.9);
-        this.bass(w, ROOTS[chord], 0.9);
-      }
-      if (i % 2 === 0) this.hat(w, 0.18);
-      return;
-    }
 
-    const roll = (id === 'cold-open' && sbar === 0) || (lastBar && ['journey', 'cinema', 'shortlist', 'grid'].includes(id)) || (id === 'domain' && sbar === 1);
+    const roll = (id === 'cold-open' && sbar === 0) || (lastBar && ['journey', 'cinema', 'shortlist', 'toolbox'].includes(id)) || (id === 'domain' && sbar === 1);
     this.groove(bar, i, w, chord, id === 'cta', id === 'cinema' || id === 'cta', roll);
     if ((id === 'maths' || id === 'navier') && i % 4 === 0) this.plink(w + 0.001, [12, 15, 19, 24][i / 4], 0.35);
   }
@@ -458,16 +450,6 @@ export class ScoreController {
     if (pos >= 8 && left > 0.4) this.riser(w, left, 0.7);
   }
 
-  private pour(bar: number, i: number, w: number, chord: number) {
-    // Under water: filtered hook, a slow kick, bubbles.
-    if (i === 0 || i === 8) this.kick(w, 0.7);
-    if (i === 0) this.bass(w, ROOTS[chord], 1.2);
-    if (i === 12) this.clap(w, 0.4, 0.4);
-    if (i % 4 === 2) this.hat(w, 0.1);
-    const note = RIFF[chord][i];
-    if (note !== undefined) this.cowbell(w, note, 0.55, 0.3);
-    if (((bar * 16 + i) * 7) % 5 === 1) this.bubble(w, i);
-  }
 
   private blackHole(bar: number, i: number, w: number) {
     // Half time, everything in a cathedral.
@@ -700,14 +682,6 @@ export class ScoreController {
     this.send(env, 0.5);
   }
 
-  private bubble(w: number, i: number) {
-    const o = this.ctx!.createOscillator();
-    const f = 420 + ((i * 97) % 7) * 70;
-    o.frequency.setValueAtTime(f, w);
-    o.frequency.exponentialRampToValueAtTime(f * 2.6, w + 0.07);
-    o.connect(this.gainEnv(this.music, w, 0.12, 0.004, 0.08));
-    this.track(o, w, w + 0.1);
-  }
 
   private crackle(w: number, dur: number) {
     const s = this.ctx!.createBufferSource();

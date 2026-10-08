@@ -24,7 +24,7 @@ import { tr } from '../i18n';
  *   bars 64–81  outro
  *
  * Playback starts at 6 s, a 12 s run-up to the drop. The reel runs from the
- * cold open (bar 11) to the spinning top (bar 68); at bar 69 the song jumps
+ * cold open (bar 11) to the spinning top (bar 70); at bar 71 the song jumps
  * back to bar 11 with it, so most of the outro never plays.
  */
 
@@ -78,7 +78,7 @@ const DOWNBEAT = 0.013;
 const START = 6; // whole seconds: the IFrame API's `start` parameter
 const DROP = 12;
 const LOOP_FROM = 11; // the cold open
-const LOOP_TO = 69; // after the spinning top (five bars into the outro)
+const LOOP_TO = 71; // after the spinning top (seven bars into the outro)
 const DURATION = 127;
 
 /**
@@ -100,13 +100,12 @@ const ARRANGEMENT: Seg[] = [
   { bar: 42, scene: 'navier' },
   { bar: 43, scene: 'cinema' }, // a frame per beat
   { bar: 46, scene: 'morning' }, // the alarm rings on bar 47's downbeat…
-  { bar: 48, scene: 'built' }, // …and the drop is back to work
-  { bar: 50, scene: 'pour' },
-  { bar: 52, scene: 'toolbox' },
-  { bar: 54, scene: 'grid' },
+  { bar: 48, scene: 'built' }, // …and the drop is back to work: what I can do for you
+  { bar: 51, scene: 'pour' }, // the pipeline, a stage every two beats
+  { bar: 54, scene: 'toolbox' },
   { bar: 56, scene: 'shortlist' }, // hook 2: a tick per "tore up"
-  { bar: 61, scene: 'cta' }, // the ask, held for seven bars
-  { bar: 68, scene: 'loop' }, // return by death: back to bar 11
+  { bar: 61, scene: 'cta' }, // the ask, held for nine bars
+  { bar: 70, scene: 'loop' }, // return by death: back to bar 11
   { bar: LOOP_TO, scene: 'loop', from: 2 },
 ];
 const segReel = (s: Seg, x: number) => sceneById(s.scene).start + (s.from ?? 0) + (x - s.bar) * 2 * (s.speed ?? 1);
@@ -116,8 +115,8 @@ const SONG_CHAPTERS: Chapter[] = [
   { id: 'numbers', label: tr('Numbers'), sub: tr('the numbers'), start: 20, end: 28 },
   { id: 'domain', label: tr('Domain'), sub: tr('supply chain & manufacturing'), start: 28, end: 36 },
   { id: 'off', label: tr('Off the clock'), sub: tr('physics · maths · cinema'), start: 36, end: 46 },
-  { id: 'work', label: tr('Back to work'), sub: tr('what I build · the toolbox · the scale'), start: 46, end: 56 },
-  { id: 'finale', label: tr('Finale'), sub: tr('why me · let’s build'), start: 56, end: 69 },
+  { id: 'work', label: tr('Back to work'), sub: tr('what I offer · the pipeline · the toolbox'), start: 46, end: 56 },
+  { id: 'finale', label: tr('Finale'), sub: tr('why me · let’s build'), start: 56, end: 71 },
 ];
 
 // ---------------------------------------------------------------------------

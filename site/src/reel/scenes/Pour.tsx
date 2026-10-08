@@ -1,160 +1,197 @@
-import type { ReactNode } from 'react';
 import { At, Stage, type SceneProps } from '../Stage';
-import { beatEnv, ease, lerp, prog } from '../anim';
+import { beatEnv, clamp01, ease, hit, lerp, prog, typed } from '../anim';
 import { C, F } from '../palette';
 import { tr } from '../../i18n';
 
-const STATIONS = [
-  { name: tr('Beans'), tech: tr('Kafka · S3 landing zone') },
-  { name: tr('Grind'), tech: 'PySpark · Airflow' },
-  { name: tr('Brew'), tech: 'Iceberg · Data Vault 2.0' },
-  { name: tr('Serve'), tech: 'ClickHouse · FastAPI' },
+/* ---------------------------------------------------------- how the data flows */
+
+/**
+ * The production pattern most global companies run: OLTP systems (ERP, MES)
+ * publish every change through CDC into Kafka; a hot path keeps an operational
+ * (OLTP) store current within seconds for the apps that run the business, and
+ * a cold path lands raw data in the lakehouse, transforms and models it, and
+ * serves it from an OLAP engine to BI, planners and ML. A stage lands every
+ * two beats.
+ */
+type Node = { id: string; at: number; path: 'src' | 'hot' | 'cold'; label: string; tech: string };
+const NODES: Node[] = [
+  { id: 'src', at: 0, path: 'src', label: tr('SOURCES · OLTP'), tech: 'ERP · MES · Oracle' },
+  { id: 'kafka', at: 1, path: 'src', label: tr('CHANGE DATA CAPTURE'), tech: 'CDC → Kafka' },
+  { id: 'stream', at: 2, path: 'hot', label: tr('STREAM PROCESSING'), tech: 'Kafka · Flink' },
+  { id: 'ops', at: 2.25, path: 'hot', label: tr('OPERATIONAL STORE'), tech: 'YugabyteDB · OLTP' },
+  { id: 'apps', at: 2.5, path: 'hot', label: tr('APPS & APIs'), tech: tr('planning · factory apps') },
+  { id: 'land', at: 3, path: 'cold', label: tr('RAW LANDING'), tech: 'S3 · Iceberg' },
+  { id: 'xform', at: 3.25, path: 'cold', label: tr('TRANSFORM'), tech: 'PySpark · dbt · Airflow' },
+  { id: 'model', at: 4, path: 'cold', label: tr('MODEL'), tech: tr('Data Vault → marts') },
+  { id: 'olap', at: 4.25, path: 'cold', label: 'OLAP', tech: 'ClickHouse' },
+  { id: 'use', at: 5, path: 'cold', label: tr('INSIGHT'), tech: tr('BI · planners · ML') },
 ];
-
-// Packet legs between stations; each lands on a downbeat-ish beat.
-const LEGS = [
-  [0.5, 1.0],
-  [1.5, 2.0],
-  [2.5, 3.0],
+const EDGES: [string, string][] = [
+  ['src', 'kafka'],
+  ['kafka', 'stream'],
+  ['stream', 'ops'],
+  ['ops', 'apps'],
+  ['kafka', 'land'],
+  ['land', 'xform'],
+  ['xform', 'model'],
+  ['model', 'olap'],
+  ['olap', 'use'],
 ];
-
-function packetAt(t: number) {
-  let pos = 0;
-  LEGS.forEach(([a, b]) => (pos += ease.expoInOut(prog(t, a, b - a))));
-  return pos; // 0..3, station index with fractions
-}
-
-function Icon({ i, t }: { i: number; t: number }) {
-  if (i === 0)
-    return (
-      <g>
-        <ellipse cx={-20} cy={-6} rx={30} ry={42} fill={C.mocha} transform="rotate(-25 -20 -6)" />
-        <path d="M-34 -42 C -8 -12, -34 16, -12 32" stroke={C.crema} strokeWidth={5} fill="none" />
-        <ellipse cx={26} cy={12} rx={28} ry={38} fill={C.cocoa} transform="rotate(20 26 12)" />
-        <path d="M18 -24 C 38 2, 16 26, 34 46" stroke={C.crema} strokeWidth={5} fill="none" />
-      </g>
-    );
-  if (i === 1)
-    return (
-      <g transform={`rotate(${t * 240})`} fill={C.cinnamon}>
-        <circle r={40} />
-        {Array.from({ length: 8 }, (_, k) => (
-          <rect key={k} x={-10} y={-58} width={20} height={26} rx={4} transform={`rotate(${k * 45})`} />
-        ))}
-        <circle r={15} fill={C.foam} />
-      </g>
-    );
-  if (i === 2) {
-    const fill = (k: number) => ease.expoOut(prog(t, 2.0 + k * 0.12, 0.3));
-    return (
-      <g>
-        <path d="M-44 -62 h88 l-10 124 h-68 z" fill={C.foam} stroke={C.espresso} strokeWidth={6} />
-        <path d={`M-38 ${62 - 56 * fill(0)} h76 l${-6 * fill(0)} ${56 * fill(0)} h-64z`} fill={C.cocoa} />
-        <rect x={-41} y={6 - 34 * fill(1)} width={82} height={34 * fill(1)} fill={C.latte} />
-        <rect x={-42} y={-28 - 30 * fill(2)} width={84} height={30 * fill(2)} fill={C.crema} />
-      </g>
-    );
-  }
-  return (
-    <g>
-      <path d="M-48 -30 h96 l-12 72 h-72 z" fill={C.crema} />
-      <path d="M48 -16 c 32 0 32 36 -8 36" stroke={C.crema} strokeWidth={8} fill="none" />
-      {[-16, 8].map((x, k) => {
-        const rise = (t * 50 + k * 20) % 40;
-        return (
-          <path key={k} d={`M${x} ${-44 - rise} c -10 -16 10 -24 0 -40`} stroke={C.caramel} strokeWidth={6} fill="none" strokeLinecap="round" opacity={1 - rise / 40} />
-        );
-      })}
-    </g>
-  );
-}
+const TINT = { src: C.mocha, hot: C.cinnamon, cold: C.caramel };
 
 export function PourScene(p: SceneProps) {
   const { t, W, H, portrait } = p;
-  const pos = packetAt(t);
-  const words = tr('How I brew data.').split(' ');
-  const stations = portrait
-    ? STATIONS.map((_, i) => ({ x: 300, y: 420 + i * 340 }))
-    : STATIONS.map((_, i) => ({ x: 220 + i * 390, y: 500 }));
-  const seg = Math.min(2, Math.floor(pos));
-  const f = pos - seg;
-  const px = lerp(stations[seg].x, stations[seg + 1].x, f);
-  const py = lerp(stations[seg].y, stations[seg + 1].y, f);
+  const NW = portrait ? 360 : 270;
+  const NH = portrait ? 104 : 96;
 
-  // Camera follows the packet at 1.35× then pulls back to reveal the whole bar.
-  const out = ease.inOutQuart(prog(t, 3.15, 0.7));
-  const s = lerp(1.35, 1, out) + 0.012 * beatEnv(t, 9);
-  const camX = lerp(-(px - W / 2) * s, 0, out);
-  const camY = lerp(-(py - H / 2) * s, 0, out);
-
-  const pipe = portrait
-    ? `M${stations[0].x} ${stations[0].y} V${stations[3].y}`
-    : `M${stations[0].x} ${stations[0].y} H${stations[3].x}`;
-  const filled = portrait ? `M${stations[0].x} ${stations[0].y} V${py}` : `M${stations[0].x} ${stations[0].y} H${px}`;
-
-  const label = (i: number, node: ReactNode) => {
-    const st = stations[i];
-    return portrait ? (
-      <At key={i} x={st.x + 140} y={st.y} anchor="lc">
-        {node}
-      </At>
-    ) : (
-      <At key={i} x={st.x} y={st.y + 130} anchor="tc" style={{ textAlign: 'center' }}>
-        {node}
-      </At>
-    );
+  // landscape: sources on the left, the two paths fanning out to the right
+  const pos: Record<string, [number, number]> = portrait
+    ? {
+        src: [450, 420],
+        kafka: [450, 570],
+        stream: [245, 760],
+        ops: [245, 900],
+        apps: [245, 1040],
+        land: [655, 760],
+        xform: [655, 900],
+        model: [655, 1040],
+        olap: [655, 1180],
+        use: [655, 1320],
+      }
+    : {
+        src: [175, 400],
+        kafka: [175, 580],
+        stream: [510, 330],
+        ops: [830, 330],
+        apps: [1150, 330],
+        land: [510, 650],
+        xform: [830, 650],
+        model: [1150, 650],
+        olap: [1440, 650],
+        use: [1440, 490],
+      };
+  const by = Object.fromEntries(NODES.map((n) => [n.id, n]));
+  const show = (n: Node) => ease.backOutHard(prog(t, n.at, 0.25));
+  const enter = ease.expoOut(prog(t, 0, 0.4));
+  // Each edge is a straight line or an S-curve; packets ride it, computed per frame.
+  const curve = (a: string, b: string): [number, number][] => {
+    const [x1, y1] = pos[a];
+    const [x2, y2] = pos[b];
+    if (x1 === x2 || y1 === y2) return [[x1, y1], [x2, y2]];
+    if (portrait) {
+      const my = (y1 + y2) / 2;
+      return [[x1, y1], [x1, my], [x2, my], [x2, y2]];
+    }
+    const mx = (x1 + x2) / 2;
+    return [[x1, y1], [mx, y1], [mx, y2], [x2, y2]];
+  };
+  const edgePath = (a: string, b: string) => {
+    const c = curve(a, b);
+    return c.length === 2 ? `M${c[0][0]} ${c[0][1]} L${c[1][0]} ${c[1][1]}` : `M${c[0][0]} ${c[0][1]} C${c[1][0]} ${c[1][1]}, ${c[2][0]} ${c[2][1]}, ${c[3][0]} ${c[3][1]}`;
+  };
+  const pointAt = (a: string, b: string, u: number): [number, number] => {
+    const c = curve(a, b);
+    if (c.length === 2) return [lerp(c[0][0], c[1][0], u), lerp(c[0][1], c[1][1], u)];
+    const v = 1 - u;
+    const k = [v * v * v, 3 * v * v * u, 3 * v * u * u, u * u * u];
+    return [k.reduce((s, w, i) => s + w * c[i][0], 0), k.reduce((s, w, i) => s + w * c[i][1], 0)];
   };
 
   return (
-    <Stage
-      p={p}
-      bg={C.oat}
-      cam={{ s, x: camX, y: camY }}
-      hud={
-        <At x={portrait ? 60 : 80} y={portrait ? 110 : 70} style={{ font: `italic 700 ${portrait ? 96 : 104}px/1 ${F.display}`, letterSpacing: '-0.03em', color: C.espresso, whiteSpace: 'nowrap' }}>
-          {words.map((w, i) => {
-            const k = ease.backOut(prog(t, i * 0.08, 0.35));
-            return (
-              <span key={i} style={{ display: 'inline-block', marginRight: '0.22em', color: i === words.length - 1 ? C.cinnamon : undefined, opacity: Math.min(1, k * 2), transform: `translateY(${(1 - k) * -90}px)` }}>
-                {w}
-              </span>
-            );
-          })}
-        </At>
-      }
-    >
+    <Stage p={p} bg={C.oat} cam={{ s: 1 + 0.012 * beatEnv(t, 9) }}>
+      <At x={portrait ? 60 : 80} y={portrait ? 140 : 70} style={{ font: `700 ${portrait ? 24 : 22}px ${F.mono}`, letterSpacing: '0.3em', color: C.cinnamon, opacity: enter }}>
+        {tr('THE PIPELINE')}
+      </At>
+      <At x={portrait ? 60 : 80} y={portrait ? 186 : 106} style={{ font: `800 ${portrait ? 88 : 84}px/1 ${F.display}`, letterSpacing: '-0.03em', color: C.espresso, opacity: enter, whiteSpace: 'nowrap' }}>
+        {tr('How I brew data.')}
+      </At>
+
+      {/* lane labels */}
+      {!portrait && (
+        <>
+          <At x={375} y={244} style={{ font: `700 18px ${F.mono}`, letterSpacing: '0.24em', color: C.cinnamon, opacity: clamp01((t - 2) / 0.2) }}>
+            {tr('HOT PATH · SECONDS')}
+          </At>
+          <At x={375} y={714} style={{ font: `700 18px ${F.mono}`, letterSpacing: '0.24em', color: C.mocha, opacity: clamp01((t - 3) / 0.2) }}>
+            {tr('COLD PATH · ANALYTICS')}
+          </At>
+        </>
+      )}
+      {portrait && (
+        <>
+          <At x={245} y={680} anchor="tc" style={{ font: `700 20px ${F.mono}`, letterSpacing: '0.2em', color: C.cinnamon, opacity: clamp01((t - 2) / 0.2), whiteSpace: 'nowrap' }}>
+            {tr('HOT PATH · SECONDS').split(' · ')[0]}
+          </At>
+          <At x={655} y={680} anchor="tc" style={{ font: `700 20px ${F.mono}`, letterSpacing: '0.2em', color: C.mocha, opacity: clamp01((t - 3) / 0.2), whiteSpace: 'nowrap' }}>
+            {tr('COLD PATH · ANALYTICS').split(' · ')[0]}
+          </At>
+        </>
+      )}
+
+      {/* edges, drawn as their target lands, with packets riding them on the beat */}
       <svg className="absolute inset-0 overflow-visible" width={W} height={H}>
-        <path d={pipe} stroke={C.latte} strokeWidth={26} strokeLinecap="round" />
-        <path d={filled} stroke={C.cinnamon} strokeWidth={26} strokeLinecap="round" />
-        {Array.from({ length: 10 }, (_, k) => {
-          const d = ((t * 1.6 + k / 10) % 1) * pos;
-          const sg = Math.min(2, Math.floor(d));
-          const ff = d - sg;
+        {EDGES.map(([a, b]) => {
+          const target = by[b];
+          const draw = ease.cubicOut(prog(t, target.at - 0.15, 0.3));
+          if (draw <= 0) return null;
+          const d = edgePath(a, b);
           return (
-            <circle key={k} cx={lerp(stations[sg].x, stations[sg + 1].x, ff)} cy={lerp(stations[sg].y, stations[sg + 1].y, ff)} r={5} fill={C.foam} opacity={0.8} />
-          );
-        })}
-        {stations.map((st, i) => {
-          const k = ease.backOutHard(prog(t, i * 1.0 + 0.05, 0.3));
-          return (
-            <g key={i} transform={`translate(${st.x} ${st.y}) scale(${k * (1 + 0.08 * (Math.round(pos) === i ? beatEnv(t, 10) : 0))})`}>
-              <circle r={104} fill={i === 3 ? C.espresso : C.foam} stroke={C.espresso} strokeWidth={7} />
-              <Icon i={i} t={t} />
+            <g key={a + b}>
+              <path d={d} fill="none" stroke={TINT[target.path]} strokeWidth={4} strokeLinecap="round" pathLength={1} strokeDasharray={`${draw} 1`} opacity={0.75} />
+              {draw >= 1 &&
+                [0, 0.5].map((o) => {
+                  const [px, py] = pointAt(a, b, ease.sineInOut((t + o) % 1));
+                  return <circle key={o} cx={px} cy={py} r={7} fill={TINT[target.path]} />;
+                })}
             </g>
           );
         })}
-        <circle cx={px} cy={py} r={26} fill={C.caramel} stroke={C.espresso} strokeWidth={6} />
-        <circle cx={px} cy={py} r={44 + 10 * beatEnv(t, 6)} fill="none" stroke={C.caramel} strokeWidth={4} opacity={0.5} />
       </svg>
-      {STATIONS.map((st, i) =>
-        label(
-          i,
-          <div style={{ opacity: prog(t, i * 1.0 + 0.15, 0.2) }}>
-            <div style={{ font: `800 40px ${F.sans}`, color: C.espresso }}>{st.name}</div>
-            <div style={{ font: `600 22px ${F.mono}`, color: C.mocha, marginTop: 6, whiteSpace: 'nowrap' }}>{st.tech}</div>
-          </div>,
-        ),
-      )}
+
+      {/* the stages */}
+      {NODES.map((n) => {
+        const s = show(n);
+        if (t < n.at - 0.02) return null;
+        const [x, y] = pos[n.id];
+        const live = t - n.at < 1;
+        return (
+          <div
+            key={n.id}
+            className="absolute"
+            style={{
+              left: x - NW / 2,
+              top: y - NH / 2,
+              width: NW,
+              height: NH,
+              borderRadius: 18,
+              background: C.foam,
+              border: `3px solid ${C.espresso}`,
+              boxShadow: `0 ${live ? 8 : 5}px 0 ${C.espresso}`,
+              transform: `scale(${lerp(1.4, 1, s) * (1 + 0.06 * hit(t, n.at, 10))})`,
+              opacity: clamp01(s * 3),
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              padding: '0 18px',
+            }}
+          >
+            <div className="absolute inset-y-0 left-0" style={{ width: 8, background: TINT[n.path] }} />
+            <div style={{ font: `700 ${portrait ? 18 : 15}px ${F.mono}`, letterSpacing: '0.1em', color: TINT[n.path], whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{n.label}</div>
+            <div style={{ marginTop: 6, font: `600 ${portrait ? 23 : 19}px ${F.sans}`, color: C.espresso, whiteSpace: 'nowrap' }}>{n.tech}</div>
+          </div>
+        );
+      })}
+
+      {/* the takeaway */}
+      <At
+        x={portrait ? W / 2 : 80}
+        y={portrait ? 1450 : 780}
+        anchor={portrait ? 'tc' : 'tl'}
+        style={{ font: `italic 500 ${portrait ? 40 : 34}px ${F.display}`, color: C.mocha, whiteSpace: 'nowrap' }}
+      >
+        {typed(tr('OLTP runs the business. OLAP explains it.'), t, 5.1, 70)}
+      </At>
     </Stage>
   );
 }

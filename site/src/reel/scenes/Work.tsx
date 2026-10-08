@@ -91,61 +91,100 @@ export function Morning(p: SceneProps) {
   );
 }
 
-/* ---------------------------------------------------------- what I build */
+/* ---------------------------------------------------------- what I can do for you */
 
-const BUILDS = [
-  tr('Batch pipelines'),
-  tr('Streaming ingestion'),
-  tr('A Rust ETL engine'),
-  tr('A rule-orchestration platform'),
-  tr('A production-planning engine'),
-  tr('Distributed databases'),
-  tr('Election software for 10K+ people'),
-  tr('Platforms people trust'),
+const OFFERS = [
+  { icon: 'bolt', head: tr('Faster pipelines'), sub: tr('Overnight batch jobs, rebuilt to finish in minutes') },
+  { icon: 'pulse', head: tr('Real-time data'), sub: tr('Factory floor to dashboard in under a second') },
+  { icon: 'layers', head: tr('A lakehouse people trust'), sub: tr('Modelled, governed, documented: one source of truth') },
+  { icon: 'shield', head: tr('Pipelines that don’t break'), sub: tr('Tests, data-quality checks, CI/CD and monitoring') },
+  { icon: 'gauge', head: tr('Lower compute bills'), sub: tr('The right engine for the job, even if it’s Rust') },
+  { icon: 'flag', head: tr('End-to-end ownership'), sub: tr('From design doc to production, and the pager after') },
 ];
 
-/** Eight things, one per beat, stacking into two columns. */
+function OfferIcon({ name, color }: { name: string; color: string }) {
+  const s = { fill: 'none', stroke: color, strokeWidth: 2.4, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
+  const d: Record<string, string> = {
+    bolt: 'M13 2 L4 14 h7 l-1 8 l9-12 h-7 z',
+    pulse: 'M2 12 h4 l3-7 l4 14 l3-7 h6',
+    layers: 'M12 3 l9 5 l-9 5 l-9-5 z M3 13 l9 5 l9-5',
+    shield: 'M12 2 l8 3 v6 c0 5-3.5 9-8 11 c-4.5-2-8-6-8-11 v-6 z M8.5 12 l2.5 2.5 l4.5-5',
+    gauge: 'M4 18 a9 9 0 1 1 16 0 M12 13 l4-5',
+    flag: 'M5 21 v-17 M5 4 h12 l-2 4 l2 4 h-12',
+  };
+  return (
+    <svg viewBox="0 0 24 24" width="100%" height="100%">
+      <path d={d[name]} {...s} />
+    </svg>
+  );
+}
+
+/** Six things I'd do for your team, one landing every two beats. */
 export function Built(p: SceneProps) {
   const { t, W, portrait } = p;
-  const n = Math.min(BUILDS.length, Math.floor(t / BEAT) + 1);
-  const cols = portrait ? 1 : 2;
+  const n = Math.min(OFFERS.length, Math.floor(t) + 1);
   const enter = ease.expoOut(prog(t, 0, 0.35));
-  // the longest item (in this language) sets the type size so nothing collides
-  const longest = Math.max(...BUILDS.map((b) => b.length));
-  const colW = portrait ? W - 200 : W / 2 - 160;
-  const size = Math.min(portrait ? 44 : 42, colW / (longest * 0.5));
+  const cols = portrait ? 1 : 3;
+  const cw = portrait ? 790 : 450;
+  const ch = portrait ? 192 : 250;
+  const gap = portrait ? 14 : 26;
+  const x0 = (W - (cols * cw + (cols - 1) * gap)) / 2;
+  const y0 = portrait ? 330 : 270;
 
   return (
-    <Stage p={p} bg={C.espresso} cam={{ s: 1 + 0.015 * beatEnv(t, 9) + 0.02 * hit(t, (n - 1) * BEAT, 9) }}>
-      <At x={portrait ? 60 : 80} y={portrait ? 140 : 96} style={{ font: `700 ${portrait ? 24 : 22}px ${F.mono}`, letterSpacing: '0.3em', color: C.caramel, opacity: enter }}>
+    <Stage p={p} bg={C.espresso} cam={{ s: 1 + 0.012 * beatEnv(t, 9) + 0.015 * hit(t, n - 1, 9) }}>
+      <At x={portrait ? 60 : 80} y={portrait ? 140 : 86} style={{ font: `700 ${portrait ? 24 : 22}px ${F.mono}`, letterSpacing: '0.3em', color: C.caramel, opacity: enter }}>
         {tr('BACK TO WORK')}
       </At>
-      <At x={portrait ? 60 : 80} y={portrait ? 186 : 132} style={{ font: `800 ${portrait ? 92 : 96}px/1 ${F.display}`, letterSpacing: '-0.03em', color: C.crema, opacity: enter, whiteSpace: 'nowrap' }}>
-        {tr('What I build.')}
+      <At x={portrait ? 60 : 80} y={portrait ? 186 : 122} style={{ font: `800 ${portrait ? 80 : 92}px/1 ${F.display}`, letterSpacing: '-0.03em', color: C.crema, opacity: enter, whiteSpace: 'nowrap' }}>
+        {tr('What I can do')} <span style={{ fontStyle: 'italic', fontWeight: 600, ...gradText() }}>{tr('for you.')}</span>
       </At>
-      {BUILDS.map((b, i) => {
+      {OFFERS.map((o, i) => {
         if (i >= n) return null;
-        const col = cols === 1 ? 0 : Math.floor(i / 4);
-        const row = cols === 1 ? i : i % 4;
-        const x = (portrait ? 60 : 80) + col * (W / 2 - 30);
-        const y = (portrait ? 400 : 310) + row * (portrait ? 115 : 128);
-        const pop = ease.backOutHard(prog(t, i * BEAT, 0.22));
+        const c = i % cols;
+        const r = Math.floor(i / cols);
+        const pop = ease.backOutHard(prog(t, i, 0.25));
         const live = i === n - 1;
-        const last = i === BUILDS.length - 1;
+        const glow = hit(t, i, 6);
         return (
-          <At key={i} x={x} y={y} style={{ display: 'flex', alignItems: 'baseline', gap: 22, transform: `translateX(${(1 - pop) * 80}px)`, opacity: clamp01(pop * 2) }}>
-            <span style={{ font: `700 ${portrait ? 26 : 24}px ${F.mono}`, color: live ? C.caramel : C.mocha, width: 44 }}>{String(i + 1).padStart(2, '0')}</span>
-            <span
+          <div
+            key={i}
+            className="absolute"
+            style={{
+              left: x0 + c * (cw + gap),
+              top: y0 + r * (ch + gap),
+              width: cw,
+              height: ch,
+              borderRadius: 22,
+              background: live ? C.roast : '#1f1611',
+              border: `2px solid ${live ? C.caramel : 'rgba(233,217,191,.14)'}`,
+              boxShadow: live ? `0 18px 50px rgba(0,0,0,.45), 0 0 ${40 * glow}px rgba(212,154,87,${0.5 * glow})` : 'none',
+              transform: `translateY(${(1 - pop) * 40}px) scale(${lerp(1.12, 1, pop)})`,
+              opacity: clamp01(pop * 2),
+              padding: portrait ? '22px 28px' : '26px 28px',
+              display: 'flex',
+              flexDirection: portrait ? 'row' : 'column',
+              alignItems: portrait ? 'center' : 'flex-start',
+              gap: portrait ? 24 : 14,
+            }}
+          >
+            <div
               style={{
-                font: `${last ? 'italic 700' : '700'} ${size}px/1.1 ${F.display}`,
-                letterSpacing: '-0.02em',
-                whiteSpace: 'nowrap',
-                ...(last ? gradText() : { color: live ? C.foam : C.latte }),
+                flex: 'none',
+                width: portrait ? 76 : 58,
+                height: portrait ? 76 : 58,
+                borderRadius: 16,
+                padding: portrait ? 16 : 12,
+                background: live ? C.caramel : 'rgba(212,154,87,.12)',
               }}
             >
-              {b}
-            </span>
-          </At>
+              <OfferIcon name={o.icon} color={live ? C.espresso : C.caramel} />
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ font: `700 ${portrait ? 42 : 32}px/1.1 ${F.display}`, letterSpacing: '-0.01em', color: live ? C.foam : C.crema }}>{o.head}</div>
+              <div style={{ marginTop: 8, font: `500 ${portrait ? 28 : 21}px/1.35 ${F.sans}`, color: C.latte, opacity: live ? 1 : 0.75 }}>{o.sub}</div>
+            </div>
+          </div>
         );
       })}
     </Stage>
