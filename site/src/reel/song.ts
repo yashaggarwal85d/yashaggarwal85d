@@ -24,8 +24,8 @@ import { tr } from '../i18n';
  *   bars 64–81  outro
  *
  * Playback starts at 6 s, a 12 s run-up to the drop. The reel runs from the
- * cold open (bar 11) to the spinning top (bar 63); at bar 64 the song jumps
- * back to bar 11 with it, so it never plays the outro.
+ * cold open (bar 11) to the spinning top (bar 66); at bar 67 the song jumps
+ * back to bar 11 with it, so most of the outro never plays.
  */
 
 /** `?song=score` previews the fallback score; `?song=off` turns music off. */
@@ -78,7 +78,7 @@ const DOWNBEAT = 0.013;
 const START = 6; // whole seconds: the IFrame API's `start` parameter
 const DROP = 12;
 const LOOP_FROM = 11; // the cold open
-const LOOP_TO = 64; // after the spinning top
+const LOOP_TO = 67; // after the spinning top (three bars into the outro)
 const DURATION = 127;
 
 /**
@@ -106,8 +106,8 @@ const ARRANGEMENT: Seg[] = [
   { bar: 54, scene: 'consolidate', speed: 0.5 }, // a slow swarm…
   { bar: 56, scene: 'consolidate', from: 2 }, // …slammed on hook 2's first beat
   { bar: 57, scene: 'shortlist' }, // a tick per "tore up"
-  { bar: 62, scene: 'cta' },
-  { bar: 63, scene: 'loop' }, // return by death: back to bar 11
+  { bar: 62, scene: 'cta' }, // the ask, held for four bars
+  { bar: 66, scene: 'loop' }, // return by death: back to bar 11
   { bar: LOOP_TO, scene: 'loop', from: 2 },
 ];
 const segReel = (s: Seg, x: number) => sceneById(s.scene).start + (s.from ?? 0) + (x - s.bar) * 2 * (s.speed ?? 1);
@@ -118,7 +118,7 @@ const SONG_CHAPTERS: Chapter[] = [
   { id: 'domain', label: tr('Domain'), sub: tr('supply chain & manufacturing'), start: 28, end: 36 },
   { id: 'off', label: tr('Off the clock'), sub: tr('physics · maths · cinema'), start: 36, end: 48 },
   { id: 'numbers', label: tr('Numbers'), sub: tr('the numbers'), start: 48, end: 57 },
-  { id: 'finale', label: tr('Finale'), sub: tr('why me · let’s build'), start: 57, end: 64 },
+  { id: 'finale', label: tr('Finale'), sub: tr('why me · let’s build'), start: 57, end: 67 },
 ];
 
 // ---------------------------------------------------------------------------

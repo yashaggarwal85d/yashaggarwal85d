@@ -132,7 +132,6 @@ export function Cta(p: SceneProps) {
   const pull = lerp(1.25, 1, ease.expoOut(prog(t, 0, 0.9)));
   const l1 = ease.expoOut(prog(t, 0.08, 0.35));
   const l2 = ease.backOut(prog(t, 0.5, 0.35));
-  const pill = ease.backOutHard(prog(t, 1.0, 0.3));
   const burst = ease.expoOut(prog(t, 0, 0.6));
   const fade = 1 - prog(t, 0.35, 0.6);
 
@@ -140,7 +139,8 @@ export function Cta(p: SceneProps) {
     <Stage
       p={p}
       bg="transparent"
-      cam={{ s: pull }}
+      // after the slam, hold: a slow push-in that breathes on the beat
+      cam={{ s: pull * (1 + 0.035 * ease.sineInOut(prog(t, 1.2, 6.8))) + 0.01 * beatEnv(t, 9) * prog(t, 1.2, 0.5) }}
       backdrop={
         <div
           className="pointer-events-none absolute inset-0"
@@ -186,37 +186,56 @@ export function Cta(p: SceneProps) {
             opacity: Math.min(1, l2 * 2),
             transform: `translateY(${(1 - l2) * 50}px)`,
             ...gradText(),
+            // the gradient drifts while we hold
+            backgroundSize: '220% 100%',
+            backgroundPosition: `${50 + 50 * Math.sin(t * 0.9)}% 0`,
           }}
         >
           {tr('that scales.')}
         </div>
-        <a
-          href={`mailto:${profile.email}`}
-          tabIndex={-1}
-          style={{
-            display: 'inline-block',
-            marginTop: 30,
-            padding: '16px 32px',
-            borderRadius: 999,
-            background: C.crema,
-            color: C.espresso,
-            font: `700 ${portrait ? 28 : 26}px ${F.mono}`,
-            transform: `scale(${pill})`,
-            pointerEvents: 'auto',
-          }}
-        >
-          {profile.email} ↗
-        </a>
+        <div style={{ marginTop: 30, display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 16 }}>
+          {[
+            { at: 1.0, href: `mailto:${profile.email}`, label: profile.email, main: true },
+            { at: 2.0, href: profile.linkedin, label: 'LinkedIn', main: false },
+            { at: 2.5, href: profile.github, label: 'GitHub', main: false },
+          ].map((l) => {
+            const pop = ease.backOutHard(prog(t, l.at, 0.3));
+            return (
+              <a
+                key={l.label}
+                href={l.href}
+                target={l.main ? undefined : '_blank'}
+                rel="noopener"
+                tabIndex={-1}
+                style={{
+                  display: 'inline-block',
+                  padding: '16px 30px',
+                  borderRadius: 999,
+                  background: l.main ? C.crema : 'rgba(23,16,12,.75)',
+                  color: l.main ? C.espresso : C.crema,
+                  border: l.main ? 'none' : `2px solid ${C.caramel}`,
+                  font: `700 ${portrait ? 28 : 26}px ${F.mono}`,
+                  opacity: t >= l.at ? 1 : 0,
+                  transform: `scale(${pop * (1 + (l.main ? 0.03 : 0.02) * beatEnv(t, 10) * prog(t, l.at + 0.3, 0.3))})`,
+                  pointerEvents: 'auto',
+                }}
+              >
+                {l.label} ↗
+              </a>
+            );
+          })}
+        </div>
       </At>
     </Stage>
   );
 }
 
+// The slam lights every key; while we hold, a glow stays on and a soft ripple goes out every bar.
 export const ctaKb = (t: number): KbFrame => ({
-  all: t < 1.7 ? 1 : 1 - prog(t, 1.7, 0.3),
-  shockR: t * 14,
-  shockAmp: Math.exp(-t * 1.5),
-  pump: 0.3 * beatEnv(t, 8),
+  all: t < 1.7 ? 1 : lerp(1, 0.3, prog(t, 1.7, 0.6)),
+  shockR: t < 2 ? t * 14 : (t % 2) * 14,
+  shockAmp: t < 2 ? Math.exp(-t * 1.5) : 0.35 * Math.exp(-(t % 2) * 1.5),
+  pump: 0.32 * beatEnv(t, 8),
   focus: null,
 });
 

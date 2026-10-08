@@ -29,10 +29,10 @@ export const SCENES: SceneDef[] = [
   { id: 'navier', title: 'Navier–Stokes', start: 58, dur: 2, Component: NavierStokes, poster: 1.95 },
   { id: 'cinema', title: tr('Rich taste'), start: 60, dur: 6, Component: Cinema, poster: 2.2 },
   { id: 'shortlist', title: tr('Why me'), start: 66, dur: 10, Component: Shortlist, poster: 9.6 },
-  { id: 'cta', title: tr('Let’s build'), start: 76, dur: 2, Component: Cta, kb: ctaKb, poster: 1.5 },
-  { id: 'loop', title: tr('Return by death'), start: 78, dur: 2, Component: LoopStinger, poster: 1.0 },
+  { id: 'cta', title: tr('Let’s build'), start: 76, dur: 8, Component: Cta, kb: ctaKb, poster: 3.2 },
+  { id: 'loop', title: tr('Return by death'), start: 84, dur: 2, Component: LoopStinger, poster: 1.0 },
   // Past the loop: only the soundtrack's arrangement (song.ts) visits these.
-  { id: 'tore-up', title: tr('Tore up'), start: 80, dur: 16, Component: TornUp, poster: 9.5 },
+  { id: 'tore-up', title: tr('Tore up'), start: 86, dur: 16, Component: TornUp, poster: 9.5 },
 ];
 
 export const sceneById = (id: string) => SCENES.find((s) => s.id === id)!;
@@ -45,7 +45,7 @@ export const CHAPTERS: Chapter[] = [
   { id: 'domain', label: tr('Domain'), sub: tr('supply chain & manufacturing'), start: 18, end: 34 },
   { id: 'grind', label: tr('Grind'), sub: tr('the numbers'), start: 34, end: 50 },
   { id: 'off', label: tr('Off the clock'), sub: tr('physics · maths · cinema'), start: 50, end: 66 },
-  { id: 'serve', label: tr('Serve'), sub: tr('why me · let’s talk'), start: 66, end: 80 },
+  { id: 'serve', label: tr('Serve'), sub: tr('why me · let’s talk'), start: 66, end: 86 },
 ];
 
 export const sceneAt = (time: number) => {
