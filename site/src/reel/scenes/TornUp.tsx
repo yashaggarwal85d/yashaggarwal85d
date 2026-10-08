@@ -9,7 +9,7 @@ import { hook } from '../hook';
 /**
  * The headline numbers, under the song's hook, where the line lands every two
  * beats (one reel second here). With TORE UP playing the word on screen is the
- * one being sung; with the original score it's REBUILT. Each card slams down the old number on one
+ * one being sung; with the original score it's OPTIMIZED. Each card slams down the old number on one
  * "tore up" and is ripped in half on the next, revealing what replaced it.
  * Seven cards, fourteen hits, then two for the finale: eight bars, the whole hook.
  */
@@ -42,8 +42,8 @@ export function TornUp(p: SceneProps) {
     ? { hx: 60, hy: 150, hs: 170, cx: 70, cy: 420, cw: 760, ch: 440, olds: 92, nowY: 640, nows: 132 }
     : { hx: 80, hy: 70, hs: 210, cx: 380, cy: 380, cw: 960, ch: 380, olds: 104, nowY: 520, nows: 150 };
 
-  const word0 = hook.toreUp ? 'TORE UP' : tr('REBUILT');
-  const fin = hook.toreUp ? 'TORE UP.' : tr('REBUILT.');
+  const word0 = hook.toreUp ? 'TORE UP' : tr('OPTIMIZED');
+  const fin = hook.toreUp ? 'TORE UP.' : tr('OPTIMIZED.');
   // Longer words (other languages) shrink to fit the stage; ~0.62 em per glyph
   // is this italic's widest case (W, M), so nothing ever runs off the edge.
   const fitH = (size: number, text: string, maxW: number) => Math.min(size, maxW / ([...text].length * 0.62));

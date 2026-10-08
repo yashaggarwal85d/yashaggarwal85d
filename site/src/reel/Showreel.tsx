@@ -364,9 +364,6 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
     return () => window.removeEventListener('keydown', onKey);
   }, [api]);
 
-  // ---- swipe between chapters on touch screens --------------------------------
-  const touch = useRef<{ x: number; y: number } | null>(null);
-
   const scene = sceneAt(frame.time);
   const local = frame.time - scene.start;
   const Scene = scene.Component;
@@ -381,18 +378,7 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
       ref={sectionRef}
       aria-label={tr('Showreel')}
       className="relative z-10 h-[100svh] w-full select-none overflow-hidden"
-      onTouchStart={(e) => (touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY })}
-      onTouchEnd={(e) => {
-        const s = touch.current;
-        touch.current = null;
-        if (!s || clock.current.intro) return;
-        const dx = e.changedTouches[0].clientX - s.x;
-        const dy = e.changedTouches[0].clientY - s.y;
-        if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.4) {
-          if (song.engaged) song.stepChapter(dx < 0 ? 1 : -1);
-          else api.chapter(chapterAt(clock.current.time) + (dx < 0 ? 1 : -1));
-        }
-      }}
+      style={{ touchAction: 'pan-y' }}
     >
       <div className="absolute inset-0" aria-hidden>
         {frame.intro ? (

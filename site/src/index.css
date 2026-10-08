@@ -80,6 +80,9 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
+  /* never sideways: clip (not hidden) so nothing becomes a scroll container */
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
@@ -88,6 +91,8 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  overflow-x: clip;
+  overscroll-behavior-x: none;
 }
 
 ::selection {

@@ -16,6 +16,8 @@ const NODES = [
 ];
 /** One stop per bar: the camera whips across and lands on each downbeat. */
 const STOP = 2;
+/** Phones skip the whip's SVG blur: filters on moving HTML are far too slow there. */
+const TOUCH = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
 const WHIP = 0.2;
 
 export function Journey(p: SceneProps) {
@@ -26,7 +28,7 @@ export function Journey(p: SceneProps) {
   const k = idx === 0 ? 1 : ease.expoInOut(prog(t, idx * STOP - WHIP, WHIP));
   const camX = -lerp((idx > 0 ? idx - 1 : 0) * spacing, idx * spacing, k);
   const velocity = idx > 0 && k < 1 ? Math.sin(Math.PI * k) : 0;
-  const blur = velocity * 26;
+  const blur = TOUCH ? 0 : velocity * 26;
   const enter = ease.expoOut(prog(t, 0, 0.4));
 
   return (
@@ -63,18 +65,24 @@ export function Journey(p: SceneProps) {
               opacity: 0.55 * vis,
               whiteSpace: 'nowrap',
               transform: `translateX(${portrait ? 0 : -100}%) translateX(${(1 - vis) * (i === idx ? 160 : -160)}px)`,
+              willChange: 'transform, opacity',
             }}
           >
             {n.year}
           </At>
         );
       })}
-      <div className="absolute inset-0" style={{ transform: `translateX(${camX}px)`, filter: blur > 0.5 ? 'url(#whip)' : undefined }}>
+      <div
+        className="absolute inset-0"
+        style={{ transform: `translate3d(${camX}px, 0, 0)`, filter: blur > 0.5 ? 'url(#whip)' : undefined, willChange: 'transform' }}
+      >
+        {/* only the stretch of line in view, so the moving layer stays small */}
         <div
           className="absolute"
-          style={{ left: -W, width: (W * 2 + spacing * NODES.length) * enter, top: lineY, height: 5, background: C.espresso }}
+          style={{ left: (idx - 1) * spacing - W, width: (W * 2 + spacing * 2) * enter, top: lineY, height: 5, background: C.espresso }}
         />
         {NODES.map((n, i) => {
+          if (Math.abs(i - idx) > 1) return null;
           const x = W / 2 + i * spacing;
           const focus = i === idx;
           const pulse = focus ? 1 + 0.18 * hit(t, i * STOP, 8) : 1;

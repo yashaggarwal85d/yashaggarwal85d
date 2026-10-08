@@ -143,7 +143,7 @@ function Shelf() {
         <h3 className="mt-2 font-display text-3xl font-bold leading-tight">{tr('Series, films, anime… and the rest.')}</h3>
         <p className="mt-3 text-sm text-muted">{tr('Rich taste, strong opinions. Pull one off the shelf.')}</p>
       </div>
-      <div className="flex min-h-[15rem] flex-1 items-end gap-3 overflow-x-auto pb-2 [scrollbar-width:none]">
+      <div className="flex min-h-[15rem] min-w-0 flex-1 items-end gap-3 overflow-x-auto pb-2 [scrollbar-width:none]">
         {films.map((f, i) => {
           const isOpen = i === open;
           return (
@@ -215,7 +215,7 @@ export default function OffTheClock() {
     <section id="off-the-clock" className="roast relative z-10 py-20 md:py-28" style={{ background: 'var(--roast)' }}>
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         <SectionHeading kicker={tr('07 · Off the clock')} title={tr('Things I can’t stop thinking about.')} />
-        <div className="grid gap-4 md:grid-cols-4">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-4">
           <Reveal className="md:col-span-2 md:row-span-1">
             <div className="relative h-80 overflow-hidden rounded-[1.25rem] border border-line">
               <BlackHole interactive hole={{ x: 0.66, y: 0.52, r: 0.2 }} />
