@@ -164,7 +164,7 @@ declare global {
 }
 
 let apiPromise: Promise<YTNamespace> | null = null;
-function loadYouTubeApi(timeoutMs = 7000) {
+function loadYouTubeApi(timeoutMs = 15000) {
   if (window.YT?.Player) return Promise.resolve(window.YT);
   apiPromise ??= new Promise<YTNamespace>((resolve, reject) => {
     const timer = window.setTimeout(() => reject(new Error('YouTube API timed out')), timeoutMs);
@@ -316,11 +316,7 @@ class SongController extends Emitter {
           this.anchorSong = START;
           if (opts.autoplay) {
             p.playVideo();
-            // Autoplay can be refused or the stream can stall: if the song hasn't
-            // started in 4 s, hand over to the fallback score.
-            this.startTimer = window.setTimeout(() => {
-              if (this.status !== 'playing') this.fail('it never started');
-            }, 4000);
+            this.armStartTimer();
           } else {
             this.set('blocked');
           }
@@ -332,6 +328,33 @@ class SongController extends Emitter {
     });
     // The controller lives as long as the page, so this interval is never cleared.
     window.setInterval(() => this.sync(), 40);
+  }
+
+  /**
+   * Autoplay can be refused or the stream can stall. A cold start on a slow
+   * connection can take several seconds, so allow as long as the run-up itself
+   * before handing over to the fallback score, and only count time the tab is
+   * visible (browsers hold media in background tabs until they're shown).
+   */
+  private armStartTimer() {
+    window.clearTimeout(this.startTimer);
+    if (document.hidden) {
+      const onShow = () => {
+        if (document.hidden) return;
+        document.removeEventListener('visibilitychange', onShow);
+        if (this.status !== 'playing' && !this.stopped) {
+          this.player?.playVideo();
+          this.armStartTimer();
+        }
+      };
+      document.addEventListener('visibilitychange', onShow);
+      return;
+    }
+    this.startTimer = window.setTimeout(() => {
+      if (this.status === 'playing' || this.stopped) return;
+      if (document.hidden) this.armStartTimer();
+      else this.fail('it never started');
+    }, 12000);
   }
 
   private fail(why: string) {
