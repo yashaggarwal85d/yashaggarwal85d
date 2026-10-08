@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { motion } from 'motion/react';
 
 export function Section({ id, children, className = '' }: { id?: string; children: ReactNode; className?: string }) {
@@ -24,15 +24,18 @@ export function Reveal({
   className = '',
   delay = 0,
   y = 24,
+  style,
 }: {
   children: ReactNode;
   className?: string;
   delay?: number;
   y?: number;
+  style?: CSSProperties;
 }) {
   return (
     <motion.div
       className={className}
+      style={style}
       initial={{ opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}

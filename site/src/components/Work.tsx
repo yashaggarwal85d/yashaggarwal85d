@@ -127,7 +127,7 @@ export default function Work() {
     return (
       <section id="work" className="relative py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <SectionHeading title="Featured Work" kicker="Impact, in numbers" />
+          <SectionHeading title="Featured Work" kicker="05 · Impact, in numbers" />
         </div>
         <div ref={trackRef} className="flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-6 [scrollbar-width:none]">
           {cards}
@@ -140,7 +140,7 @@ export default function Work() {
     <section id="work" ref={sectionRef} className="relative" style={{ height: `calc(100vh + ${distance}px)` }}>
       <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden">
         <div className="mx-auto w-full max-w-6xl px-6">
-          <SectionHeading title="Featured Work" kicker="Impact, in numbers" />
+          <SectionHeading title="Featured Work" kicker="05 · Impact, in numbers" />
         </div>
         <motion.div ref={trackRef} style={{ x }} className="flex gap-5 pl-[max(1.5rem,calc((100vw-72rem)/2+1.5rem))] pr-6">
           {cards}

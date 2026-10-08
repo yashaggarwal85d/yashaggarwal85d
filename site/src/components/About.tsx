@@ -1,25 +1,12 @@
-import { useEffect, useState } from 'react';
 import { ArrowUpRight, GraduationCap, Mail } from 'lucide-react';
 import { education, profile } from '../data';
 import { Reveal, Section, SectionHeading } from './ui';
 import Globe from './Globe';
 
-function useIsDark() {
-  const read = () => document.documentElement.dataset.theme !== 'light';
-  const [dark, setDark] = useState(read);
-  useEffect(() => {
-    const mo = new MutationObserver(() => setDark(read()));
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-    return () => mo.disconnect();
-  }, []);
-  return dark;
-}
-
 export default function About() {
-  const dark = useIsDark();
   return (
     <Section id="about">
-      <SectionHeading title="About Me" kicker="Who I am" />
+      <SectionHeading title="Hi, I’m Yash." kicker="03 · About" />
       <div className="grid gap-4 md:grid-cols-3">
         <Reveal className="card flex flex-col p-6">
           <div className="flex items-center gap-4">
@@ -50,7 +37,7 @@ export default function About() {
             ready to move globally
           </h3>
           <div className="relative -mb-24 mt-4 flex-1">
-            <Globe dark={dark} />
+            <Globe />
           </div>
         </Reveal>
 

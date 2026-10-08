@@ -4,7 +4,7 @@ import createGlobe from 'cobe';
 const BANGALORE: [number, number] = [12.97, 77.59];
 const startPhi = Math.PI - ((BANGALORE[1] * Math.PI) / 180 - Math.PI / 2);
 
-export default function Globe({ dark }: { dark: boolean }) {
+export default function Globe() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const drag = useRef<{ x: number; phi: number } | null>(null);
   const extra = useRef(0);
@@ -24,14 +24,14 @@ export default function Globe({ dark }: { dark: boolean }) {
       height: width * 2,
       phi,
       theta: 0.25,
-      dark: dark ? 1 : 0,
-      diffuse: dark ? 1.4 : 1.2,
+      dark: 0,
+      diffuse: 1.2,
       mapSamples: 16000,
-      mapBrightness: dark ? 5 : 8,
+      mapBrightness: 6,
       mapBaseBrightness: 0,
-      baseColor: dark ? [0.22, 0.22, 0.32] : [1, 1, 1],
-      markerColor: [1, 0.25, 0.69],
-      glowColor: dark ? [0.35, 0.25, 0.6] : [0.95, 0.9, 1],
+      baseColor: [0.96, 0.91, 0.84],
+      markerColor: [0.72, 0.38, 0.18],
+      glowColor: [0.95, 0.88, 0.76],
       markers: [{ location: BANGALORE, size: 0.09 }],
       onRender: (state) => {
         if (!drag.current && !reduce) phi += 0.0035;
@@ -45,7 +45,7 @@ export default function Globe({ dark }: { dark: boolean }) {
       globe.destroy();
       window.removeEventListener('resize', onResize);
     };
-  }, [dark]);
+  }, []);
 
   return (
     <canvas

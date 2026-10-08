@@ -1,46 +1,56 @@
 @import 'tailwindcss';
 
-@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+/* Coffee beige: roasted dark to steamed light. */
+:root {
+  --espresso: #17100c;
+  --roast: #2a1d16;
+  --cocoa: #3b2a21;
+  --mocha: #5a4032;
+  --taupe: #8b7766;
+  --latte: #c8ac8c;
+  --crema: #e9d9bf;
+  --oat: #f3eadb;
+  --foam: #fbf7ef;
+  --caramel: #d49a57;
+  --cinnamon: #b8612f;
+  --cherry: #8e2f2a;
 
-:root,
-[data-theme='light'] {
-  --bg: #f2f2f7;
-  --fg: #12121a;
-  --muted: #5b5b6e;
-  --subtle: #8a8a9c;
-  --card: rgb(255 255 255 / 0.78);
-  --card-solid: #ffffff;
-  --chip: rgb(18 18 26 / 0.05);
-  --line: rgb(18 18 26 / 0.09);
-  --line-strong: rgb(18 18 26 / 0.16);
-  --accent: #c42f8f;
-  --accent-2: #6a29b8;
-  --shadow: 0 1px 2px rgb(18 18 26 / 0.04), 0 8px 30px rgb(18 18 26 / 0.06);
-  --ribbon-plain: #ffffff;
-  --ribbon-plain-fg: #4a4a5c;
+  /* semantic tokens for the oat "explore" pages */
+  --bg: var(--oat);
+  --fg: var(--espresso);
+  --muted: #5e4a3d;
+  --subtle: #8b7766;
+  --card: rgb(251 247 239 / 0.82);
+  --card-solid: var(--foam);
+  --chip: rgb(23 16 12 / 0.05);
+  --line: rgb(23 16 12 / 0.1);
+  --line-strong: rgb(23 16 12 / 0.18);
+  --accent: var(--cinnamon);
+  --accent-2: var(--caramel);
+  --shadow: 0 1px 2px rgb(23 16 12 / 0.05), 0 10px 30px rgb(23 16 12 / 0.07);
   color-scheme: light;
 }
 
-[data-theme='dark'] {
-  --bg: #05050a;
-  --fg: #f2f2f8;
-  --muted: #a3a3b8;
-  --subtle: #6e6e86;
-  --card: rgb(16 16 26 / 0.72);
-  --card-solid: #10101a;
-  --chip: rgb(255 255 255 / 0.06);
-  --line: rgb(255 255 255 / 0.08);
-  --line-strong: rgb(255 255 255 / 0.16);
-  --accent: #ff3fb0;
-  --accent-2: #9b3bff;
-  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 40px rgb(0 0 0 / 0.35);
-  --ribbon-plain: #0e0e18;
-  --ribbon-plain-fg: #c7c7d8;
-  color-scheme: dark;
+/* Dark-roast islands (Off the Clock, CTA) reuse the same tokens, inverted. */
+.roast {
+  --bg: var(--roast);
+  --fg: var(--crema);
+  --muted: #c3ab92;
+  --subtle: #9a8471;
+  --card: rgb(23 16 12 / 0.6);
+  --card-solid: var(--espresso);
+  --chip: rgb(233 217 191 / 0.07);
+  --line: rgb(233 217 191 / 0.12);
+  --line-strong: rgb(233 217 191 / 0.22);
+  --accent: var(--caramel);
+  --accent-2: var(--cinnamon);
+  --shadow: 0 12px 40px rgb(0 0 0 / 0.35);
+  color: var(--fg);
 }
 
 @theme inline {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Fraunces', ui-serif, Georgia, serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   --color-bg: var(--bg);
   --color-fg: var(--fg);
@@ -53,6 +63,18 @@
   --color-line-strong: var(--line-strong);
   --color-accent: var(--accent);
   --color-accent-2: var(--accent-2);
+  --color-espresso: var(--espresso);
+  --color-roast: var(--roast);
+  --color-cocoa: var(--cocoa);
+  --color-mocha: var(--mocha);
+  --color-taupe: var(--taupe);
+  --color-latte: var(--latte);
+  --color-crema: var(--crema);
+  --color-oat: var(--oat);
+  --color-foam: var(--foam);
+  --color-caramel: var(--caramel);
+  --color-cinnamon: var(--cinnamon);
+  --color-cherry: var(--cherry);
 }
 
 html {
@@ -61,7 +83,7 @@ html {
 }
 
 body {
-  background: var(--bg);
+  background: var(--oat);
   color: var(--fg);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -69,22 +91,27 @@ body {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--accent) 35%, transparent);
+  background: color-mix(in srgb, var(--caramel) 45%, transparent);
 }
 
+/* Caramel → cinnamon → cherry on light grounds; crema-led on dark ones. */
 .text-spectrum {
-  background: linear-gradient(100deg, #2de8c0 0%, #3f7bff 30%, #9b3bff 62%, #ff3fb0 100%);
+  background: linear-gradient(100deg, #d49a57 0%, #b8612f 55%, #8e2f2a 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
-[data-theme='light'] .text-spectrum {
-  background-image: linear-gradient(100deg, #0f9e86 0%, #2f5bcc 30%, #6a29b8 62%, #c42f8f 100%);
+.roast .text-spectrum,
+.text-crema-spectrum {
+  background: linear-gradient(100deg, #e9d9bf 0%, #d49a57 40%, #b8612f 75%, #8e2f2a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .bg-spectrum {
-  background: linear-gradient(100deg, #2de8c0 0%, #3f7bff 30%, #9b3bff 62%, #ff3fb0 100%);
+  background: linear-gradient(100deg, #d49a57 0%, #b8612f 55%, #8e2f2a 100%);
 }
 
 .card {
@@ -92,18 +119,20 @@ body {
   border: 1px solid var(--line);
   border-radius: 1.25rem;
   box-shadow: var(--shadow);
-  backdrop-filter: blur(14px) saturate(140%);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+}
+
+/* Film grain for the reel. Static noise, nudged each frame by the reel itself. */
+.grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
 }
 
 .marquee-track {
   display: flex;
   width: max-content;
   animation: marquee var(--marquee-duration, 40s) linear infinite;
-}
-
-.marquee-track.reverse {
-  animation-direction: reverse;
 }
 
 @keyframes marquee {

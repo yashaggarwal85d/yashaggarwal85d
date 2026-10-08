@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type RefObject } from 'react';
 import * as THREE from 'three';
 import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2.js';
 import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry.js';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
+import type { KbDriver } from '../reel/kbDriver';
 
 /**
  * Mechanical-keyboard backdrop.
@@ -11,31 +12,38 @@ import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
  * raycast onto an invisible ground plane and every key lifts by its distance to
  * the hit point, with an asymmetric spring (snappy press, softer release). Keys
  * draw in as corner brackets, complete their outline, then fill as they rise;
- * keys held up shift hue. After 1.8 s without input a wave sweeps the board.
+ * keys held up heat towards foam.
  *
- * Technique inspired by the hero of yashahire.info.
+ * The showreel steers it through a shared `KbDriver`: beat pumps, shock-waves,
+ * a focused key, launching every key, and a crossfade between the espresso and
+ * oat palettes. Technique inspired by the hero of yashahire.info.
  */
 
 const ROWS = 12;
 const COLS = 20;
 const SPACING = 2;
-const X0 = -((COLS - 1) * SPACING) / 2; // -19
-const Z0 = -((ROWS - 1) * SPACING) / 2; // -11
+const X0 = -((COLS - 1) * SPACING) / 2;
+const Z0 = -((ROWS - 1) * SPACING) / 2;
 
 const CAP_BOTTOM = 1.12;
 const CAP_TOP = 0.7616;
 const CAP_HEIGHT = 0.76;
 const PAD_SIZE = 1.84;
-const VIEW = 8.5; // half-height of the orthographic frustum
+const VIEW = 8.5;
 
 const IDLE_MS = 1800;
 const WAVE_MS = 7000;
 const VIGNETTE_START = 0.55;
 
-const PALETTES = {
-  dark: ['#2de8c0', '#3f7bff', '#9b3bff', '#ff3fb0'],
-  light: ['#0f9e86', '#2f5bcc', '#6a29b8', '#b82f8a'],
-};
+const PALETTE_DARK = ['#e9d9bf', '#d49a57', '#b8612f', '#8e2f2a'];
+const PALETTE_LIGHT = ['#b8612f', '#d49a57', '#8e2f2a', '#5a4032'];
+const CLEAR_DARK = new THREE.Color('#17100c');
+const CLEAR_LIGHT = new THREE.Color('#f3eadb');
+const BODY_DARK = new THREE.Color('#0d0907');
+const BODY_LIGHT = new THREE.Color('#efe3cf');
+const HOT_DARK = new THREE.Color('#fbf7ef');
+const HOT_LIGHT = new THREE.Color('#8e2f2a');
+const BEAN = new THREE.Color('#5a4032');
 
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
 const smooth = (v: number) => v * v * (3 - 2 * v);
@@ -49,23 +57,12 @@ function gradientAt(t: number, stops: string[]) {
 
 /** Bottom/top square of the keycap frustum, as line endpoints. */
 function keycapOutline() {
-  const b = 0.56; // half-width at the base
-  const t = CAP_TOP / 2; // half-width at the top
+  const b = 0.56;
+  const t = CAP_TOP / 2;
   const h = CAP_HEIGHT / 2;
-  const base = [
-    [b, -h, b],
-    [b, -h, -b],
-    [-b, -h, -b],
-    [-b, -h, b],
-  ];
-  const top = [
-    [t, h, t],
-    [t, h, -t],
-    [-t, h, -t],
-    [-t, h, t],
-  ];
+  const base = [[b, -h, b], [b, -h, -b], [-b, -h, -b], [-b, -h, b]];
+  const top = [[t, h, t], [t, h, -t], [-t, h, -t], [-t, h, t]];
   const lerp = (p: number[], q: number[], k: number) => p.map((v, i) => v + (q[i] - v) * k);
-
   const brackets: number[] = [];
   const middles: number[] = [];
   for (const ring of [base, top]) {
@@ -78,21 +75,19 @@ function keycapOutline() {
       middles.push(...p1, ...q1);
     }
   }
-  for (let i = 0; i < 4; i++) brackets.push(...base[i], ...top[i]); // vertical edges
+  for (let i = 0; i < 4; i++) brackets.push(...base[i], ...top[i]);
   return { brackets, middles };
 }
 
-type Props = { theme: 'dark' | 'light' };
+type Props = { driver: RefObject<KbDriver> };
 
-export default function KeyboardBackground({ theme }: Props) {
+export default function KeyboardBackground({ driver }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
 
-    const dark = theme === 'dark';
-    const palette = PALETTES[theme];
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let width = host.clientWidth;
     let height = host.clientHeight;
@@ -105,7 +100,7 @@ export default function KeyboardBackground({ theme }: Props) {
     }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(width, height);
-    renderer.setClearColor(dark ? 0x05050a : 0xf2f2f7);
+    renderer.setClearColor(CLEAR_DARK);
     host.appendChild(renderer.domElement);
 
     const scene = new THREE.Scene();
@@ -114,36 +109,33 @@ export default function KeyboardBackground({ theme }: Props) {
     camera.lookAt(0, 0, 0);
     const fitCamera = () => {
       const aspect = width / height;
-      camera.left = -VIEW * aspect;
-      camera.right = VIEW * aspect;
-      camera.top = VIEW;
-      camera.bottom = -VIEW;
+      // Portrait screens see a narrower slice; zoom out a little so it still reads as a board.
+      const view = aspect < 1 ? VIEW * 1.25 : VIEW;
+      camera.left = -view * aspect;
+      camera.right = view * aspect;
+      camera.top = view;
+      camera.bottom = -view;
       camera.updateProjectionMatrix();
     };
     fitCamera();
 
-    scene.add(new THREE.AmbientLight(dark ? 0x223355 : 0x9999bb, 1.6));
-    const point = new THREE.PointLight(dark ? 0x3366ff : 0x6688cc, 1.6);
+    const ambient = new THREE.AmbientLight(0x3a2a20, 1.6);
+    scene.add(ambient);
+    const point = new THREE.PointLight(0xd49a57, 1.6);
     point.position.set(-5, 12, 8);
     scene.add(point);
 
-    // Invisible plane the pointer is projected onto.
     const groundGeo = new THREE.PlaneGeometry(50, 34);
     const groundMat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false, depthTest: false });
     const ground = new THREE.Mesh(groundGeo, groundMat);
     ground.rotation.x = -Math.PI / 2;
     scene.add(ground);
 
-    // Shared geometry. A 4-sided cylinder rotated 45° is a square frustum: a keycap.
-    const capGeo = new THREE.CylinderGeometry(
-      CAP_TOP / Math.SQRT2,
-      CAP_BOTTOM / Math.SQRT2,
-      CAP_HEIGHT,
-      4,
-      1,
-      false,
-      Math.PI / 4,
-    );
+    // A 4-sided cylinder rotated 45° is a square frustum: a keycap.
+    const capGeo = new THREE.CylinderGeometry(CAP_TOP / Math.SQRT2, CAP_BOTTOM / Math.SQRT2, CAP_HEIGHT, 4, 1, false, Math.PI / 4);
+    // Coffee bean for the easter egg: a squashed ellipsoid, roughly keycap-sized.
+    const beanGeo = new THREE.SphereGeometry(0.5, 20, 14);
+    beanGeo.scale(0.78, 0.76, 1.08);
     const outline = keycapOutline();
     const bracketGeo = new LineSegmentsGeometry().setPositions(outline.brackets);
     const middleGeo = new LineSegmentsGeometry().setPositions(outline.middles);
@@ -156,14 +148,16 @@ export default function KeyboardBackground({ theme }: Props) {
     const COUNT = ROWS * COLS;
     const keyX = new Float32Array(COUNT);
     const keyZ = new Float32Array(COUNT);
+    const keyR = new Float32Array(COUNT); // distance from the board centre, in keys
     const vignette = new Float32Array(COUNT);
+    const jitter = new Float32Array(COUNT);
     const lift = new Float32Array(COUNT);
     const held = new Float32Array(COUNT);
-    const baseHSL: { h: number; s: number; l: number }[] = [];
-    const baseColor: THREE.Color[] = [];
-    const tinted = new Uint8Array(COUNT);
+    const darkColor: THREE.Color[] = [];
+    const lightColor: THREE.Color[] = [];
 
     const caps: THREE.Group[] = [];
+    const bodies: THREE.Mesh[] = [];
     const bodyMats: THREE.MeshPhongMaterial[] = [];
     const bracketMats: LineMaterial[] = [];
     const middleMats: LineMaterial[] = [];
@@ -171,32 +165,25 @@ export default function KeyboardBackground({ theme }: Props) {
     const padMats: THREE.MeshBasicMaterial[] = [];
 
     const lineMat = (color: THREE.Color, lw: number) =>
-      new LineMaterial({
-        color: color.getHex(),
-        linewidth: lw,
-        transparent: true,
-        opacity: 0,
-        depthWrite: false,
-      });
+      new LineMaterial({ color: color.getHex(), linewidth: lw, transparent: true, opacity: 0, depthWrite: false });
 
     for (let r = 0; r < ROWS; r++) {
       for (let c = 0; c < COLS; c++) {
         const i = r * COLS + c;
-        const color = gradientAt((r + c) / (ROWS + COLS - 2), palette);
+        const t = (r + c) / (ROWS + COLS - 2);
+        const dark = gradientAt(t, PALETTE_DARK);
+        darkColor.push(dark);
+        lightColor.push(gradientAt(t, PALETTE_LIGHT));
         const dx = (c - (COLS - 1) / 2) / ((COLS - 1) / 2);
         const dz = (r - (ROWS - 1) / 2) / ((ROWS - 1) / 2);
-        const d = Math.min(1, Math.hypot(dx, dz));
-        vignette[i] = 1 - band(d, VIGNETTE_START, 1);
-        const hsl = { h: 0, s: 0, l: 0 };
-        color.getHSL(hsl);
-        baseHSL.push(hsl);
-        baseColor.push(color);
+        vignette[i] = 1 - band(Math.min(1, Math.hypot(dx, dz)), VIGNETTE_START, 1);
+        jitter[i] = 0.75 + 0.25 * Math.abs(Math.sin(i * 12.9898) * 43758.5453 % 1);
 
         const body = new THREE.MeshPhongMaterial({
-          color: dark ? 0x050508 : 0xe4e4ee,
-          emissive: color,
-          emissiveIntensity: dark ? 0.12 : 0.05,
-          shininess: dark ? 30 : 6,
+          color: BODY_DARK.clone(),
+          emissive: dark.clone(),
+          emissiveIntensity: 0.12,
+          shininess: 30,
           transparent: true,
           opacity: 0,
           depthWrite: false,
@@ -204,16 +191,16 @@ export default function KeyboardBackground({ theme }: Props) {
           polygonOffsetFactor: 1,
           polygonOffsetUnits: 1,
         });
-        const bracketMat = lineMat(color, dark ? 3.8 : 3);
-        const middleMat = lineMat(color, dark ? 3.8 : 3);
-        const socketMat = lineMat(color, dark ? 4.2 : 3.2);
-        const padMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0, depthWrite: false });
+        const bracketMat = lineMat(dark, 3.6);
+        const middleMat = lineMat(dark, 3.6);
+        const socketMat = lineMat(dark, 4);
+        const padMat = new THREE.MeshBasicMaterial({ color: dark.clone(), transparent: true, opacity: 0, depthWrite: false });
 
         const x = X0 + c * SPACING;
         const z = Z0 + r * SPACING;
-
         const cap = new THREE.Group();
-        cap.add(new THREE.Mesh(capGeo, body));
+        const bodyMesh = new THREE.Mesh(capGeo, body);
+        cap.add(bodyMesh);
         cap.add(new LineSegments2(bracketGeo, bracketMat));
         cap.add(new LineSegments2(middleGeo, middleMat));
         cap.position.set(x, 0, z);
@@ -230,8 +217,10 @@ export default function KeyboardBackground({ theme }: Props) {
         scene.add(pad);
 
         caps.push(cap);
+        bodies.push(bodyMesh);
         keyX[i] = x;
         keyZ[i] = z;
+        keyR[i] = Math.hypot(x, z) / SPACING;
         bodyMats.push(body);
         bracketMats.push(bracketMat);
         middleMats.push(middleMat);
@@ -242,11 +231,13 @@ export default function KeyboardBackground({ theme }: Props) {
     const allLineMats = [...bracketMats, ...middleMats, ...socketMats];
     allLineMats.forEach((m) => m.resolution.set(width, height));
 
-    // Twinkling dots where the switch rows cross, in three size buckets.
+    // Twinkling dots where the switch rows cross. Each dot carries both palettes.
     const buckets: number[][] = [[], [], []];
     for (let r = 0; r <= ROWS; r++) {
       for (let c = 0; c <= COLS; c++) {
-        const color = gradientAt((r + c) / (ROWS + COLS), palette);
+        const t = (r + c) / (ROWS + COLS);
+        const cd = gradientAt(t, PALETTE_DARK);
+        const cl = gradientAt(t, PALETTE_LIGHT);
         const dx = (c - COLS / 2) / (COLS / 2);
         const dz = (r - ROWS / 2) / (ROWS / 2);
         const fade = 1 - band(Math.min(1, Math.hypot(dx, dz)), VIGNETTE_START, 1);
@@ -254,49 +245,58 @@ export default function KeyboardBackground({ theme }: Props) {
         const b = roll < 0.55 ? 0 : roll < 0.85 ? 1 : 2;
         buckets[b].push(
           X0 - 1 + c * SPACING, 0.015, Z0 - 1 + r * SPACING,
-          color.r * fade, color.g * fade, color.b * fade,
+          cd.r * fade, cd.g * fade, cd.b * fade,
+          cl.r * fade, cl.g * fade, cl.b * fade,
           Math.random(), 0.5 + 0.8 * Math.random(),
         );
       }
     }
+    const STRIDE = 11;
     const dotGeos: THREE.BufferGeometry[] = [];
     const dotMats: THREE.ShaderMaterial[] = [];
     const pr = renderer.getPixelRatio();
     [3, 5, 8].forEach((size, b) => {
       const data = buckets[b];
-      const n = data.length / 8;
+      const n = data.length / STRIDE;
       if (!n) return;
       const pos = new Float32Array(n * 3);
-      const col = new Float32Array(n * 3);
+      const colD = new Float32Array(n * 3);
+      const colL = new Float32Array(n * 3);
       const phase = new Float32Array(n);
       const speed = new Float32Array(n);
       for (let k = 0; k < n; k++) {
-        pos.set(data.slice(k * 8, k * 8 + 3), k * 3);
-        col.set(data.slice(k * 8 + 3, k * 8 + 6), k * 3);
-        phase[k] = data[k * 8 + 6];
-        speed[k] = data[k * 8 + 7];
+        const o = k * STRIDE;
+        pos.set(data.slice(o, o + 3), k * 3);
+        colD.set(data.slice(o + 3, o + 6), k * 3);
+        colL.set(data.slice(o + 6, o + 9), k * 3);
+        phase[k] = data[o + 9];
+        speed[k] = data[o + 10];
       }
       const geo = new THREE.BufferGeometry();
       geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-      geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+      geo.setAttribute('colorDark', new THREE.BufferAttribute(colD, 3));
+      geo.setAttribute('colorLight', new THREE.BufferAttribute(colL, 3));
       geo.setAttribute('phase', new THREE.BufferAttribute(phase, 1));
       geo.setAttribute('speed', new THREE.BufferAttribute(speed, 1));
       const mat = new THREE.ShaderMaterial({
         uniforms: {
           uTime: { value: 0 },
           uSize: { value: size * pr * 0.75 },
-          uOpacity: { value: dark ? 0.62 : 0.8 },
+          uOpacity: { value: 0.62 },
+          uLight: { value: 0 },
         },
         vertexShader: /* glsl */ `
-          attribute vec3 color;
+          attribute vec3 colorDark;
+          attribute vec3 colorLight;
           attribute float phase;
           attribute float speed;
           uniform float uTime;
           uniform float uSize;
+          uniform float uLight;
           varying vec3 vColor;
           varying float vTwinkle;
           void main() {
-            vColor = color;
+            vColor = mix(colorDark, colorLight, uLight);
             vTwinkle = 0.5 + 0.5 * sin(uTime * speed * 3.0 + phase * 6.28318);
             gl_PointSize = uSize * (0.45 + 0.85 * vTwinkle);
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
@@ -318,35 +318,22 @@ export default function KeyboardBackground({ theme }: Props) {
       dotMats.push(mat);
     });
 
-    // Distant star field (dark theme only).
-    let stars: THREE.Points | null = null;
-    if (dark) {
-      const pos = new Float32Array(660);
-      for (let k = 0; k < pos.length; k++) pos[k] = 46 * (Math.random() - 0.5);
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-      stars = new THREE.Points(
-        geo,
-        new THREE.PointsMaterial({ color: 0x88aacc, size: 2, sizeAttenuation: false, transparent: true, opacity: 0.5, depthWrite: false }),
-      );
-      scene.add(stars);
-    }
-
-    // Scrolling raises a faint "socket" grid so the board stays legible as a texture.
-    let scrollProgress = 0;
-    const onScroll = () => {
-      scrollProgress = clamp01(window.scrollY / (0.9 * window.innerHeight));
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
+    // Distant star field, only visible on the espresso palette.
+    const starPos = new Float32Array(660);
+    for (let k = 0; k < starPos.length; k++) starPos[k] = 46 * (Math.random() - 0.5);
+    const starGeo = new THREE.BufferGeometry();
+    starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+    const starMat = new THREE.PointsMaterial({ color: 0xe9d9bf, size: 2, sizeAttenuation: false, transparent: true, opacity: 0.45, depthWrite: false });
+    const stars = new THREE.Points(starGeo, starMat);
+    scene.add(stars);
 
     const raycaster = new THREE.Raycaster();
     const ndc = new THREE.Vector2(-9999, -9999);
+    const focusNdc = new THREE.Vector2();
     let lastInput = -Infinity;
     const onPointer = (e: PointerEvent) => {
-      const rect = host.getBoundingClientRect();
-      ndc.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      ndc.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+      ndc.x = (e.clientX / window.innerWidth) * 2 - 1;
+      ndc.y = -(e.clientY / window.innerHeight) * 2 + 1;
       lastInput = performance.now();
     };
     window.addEventListener('pointermove', onPointer, { passive: true });
@@ -355,47 +342,98 @@ export default function KeyboardBackground({ theme }: Props) {
     const waveFrom = new THREE.Vector3(X0, 0, Z0);
     const waveTo = new THREE.Vector3(-X0, 0, -Z0);
     const wave = new THREE.Vector3();
-    const tint = new THREE.Color();
+    const focusPoint = new THREE.Vector3();
+    const pointerPoint = new THREE.Vector3();
+    const tmp = new THREE.Color();
+    const tmpBody = new THREE.Color();
+    const tmpClear = new THREE.Color();
 
+    let opacity = -1;
+    let light = 0;
+    let beans = false;
     let raf = 0;
     let prev = performance.now();
+
+    const hitGround = (v: THREE.Vector2, out: THREE.Vector3) => {
+      raycaster.setFromCamera(v, camera);
+      const hit = raycaster.intersectObject(ground);
+      if (!hit.length) return false;
+      out.copy(hit[0].point);
+      return true;
+    };
+
     const frame = () => {
       raf = requestAnimationFrame(frame);
+      const now = performance.now();
       if (document.hidden) {
-        prev = performance.now();
+        prev = now;
         return;
       }
-      const now = performance.now();
+      const d = driver.current;
+      if (!d) return;
       const dt = Math.min(0.1, (now - prev) / 1000);
       prev = now;
-      const step = dt * 60; // normalise the springs to 60 fps
+      const step = dt * 60;
+
+      // Fade the whole canvas; skip rendering entirely while it is invisible.
+      const nextOpacity = opacity < 0 ? d.visible : opacity + (d.visible - opacity) * (1 - Math.pow(0.82, step));
+      if (Math.abs(nextOpacity - opacity) > 0.002) host.style.opacity = nextOpacity.toFixed(3);
+      opacity = nextOpacity;
+      if (opacity < 0.01) return;
+
+      light += (d.light - light) * (1 - Math.pow(0.9, step));
+      if (Math.abs(d.light - light) < 0.001) light = d.light;
+
+      if (d.beans !== beans) {
+        beans = d.beans;
+        bodies.forEach((m) => (m.geometry = beans ? beanGeo : capGeo));
+      }
 
       if (!reduceMotion) dotMats.forEach((m) => (m.uniforms.uTime.value = now / 1000));
+      dotMats.forEach((m) => (m.uniforms.uLight.value = light));
+      starMat.opacity = 0.45 * (1 - light);
+      renderer.setClearColor(tmpClear.copy(CLEAR_DARK).lerp(CLEAR_LIGHT, light));
+      tmpBody.copy(BODY_DARK).lerp(BODY_LIGHT, light);
 
-      let target: THREE.Vector3 | null = null;
-      let idle = now - lastInput > IDLE_MS;
-      if (!idle) {
-        raycaster.setFromCamera(ndc, camera);
-        const hit = raycaster.intersectObject(ground);
-        target = hit.length ? hit[0].point : null;
-        idle = !target;
-      }
-      if (idle && !reduceMotion) {
+      // Pointer target
+      const pointer = now - lastInput < IDLE_MS && hitGround(ndc, pointerPoint) ? pointerPoint : null;
+      const idle = !pointer;
+      let waveTarget: THREE.Vector3 | null = null;
+      if (idle && d.idleWave && !reduceMotion) {
         const t = ((now % WAVE_MS) / WAVE_MS) * 2;
-        target = wave.copy(waveFrom).lerp(waveTo, smooth(t < 1 ? t : 2 - t));
+        waveTarget = wave.copy(waveFrom).lerp(waveTo, smooth(t < 1 ? t : 2 - t));
+      }
+      let focus: THREE.Vector3 | null = null;
+      if (d.focus && d.focus.strength > 0) {
+        focusNdc.set(d.focus.x * 2 - 1, -(d.focus.y * 2 - 1));
+        if (hitGround(focusNdc, focusPoint)) focus = focusPoint;
       }
 
-      const radius = idle ? 6 : 2.3;
-      const falloff = idle ? 2.6 : 0.6;
-      const socketFloor = 0.16 * scrollProgress;
+      const shockR = d.shockR;
+      const shockAmp = d.shockAmp;
+      const hot = light > 0.5 ? HOT_LIGHT : HOT_DARK;
 
       for (let i = 0; i < COUNT; i++) {
         let goal = 0;
-        if (target) {
-          const dist = Math.hypot(target.x - keyX[i], target.z - keyZ[i]) / SPACING;
-          goal = smooth(Math.pow(clamp01(1 - dist / radius), falloff));
+        if (pointer) {
+          const dist = Math.hypot(pointer.x - keyX[i], pointer.z - keyZ[i]) / SPACING;
+          goal = smooth(Math.pow(clamp01(1 - dist / 2.3), 0.6));
+        } else if (waveTarget) {
+          const dist = Math.hypot(waveTarget.x - keyX[i], waveTarget.z - keyZ[i]) / SPACING;
+          goal = smooth(Math.pow(clamp01(1 - dist / 6), 2.6));
         }
-        const rate = goal > lift[i] ? 0.22 : 0.12;
+        if (focus && d.focus) {
+          const dist = Math.hypot(focus.x - keyX[i], focus.z - keyZ[i]) / SPACING;
+          goal = Math.max(goal, d.focus.strength * smooth(Math.pow(clamp01(1 - dist / d.focus.radius), 0.7)));
+        }
+        if (d.pump > 0) goal = Math.max(goal, d.pump * 0.32 * jitter[i]);
+        if (shockR >= 0 && shockAmp > 0) {
+          const k = (keyR[i] - shockR) / 1.1;
+          goal = Math.max(goal, shockAmp * Math.exp(-k * k));
+        }
+        if (d.all > 0) goal = Math.max(goal, d.all * jitter[i]);
+
+        const rate = goal > lift[i] ? 0.24 : 0.11;
         lift[i] += (goal - lift[i]) * (1 - Math.pow(1 - rate, step));
         const u = lift[i];
         const w = vignette[i];
@@ -404,30 +442,32 @@ export default function KeyboardBackground({ theme }: Props) {
         caps[i].scale.set(1, sy, 1);
         caps[i].position.y = (sy * CAP_HEIGHT) / 2 + 0.1 * u;
 
-        bracketMats[i].opacity = band(u, 0, 0.35) * w;
-        middleMats[i].opacity = band(u, 0.2, 0.6) * w;
-        bodyMats[i].opacity = smooth(Math.max(0, (u - 0.62) / 0.38)) * w;
-        socketMats[i].opacity = THREE.MathUtils.lerp(socketFloor, 1, u) * w;
+        const lineFade = beans ? 0 : 1;
+        bracketMats[i].opacity = band(u, 0, 0.35) * w * lineFade;
+        middleMats[i].opacity = band(u, 0.2, 0.6) * w * lineFade;
+        bodyMats[i].opacity = smooth(Math.max(0, (u - (beans ? 0.25 : 0.62)) / (beans ? 0.5 : 0.38))) * w;
+        socketMats[i].opacity = THREE.MathUtils.lerp(d.socketFloor, 1, u) * w;
         padMats[i].opacity = 0.55 * smooth(u) * w;
 
-        // Keys held down under the cursor slowly cycle through the spectrum.
-        held[i] = !idle && u > 0.75 ? Math.min(30, held[i] + dt) : Math.max(0, held[i] - 2 * dt);
-        if (held[i] > 0.05) {
-          const hsl = baseHSL[i];
-          tint.setHSL((hsl.h + 0.12 * held[i]) % 1, hsl.s, hsl.l);
-          tinted[i] = 1;
-        } else if (tinted[i]) {
-          tint.copy(baseColor[i]);
-          tinted[i] = 0;
-        } else continue;
-        bracketMats[i].color.copy(tint);
-        middleMats[i].color.copy(tint);
-        socketMats[i].color.copy(tint);
-        bodyMats[i].emissive.copy(tint);
-        padMats[i].color.copy(tint);
+        // Keys held up under the cursor heat towards foam (or cherry on oat).
+        held[i] = pointer && u > 0.75 ? Math.min(6, held[i] + dt) : Math.max(0, held[i] - 2 * dt);
+        tmp.copy(darkColor[i]).lerp(lightColor[i], light);
+        if (held[i] > 0.02) tmp.lerp(hot, Math.min(0.75, held[i] * 0.35));
+        bracketMats[i].color.copy(tmp);
+        middleMats[i].color.copy(tmp);
+        socketMats[i].color.copy(tmp);
+        padMats[i].color.copy(tmp);
+        if (beans) {
+          bodyMats[i].color.copy(BEAN);
+          bodyMats[i].emissive.copy(tmp).multiplyScalar(0.35);
+        } else {
+          bodyMats[i].color.copy(tmpBody);
+          bodyMats[i].emissive.copy(tmp);
+        }
+        bodyMats[i].emissiveIntensity = THREE.MathUtils.lerp(0.12, 0.05, light);
       }
 
-      if (stars && !reduceMotion) stars.rotation.y += 0.00015 * step;
+      if (!reduceMotion) stars.rotation.y += 0.00015 * step;
       renderer.render(scene, camera);
     };
     frame();
@@ -443,26 +483,15 @@ export default function KeyboardBackground({ theme }: Props) {
 
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener('scroll', onScroll);
       window.removeEventListener('pointermove', onPointer);
       window.removeEventListener('pointerdown', onPointer);
       window.removeEventListener('resize', onResize);
-      [groundGeo, capGeo, bracketGeo, middleGeo, socketGeo, padGeo, ...dotGeos].forEach((g) => g.dispose());
-      [groundMat, ...bodyMats, ...allLineMats, ...padMats, ...dotMats].forEach((m) => m.dispose());
-      if (stars) {
-        stars.geometry.dispose();
-        (stars.material as THREE.Material).dispose();
-      }
+      [groundGeo, capGeo, beanGeo, bracketGeo, middleGeo, socketGeo, padGeo, starGeo, ...dotGeos].forEach((g) => g.dispose());
+      [groundMat, starMat, ...bodyMats, ...allLineMats, ...padMats, ...dotMats].forEach((m) => m.dispose());
       renderer.dispose();
       renderer.domElement.remove();
     };
-  }, [theme]);
+  }, [driver]);
 
-  return (
-    <div
-      ref={hostRef}
-      aria-hidden
-      className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
-    />
-  );
+  return <div ref={hostRef} aria-hidden className="pointer-events-none fixed inset-0 z-0 overflow-hidden" />;
 }

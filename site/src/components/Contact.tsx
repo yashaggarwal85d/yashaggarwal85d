@@ -14,11 +14,12 @@ export default function Contact() {
   return (
     <Section id="contact">
       <Reveal className="mb-10">
+        <p className="mb-2 font-mono text-xs uppercase tracking-[0.25em] text-subtle">09 · Contact</p>
         <h2 className="text-3xl font-bold tracking-tight md:text-4xl">Ready to Connect?</h2>
         <p className="mt-2 text-muted">Let’s turn your next data problem into something that runs itself.</p>
         <span className="mt-3 block h-[3px] w-10 rounded-full bg-spectrum" />
       </Reveal>
-      <Reveal className="card relative overflow-hidden px-6 py-16 text-center md:py-20">
+      <Reveal className="card roast relative overflow-hidden px-6 py-16 text-center md:py-20" style={{ background: 'var(--espresso)' }}>
         <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-accent/15 blur-3xl" />
         <div className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-accent-2/15 blur-3xl" />
         <h3 className="relative text-4xl font-black tracking-tight md:text-6xl">

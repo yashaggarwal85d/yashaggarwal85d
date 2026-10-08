@@ -83,11 +83,11 @@ export default function Experience() {
 
   return (
     <Section id="experience">
-      <SectionHeading title="Experience" kicker="Where I’ve built" />
+      <SectionHeading title="Experience" kicker="04 · Where I’ve built" />
       <div ref={ref} className="relative space-y-10 md:space-y-16">
         <div className="absolute bottom-0 left-5 top-0 w-px -translate-x-1/2 bg-line md:left-1/2" />
         <motion.div
-          className="absolute bottom-0 left-5 top-0 w-[2px] origin-top -translate-x-1/2 bg-gradient-to-b from-[#ff3fb0] via-[#3f7bff] to-[#2de8c0] md:left-1/2"
+          className="absolute bottom-0 left-5 top-0 w-[2px] origin-top -translate-x-1/2 bg-gradient-to-b from-cinnamon via-caramel to-mocha md:left-1/2"
           style={{ scaleY: fill }}
         />
         {experience.map((job, i) => (

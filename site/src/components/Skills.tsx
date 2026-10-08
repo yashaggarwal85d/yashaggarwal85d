@@ -41,7 +41,7 @@ export default function Skills() {
 
   return (
     <Section id="skills">
-      <SectionHeading title="Skills" kicker="The toolbox" />
+      <SectionHeading title="Skills" kicker="06 · The toolbox" />
       <div className="mb-6 flex flex-wrap gap-2">
         {groups.map((g) => (
           <button

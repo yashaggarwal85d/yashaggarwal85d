@@ -97,7 +97,7 @@ yash = {
 
 | | Repo | Description |
 |---|---|---|
-| 🌐 | [Portfolio](./site) | This profile's website: React + three.js with a mechanical-keyboard backdrop that reacts to your cursor. |
+| 🌐 | [Portfolio](./site) | This profile's website: a 48-second, 120 BPM coffee-roasted showreel in React + three.js, on a mechanical-keyboard backdrop that reacts to your cursor. |
 | 📦 | [Data Structures & Algorithms](https://github.com/yashaggarwal85d/Data-structures-and-Algorithms) | Data-structure and algorithm implementations in C++. |
 | 📦 | [ProjectX1](https://github.com/yashaggarwal85d/ProjectX1) | A collaboration platform where team members and clients join projects and work through raised issues. |
 | 📦 | [Blockchain](https://github.com/yashaggarwal85d/Blockchain) | A web and mobile chat app with public, private and anonymous modes, backed by encrypted data on a blockchain. |

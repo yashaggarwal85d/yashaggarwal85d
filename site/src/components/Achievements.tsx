@@ -7,7 +7,7 @@ const icons = { presentation: Presentation, trophy: Trophy, star: Star, grad: Gr
 export default function Achievements() {
   return (
     <Section id="achievements">
-      <SectionHeading title="Achievements" kicker="Recognition" />
+      <SectionHeading title="Achievements" kicker="08 · Recognition" />
       <div className="grid gap-4 md:grid-cols-2">
         {achievements.map((a, i) => {
           const Icon = icons[a.icon];
