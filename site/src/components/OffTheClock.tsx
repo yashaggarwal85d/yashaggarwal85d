@@ -175,7 +175,7 @@ function Shelf() {
                     transition={{ duration: 0.35 }}
                     className="flex h-full flex-col p-5"
                   >
-                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] opacity-70">{f.kind}</span>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] opacity-70">{tr(f.kind)}</span>
                     <span className="mt-1 text-2xl font-extrabold tracking-wide">{f.title.toUpperCase()}</span>
                     <span className="mt-3 font-display text-lg italic leading-snug">“{f.take}”</span>
                   </motion.div>

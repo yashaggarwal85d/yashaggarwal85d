@@ -22,6 +22,8 @@ for (const f of files) {
   const src = fs.readFileSync(f, 'utf8');
   for (const m of src.matchAll(re)) keys.add(m[2].replace(/\\(['"\\])/g, '$1'));
 }
+// Keys that only reach tr() through a variable (skill groups, shelf kinds).
+for (const k of ['All', 'Languages', 'Processing', 'Lakehouse', 'Databases', 'Cloud & IaC', 'DevOps', 'AI', 'Series', 'Film', 'Anime', 'Books', 'Music', 'Travel', 'Kitchen']) keys.add(k);
 const list = [...keys].sort();
 
 if (!process.argv.includes('--check')) {
