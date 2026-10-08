@@ -32,6 +32,10 @@ import { tr } from '../i18n';
 const requested = new URLSearchParams(window.location.search).get('song');
 export const SONG_ENABLED = requested !== 'off';
 
+/** Phones and tablets get the original score: no YouTube, no ads, no player card. */
+const ua = navigator.userAgent;
+export const MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(ua) || (navigator.maxTouchPoints > 1 && /Macintosh/i.test(ua));
+
 export type TrackMeta = { kind: 'youtube' | 'synth'; title: string; artist: string; source: string; url: string; bpm: number };
 
 export type SongStatus =
@@ -231,6 +235,17 @@ class SongController extends Emitter {
   private startTimer = 0;
   /** the viewer switched the music off; ignore the player's own state noise */
   private stopped = false;
+  /**
+   * TORE UP only counts as playing once the song itself is running from its
+   * start. Until then the player stays muted, so if YouTube puts an ad first
+   * nobody hears it: we hand over to the score instead.
+   */
+  private verified = false;
+  private probeSince = 0;
+  /** the viewer asked for sound before the song was verified */
+  wantSound = false;
+  /** we asked the player to play (autoplay or a click) */
+  asked = false;
 
   private set(status: SongStatus) {
     if (this.status !== status) {
@@ -313,6 +328,7 @@ class SongController extends Emitter {
           this.muted = true;
           this.anchorSong = START;
           if (opts.autoplay) {
+            this.asked = true;
             p.playVideo();
             this.armStartTimer();
           } else {
@@ -352,7 +368,7 @@ class SongController extends Emitter {
       if (this.status === 'playing' || this.stopped) return;
       if (document.hidden) this.armStartTimer();
       else this.fail('it never started');
-    }, 12000);
+    }, 8000);
   }
 
   private fail(why: string) {
@@ -377,7 +393,7 @@ class SongController extends Emitter {
 
   private onState(s: number) {
     const p = this.player;
-    if (!p || this.stopped) return;
+    if (!p || this.stopped || !this.verified) return; // the probe in sync() decides when it has started
     if (s === 1) {
       window.clearTimeout(this.startTimer);
       if (this.status !== 'playing') {
@@ -406,6 +422,7 @@ class SongController extends Emitter {
    */
   private sync() {
     const p = this.player;
+    if (p && !this.verified && !this.stopped && this.asked) return this.probe(p);
     if (!p || this.status !== 'playing') return;
     const v = p.getCurrentTime();
     const wall = performance.now() / 1000;
@@ -441,6 +458,35 @@ class SongController extends Emitter {
     }
   }
 
+  /**
+   * Is the song itself playing, or an ad? The song starts at START and runs
+   * for DURATION; an ad has its own length and leaves the song's clock where
+   * it was. Playing for 1.5 s without the song moving means an ad.
+   */
+  private probe(p: YTPlayer) {
+    if (document.hidden || p.getPlayerState() !== 1) {
+      this.probeSince = 0;
+      return;
+    }
+    const d = p.getDuration();
+    if (d > 0 && Math.abs(d - DURATION) > 4) return this.fail('an ad is playing');
+    const v = p.getCurrentTime();
+    if (v >= START + 0.15 && v < START + 4) {
+      this.verified = true;
+      window.clearTimeout(this.startTimer);
+      this.resetClock(v);
+      if (this.wantSound) {
+        p.unMute();
+        p.setVolume(90);
+        this.muted = false;
+      }
+      this.set('playing');
+      return;
+    }
+    this.probeSince ||= performance.now();
+    if (performance.now() - this.probeSince > 1500) this.fail('an ad is playing');
+  }
+
   /** After the spinning top: back to the cold open, the reel and the song together. */
   private loopBack(overshootBars: number) {
     this.passes += 1;
@@ -456,6 +502,11 @@ class SongController extends Emitter {
     this.stopped = false;
     if (withSound) this.unmute();
     p.playVideo();
+    if (!this.verified && !this.asked) {
+      this.asked = true;
+      this.set('loading');
+      this.armStartTimer();
+    }
   }
   pause() {
     this.player?.pauseVideo();
@@ -467,7 +518,13 @@ class SongController extends Emitter {
   /** `rewind`: a first unmute just after the drop goes back to hear it. */
   unmute(rewind = false) {
     const p = this.player;
-    if (!p) return;
+    if (!p || !this.verified) {
+      // Not until we know it's the song and not an ad.
+      this.wantSound = true;
+      this.muted = false;
+      this.emit();
+      return;
+    }
     p.unMute();
     p.setVolume(90);
     this.muted = false;
@@ -477,7 +534,12 @@ class SongController extends Emitter {
   }
   toggleMute() {
     const p = this.player;
-    if (!p) return;
+    if (!p || !this.verified) {
+      this.wantSound = this.muted;
+      this.muted = !this.muted;
+      this.emit();
+      return;
+    }
     if (this.muted) this.unmute();
     else {
       p.mute();
@@ -574,7 +636,7 @@ class Soundtrack extends Emitter {
 
   constructor() {
     super();
-    if (requested === 'score') this.active = this.makeScore();
+    if (requested === 'score' || (MOBILE && requested !== 'tore-up')) this.active = this.makeScore();
     else {
       const yt = new SongController();
       yt.subscribe(() => {
@@ -593,9 +655,12 @@ class Soundtrack extends Emitter {
   }
 
   private fallBack() {
+    const yt = this.yt!;
     this.fellBack = true;
-    this.active = this.makeScore();
-    this.active.mount(null, { autoplay: this.autoplay });
+    const score = this.makeScore();
+    this.active = score;
+    score.mount(null, { autoplay: this.autoplay || yt.asked });
+    if (yt.wantSound) score.unmute();
   }
 
   /** The YouTube track, while it's still the one playing. */

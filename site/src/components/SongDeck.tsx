@@ -2,16 +2,14 @@ import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ExternalLink, Music2, Play, SkipForward, Volume2, VolumeX, X } from 'lucide-react';
 import { SONG_ENABLED, shouldAutoplaySong, song } from '../reel/song';
-import ScoreCard from './ScoreCard';
 import { tr } from '../i18n';
 
 /**
- * The soundtrack's visible home: a 200 × 200 card in the bottom-left corner.
- * For TORE UP it holds the YouTube player (which never remounts) at the
- * minimum size YouTube allows; for the fallback score, a live visualiser.
- * During the run-up the middle of the screen counts the beats to the drop.
- * YouTube's terms require the player to stay visible while it plays, so
- * stopping the music hides it.
+ * The soundtrack's visible home. TORE UP needs a 200 × 200 card in the
+ * bottom-left corner: YouTube's terms want its player visible, at least that
+ * big, while it plays. The original score needs no card at all; the reel's
+ * own dock has its sound button. During the run-up the middle of the screen
+ * counts the beats to the drop.
  */
 export default function SongDeck() {
   return SONG_ENABLED ? <SongDeckInner /> : null;
@@ -49,12 +47,6 @@ function SongDeckInner() {
     toastTimer.current = window.setTimeout(() => setToast(null), ms);
   };
 
-  // Say so (once) if TORE UP couldn't play and the score took over.
-  const fellBack = song.fellBack;
-  useEffect(() => {
-    if (fellBack) showToast(tr('TORE UP wouldn’t load here, so the intro brewed its own score'), 4200);
-  }, [fellBack]);
-
   // A ticker for the countdown while the run-up plays.
   const f = song.frame();
   const intro = song.engaged && f.intro;
@@ -85,14 +77,14 @@ function SongDeckInner() {
   const meta = song.meta;
   const status = song.status;
   const playing = status === 'playing' || status === 'buffering';
-  const showCard = song.engaged || status === 'loading';
+  const showCard = yt && (song.engaged || status === 'loading');
   const introShown = (intro || status === 'loading') && reelInView;
   const askForSound = song.engaged && !f.intro && song.muted && reelInView;
 
   // The card sits above the reel's dock when it shows, lower during the run-up
   // (no dock yet) and near the bottom once the reel has scrolled away.
   const lift = !reelInView ? 72 : introShown ? 56 : vw < 768 ? 150 : 170;
-  const cardTop = `calc(100vh - 200px - ${lift}px)`;
+  const cardTop = `calc(100vh - ${yt ? 200 : 0}px - ${lift}px)`;
   const captionTop = `calc(100vh - ${lift}px + 6px)`;
   const countdown = f.beatsToDrop <= 4;
 
@@ -206,11 +198,10 @@ function SongDeckInner() {
         <div className="h-full w-full" style={{ display: yt ? 'block' : 'none' }}>
           <div ref={hostRef} className="h-full w-full" />
         </div>
-        {song.score && <ScoreCard score={song.score} />}
       </div>
 
       {/* Caption under the card. */}
-      {song.engaged && (
+      {yt && song.engaged && (
         <div
           className="fixed z-30 flex w-[200px] items-center gap-1.5 rounded-xl border border-crema/15 px-2.5 py-1.5 text-crema shadow-xl transition-[top] duration-700"
           style={{ left: 16, top: captionTop, background: 'rgba(23,16,12,.9)' }}
