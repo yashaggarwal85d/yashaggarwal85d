@@ -1,0 +1,168 @@
+@import 'tailwindcss';
+
+/* Coffee beige: roasted dark to steamed light. */
+:root {
+  --espresso: #17100c;
+  --roast: #2a1d16;
+  --cocoa: #3b2a21;
+  --mocha: #5a4032;
+  --taupe: #8b7766;
+  --latte: #c8ac8c;
+  --crema: #e9d9bf;
+  --oat: #f3eadb;
+  --foam: #fbf7ef;
+  --caramel: #d49a57;
+  --cinnamon: #b8612f;
+  --cherry: #8e2f2a;
+
+  /* semantic tokens for the oat "explore" pages */
+  --bg: var(--oat);
+  --fg: var(--espresso);
+  --muted: #5e4a3d;
+  --subtle: #8b7766;
+  --card: rgb(251 247 239 / 0.82);
+  --card-solid: var(--foam);
+  --chip: rgb(23 16 12 / 0.05);
+  --line: rgb(23 16 12 / 0.1);
+  --line-strong: rgb(23 16 12 / 0.18);
+  --accent: var(--cinnamon);
+  --accent-2: var(--caramel);
+  --shadow: 0 1px 2px rgb(23 16 12 / 0.05), 0 10px 30px rgb(23 16 12 / 0.07);
+  color-scheme: light;
+}
+
+/* Dark-roast islands (Off the Clock, CTA) reuse the same tokens, inverted. */
+.roast {
+  --bg: var(--roast);
+  --fg: var(--crema);
+  --muted: #c3ab92;
+  --subtle: #9a8471;
+  --card: rgb(23 16 12 / 0.6);
+  --card-solid: var(--espresso);
+  --chip: rgb(233 217 191 / 0.07);
+  --line: rgb(233 217 191 / 0.12);
+  --line-strong: rgb(233 217 191 / 0.22);
+  --accent: var(--caramel);
+  --accent-2: var(--cinnamon);
+  --shadow: 0 12px 40px rgb(0 0 0 / 0.35);
+  color: var(--fg);
+}
+
+@theme inline {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Fraunces', ui-serif, Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-card: var(--card);
+  --color-card-solid: var(--card-solid);
+  --color-chip: var(--chip);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-espresso: var(--espresso);
+  --color-roast: var(--roast);
+  --color-cocoa: var(--cocoa);
+  --color-mocha: var(--mocha);
+  --color-taupe: var(--taupe);
+  --color-latte: var(--latte);
+  --color-crema: var(--crema);
+  --color-oat: var(--oat);
+  --color-foam: var(--foam);
+  --color-caramel: var(--caramel);
+  --color-cinnamon: var(--cinnamon);
+  --color-cherry: var(--cherry);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  background: var(--oat);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--caramel) 45%, transparent);
+}
+
+/* Caramel → cinnamon → cherry on light grounds; crema-led on dark ones. */
+.text-spectrum {
+  background: linear-gradient(100deg, #d49a57 0%, #b8612f 55%, #8e2f2a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.roast .text-spectrum,
+.text-crema-spectrum {
+  background: linear-gradient(100deg, #e9d9bf 0%, #d49a57 40%, #b8612f 75%, #8e2f2a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.bg-spectrum {
+  background: linear-gradient(100deg, #d49a57 0%, #b8612f 55%, #8e2f2a 100%);
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+}
+
+/* Film grain for the reel. Static noise, nudged each frame by the reel itself. */
+.grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee var(--marquee-duration, 40s) linear infinite;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes ping-soft {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  80%,
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+.animate-ping-soft {
+  animation: ping-soft 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .marquee-track,
+  .animate-ping-soft {
+    animation: none;
+  }
+}
