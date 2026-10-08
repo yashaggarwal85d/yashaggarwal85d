@@ -110,6 +110,10 @@ export function Built(p: SceneProps) {
   const n = Math.min(BUILDS.length, Math.floor(t / BEAT) + 1);
   const cols = portrait ? 1 : 2;
   const enter = ease.expoOut(prog(t, 0, 0.35));
+  // the longest item (in this language) sets the type size so nothing collides
+  const longest = Math.max(...BUILDS.map((b) => b.length));
+  const colW = portrait ? W - 200 : W / 2 - 160;
+  const size = Math.min(portrait ? 44 : 42, colW / (longest * 0.5));
 
   return (
     <Stage p={p} bg={C.espresso} cam={{ s: 1 + 0.015 * beatEnv(t, 9) + 0.02 * hit(t, (n - 1) * BEAT, 9) }}>
@@ -133,7 +137,7 @@ export function Built(p: SceneProps) {
             <span style={{ font: `700 ${portrait ? 26 : 24}px ${F.mono}`, color: live ? C.caramel : C.mocha, width: 44 }}>{String(i + 1).padStart(2, '0')}</span>
             <span
               style={{
-                font: `${last ? 'italic 700' : '700'} ${portrait ? 44 : 42}px/1.1 ${F.display}`,
+                font: `${last ? 'italic 700' : '700'} ${size}px/1.1 ${F.display}`,
                 letterSpacing: '-0.02em',
                 whiteSpace: 'nowrap',
                 ...(last ? gradText() : { color: live ? C.foam : C.latte }),
