@@ -436,17 +436,16 @@ export default function Showreel({ kb, controls, onExplore }: Props) {
       <AnimatePresence>
         {locked && nudged && (
           <motion.div
-            initial={{ opacity: 0, y: 24, scale: 0.9 }}
+            initial={{ opacity: 0, y: -16, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12 }}
+            exit={{ opacity: 0, y: -10 }}
             transition={{ type: 'spring', stiffness: 320, damping: 24 }}
-            className="absolute inset-x-0 z-30 mx-auto w-max max-w-[calc(100vw-32px)] overflow-hidden rounded-full border border-crema/20 px-5 py-2.5 text-crema shadow-2xl backdrop-blur-xl"
-            style={{ bottom: size.vw < 768 ? 96 : 118, background: 'rgba(23,16,12,.86)' }}
-            role="status"
+            className="fixed inset-x-0 top-20 z-50 mx-auto w-max max-w-[calc(100vw-32px)] overflow-hidden rounded-2xl border border-crema/20 px-5 py-3 text-center text-crema shadow-2xl backdrop-blur-xl"
+            style={{ background: 'rgba(23,16,12,.92)' }}
+            role="alert"
           >
-            <span className="text-sm">
-              {tr('The page opens when the intro ends.')} <span className="text-latte">{tr('Stay for the drop.')}</span>
-            </span>
+            <p className="font-display text-lg font-bold italic">{tr('Watch the intro first.')}</p>
+            <p className="mt-0.5 text-sm text-latte">{tr('The rest of the page opens when it ends.')}</p>
             <span className="absolute inset-x-0 bottom-0 h-[3px] bg-crema/10">
               <span
                 className="block h-full bg-caramel"

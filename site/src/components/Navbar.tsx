@@ -37,7 +37,7 @@ export default function Navbar({
   onOpenPalette: () => void;
 }) {
   const { id: current, group: active } = useActiveSection();
-  // Hidden (and inert) until the intro has played through once.
+  // Until the intro has played once, the tabs and menu only say "watch the intro first".
   const locked = useSyncExternalStore(gate.subscribe, gate.getLocked);
   // Over the reel and the dark-roast sections the chrome goes dark too.
   const dark = current === "reel" || current === "off-the-clock";
@@ -50,12 +50,7 @@ export default function Navbar({
     : "border-espresso/10 bg-foam/80 text-espresso shadow-[0_8px_30px_rgba(23,16,12,.08)]";
 
   return (
-    <header
-      className="fixed inset-x-0 top-0 z-40 transition-[opacity,transform] duration-700 ease-[cubic-bezier(.16,1,.3,1)]"
-      style={{ opacity: locked ? 0 : 1, transform: locked ? "translateY(-110%)" : "none", pointerEvents: locked ? "none" : undefined }}
-      aria-hidden={locked || undefined}
-      inert={locked || undefined}
-    >
+    <header className="fixed inset-x-0 top-0 z-40">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 pt-4 sm:px-6">
         <a
           href="#reel"
@@ -99,7 +94,7 @@ export default function Navbar({
         <div className="flex items-center gap-2">
           <LangSwitch dark={dark} />
           <button
-            onClick={onOpenPalette}
+            onClick={locked ? gate.nudge : onOpenPalette}
             className={`flex h-10 items-center gap-1.5 rounded-xl border px-3 backdrop-blur-xl transition-colors ${glass}`}
             aria-label={tr("Open chapter select")}
           >

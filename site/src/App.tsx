@@ -16,6 +16,7 @@ import SongDeck from './components/SongDeck';
 import Showreel, { type ReelControls } from './reel/Showreel';
 import { createKbDriver } from './reel/kbDriver';
 import { tr } from './i18n';
+import { gate } from './reel/gate';
 
 const KONAMI = ['arrowup', 'arrowup', 'arrowdown', 'arrowdown', 'arrowleft', 'arrowright', 'arrowleft', 'arrowright', 'b', 'a'];
 
@@ -41,7 +42,8 @@ export default function App() {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        setPaletteOpen((o) => !o);
+        if (gate.locked) gate.nudge();
+        else setPaletteOpen((o) => !o);
         return;
       }
       const key = e.key.toLowerCase();

@@ -7,6 +7,15 @@ const SAFETY_MS = 4 * 60_000; // whatever happens, nobody is held longer than th
 const SCROLL_KEYS = new Set(['ArrowDown', 'PageDown', 'End']);
 
 function startsLocked() {
+  // `?first` replays the first visit (for testing): forget the intro was seen.
+  if (new URLSearchParams(window.location.search).has('first')) {
+    try {
+      localStorage.removeItem(KEY);
+    } catch {
+      /* storage unavailable */
+    }
+    return true;
+  }
   try {
     if (localStorage.getItem(KEY)) return false;
   } catch {
