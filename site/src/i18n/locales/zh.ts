@@ -76,6 +76,7 @@ const d: Record<string, string> = {
   "Changed how a Fortune 500 plans its supply chain: same-day replans": "改变了一家世界500强的供应链计划方式：当天即可重排",
   "Chapter select": "章节选择",
   "Chapter select: type, or press 1–5": "章节选择：输入，或按 1–5",
+  "Checking music availability for an enhanced experience…": "正在检查音乐是否可用，以获得更好的体验…",
   "Cloud & IaC": "云与 IaC",
   "Cold open": "冷开场",
   "Contact": "联系",

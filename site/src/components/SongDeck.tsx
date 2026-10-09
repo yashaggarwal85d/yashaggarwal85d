@@ -184,7 +184,25 @@ function SongDeckInner() {
         )}
       </AnimatePresence>
 
-      {/* The card: YouTube's player at its minimum size, or the score's visualiser. */}
+      {/* While TORE UP is being checked (is it there, does an ad come first?), say so. */}
+      <AnimatePresence>
+        {yt && status === 'loading' && (
+          <motion.p
+            key="checking"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="fixed z-30 flex w-[200px] items-start gap-1.5 font-mono text-[10.5px] leading-snug text-latte"
+            style={{ left: 16, top: `calc(${cardTop} - 40px)` }}
+            role="status"
+          >
+            <span className="mt-[3px] h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-caramel" />
+            {tr('Checking music availability for an enhanced experience…')}
+          </motion.p>
+        )}
+      </AnimatePresence>
+
+      {/* The card: YouTube's player at its minimum size. */}
       <div
         className="fixed z-30 overflow-hidden rounded-2xl border border-crema/15 bg-espresso shadow-2xl transition-[top,opacity] duration-700 ease-[cubic-bezier(.65,0,.35,1)]"
         style={{

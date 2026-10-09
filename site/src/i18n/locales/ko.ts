@@ -76,6 +76,7 @@ const d: Record<string, string> = {
   "Changed how a Fortune 500 plans its supply chain: same-day replans": "Fortune 500 기업의 공급망 계획 방식을 바꿨습니다: 당일 재계획",
   "Chapter select": "챕터 선택",
   "Chapter select: type, or press 1–5": "챕터 선택: 입력하거나 1–5를 누르세요",
+  "Checking music availability for an enhanced experience…": "더 나은 경험을 위해 음악을 사용할 수 있는지 확인하는 중…",
   "Cloud & IaC": "클라우드 & IaC",
   "Cold open": "콜드 오픈",
   "Contact": "연락처",

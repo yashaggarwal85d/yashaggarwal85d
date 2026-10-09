@@ -76,6 +76,7 @@ const d: Record<string, string> = {
   "Changed how a Fortune 500 plans its supply chain: same-day replans": "Fortune 500企業のサプライチェーン計画を変革：即日の再計画を実現",
   "Chapter select": "チャプター選択",
   "Chapter select: type, or press 1–5": "チャプター選択：入力するか、1–5を押してください",
+  "Checking music availability for an enhanced experience…": "より良い体験のため、音楽が使えるか確認中…",
   "Cloud & IaC": "クラウド & IaC",
   "Cold open": "アバン",
   "Contact": "連絡先",

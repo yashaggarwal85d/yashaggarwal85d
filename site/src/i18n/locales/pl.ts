@@ -76,6 +76,7 @@ const d: Record<string, string> = {
   "Changed how a Fortune 500 plans its supply chain: same-day replans": "Zmieniłem planowanie dostaw w Fortune 500: nowy plan tego samego dnia",
   "Chapter select": "Wybór rozdziału",
   "Chapter select: type, or press 1–5": "Wybór rozdziału: pisz lub wciśnij 1–5",
+  "Checking music availability for an enhanced experience…": "Sprawdzam dostępność muzyki, dla pełniejszych wrażeń…",
   "Cloud & IaC": "Chmura i IaC",
   "Cold open": "Zimny start",
   "Contact": "Kontakt",
