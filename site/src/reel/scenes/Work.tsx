@@ -95,7 +95,7 @@ export function Morning(p: SceneProps) {
 
 const OFFERS = [
   { icon: 'bolt', head: tr('Faster pipelines'), sub: tr('Overnight batch jobs, rebuilt to finish in minutes') },
-  { icon: 'pulse', head: tr('Real-time data'), sub: tr('Factory floor to dashboard in under a second') },
+  { icon: 'pulse', head: tr('Real-time data'), sub: tr('Factory floor to operational store in under a second') },
   { icon: 'layers', head: tr('A lakehouse people trust'), sub: tr('Modelled, governed, documented: one source of truth') },
   { icon: 'shield', head: tr('Pipelines that don’t break'), sub: tr('Tests, data-quality checks, CI/CD and monitoring') },
   { icon: 'gauge', head: tr('Lower compute bills'), sub: tr('The right engine for the job, even if it’s Rust') },
@@ -194,9 +194,9 @@ export function Built(p: SceneProps) {
 /* ---------------------------------------------------------- the toolbox */
 
 const TOOLS = [
-  'Python', 'SQL', 'Rust', 'PySpark', 'Kafka', 'Flink', 'Airflow', 'dbt',
-  'Apache Iceberg', 'Delta Lake', 'Databricks', 'ClickHouse', 'PostgreSQL', 'Oracle', 'YugabyteDB', 'Redis',
-  'Snowflake', 'AWS', 'Azure', 'Terraform', 'Kubernetes', 'Docker', 'ArgoCD', 'Grafana',
+  'Python', 'SQL', 'Rust', 'PySpark', 'Kafka', 'Flink', 'Airflow', 'Spark SQL',
+  'Apache Iceberg', 'MinIO', 'ClickHouse', 'Data Vault 2.0', 'PostgreSQL', 'Oracle', 'YugabyteDB', 'Redis',
+  'Linux', 'Kubernetes', 'Docker', 'Helm', 'Jenkins', 'ArgoCD', 'Prometheus', 'Grafana',
 ].map((name) => skills.find((s) => s.name === name)!).filter(Boolean);
 
 /** The tools as keycaps: they pop in on 32nds, then one key is pressed on every beat. */

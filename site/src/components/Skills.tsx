@@ -5,7 +5,7 @@ import { skills, type Skill, type SkillGroup } from '../data';
 import { Section, SectionHeading } from './ui';
 import { tr } from '../i18n';
 
-const groups: ('All' | SkillGroup)[] = ['All', 'Languages', 'Processing', 'Lakehouse', 'Databases', 'Cloud & IaC', 'DevOps', 'AI'];
+const groups: ('All' | SkillGroup)[] = ['All', 'Languages', 'Processing', 'Lakehouse', 'Databases', 'DevOps', 'Evaluated'];
 
 const luminance = (hex: string) => {
   const n = parseInt(hex.replace('#', ''), 16);

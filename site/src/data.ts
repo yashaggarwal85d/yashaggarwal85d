@@ -15,7 +15,7 @@ export const profile = {
   tagline:
     tr('Data Engineer building the batch and streaming platforms behind semiconductor manufacturing and supply-chain planning.'),
   summary:
-    tr('Data Engineer with 3+ years at Texas Instruments, building the batch and streaming data platforms behind semiconductor manufacturing and supply-chain planning. Hands-on with Python, SQL, PySpark, Kafka and Airflow at multi-terabyte scale, lakehouse modelling (Iceberg, Data Vault 2.0) and CI/CD on Kubernetes.'),
+    tr('Data Engineer with 3+ years at Texas Instruments, building on-prem lakehouse, streaming and batch pipelines for semiconductor manufacturing and supply chain from MES, ERP and high-volume equipment-sensor data. Works daily on Linux with Python, SQL, PySpark, Kafka, Airflow and Apache Iceberg on Kubernetes.'),
   availability: tr('Ready to relocate · notice period 1–2 months · English (fluent)'),
 };
 
@@ -48,15 +48,15 @@ export const experience: Job[] = [
     icon: 'server',
     color: '#b8612f',
     blurb:
-      tr('Supply Chain & Manufacturing IT: data platforms for demand, supply and factory operations.'),
+      tr('Supply Chain & Manufacturing IT: data platforms for demand, supply and factory planning.'),
     points: [
-      tr('Cut the nightly supply-planning run from ~18h to ~45min (24×), so planners can replan intra-day, by driving the data-engineering track of a 20-engineer programme that rebuilt monolithic cron jobs as distributed PySpark services.'),
-      tr('Raised per-node ingest throughput 3.8× over the previous Spark jobs (1.5 GB/s on identical hardware) by building a Rust-based ETL engine that now lands ~16 TB/day of factory and operational data.'),
-      tr('Designed Data Vault 2.0 models on an Iceberg/ClickHouse lakehouse growing by ~6 PB/year, giving planners, yield and logistics teams one governed source for cross-application analytics.'),
-      tr('Streamed MES and ERP data from sites worldwide into the operational stores behind planning and factory applications at sub-second p95 latency, owning Kafka ingestion with S3/Iceberg as the raw landing zone.'),
-      tr('Took supply-chain rule changes from a ~2-week release cycle to same-day, with a full audit trail, by building a rule-orchestration platform with automated validation and staged rollouts.'),
-      tr('Merged 136 site-level databases into one distributed YugabyteDB cluster behind a unified Python/FastAPI layer, giving every site a single source of truth for production data.'),
-      tr('Designed the concurrent production-start planning engine that turns business rules and ML demand signals into 64-week factory build plans for every site.'),
+      tr('Met a factory-data ingest target the Spark jobs missed by proposing and designing a Rust ETL engine, coding most of it with one intern: 1.5 GB/s per node, 3.8× the Spark jobs on identical hardware; live since Sep 2026 at ~16 TB/day.'),
+      tr('Cut the end-to-end supply-planning run from ~18h to ~45min (24×), so planners replan intra-day, by moving monolithic cron jobs to distributed PySpark services as one of three technical leads of a 20+ engineer programme.'),
+      tr('Gave yield, logistics and planning teams one governed source for fab and assembly/test data as owner of the factory-data domain in TI’s Iceberg/ClickHouse lakehouse growing by ~6 PB/year, using Data Vault 2.0 on on-prem MinIO.'),
+      tr('Delivered MES, ERP and equipment-sensor data from 27 fab and assembly/test sites to operational stores at sub-second p95 latency through Kafka pipelines built with the ingestion team.'),
+      tr('Moved supply-chain rule changes from a ~2-week release cycle to same-day rollout through a rule-orchestration platform, built with one graduate engineer, with automated data validation and an audit trail.'),
+      tr('Replaced slow cross-site database-link queries with one API: consolidated 136 site-level databases of separate applications into a YugabyteDB cluster behind a Python/FastAPI layer (cross-team effort).'),
+      tr('Turned business rules and ML demand signals into 64-week factory build plans for TI’s global sites with PySpark services the team built for the production-start planning engine.'),
     ],
     tags: ['PySpark', 'Rust', 'Kafka', 'Iceberg', 'ClickHouse', 'YugabyteDB', 'FastAPI'],
   },
@@ -68,10 +68,9 @@ export const experience: Job[] = [
     icon: 'workflow',
     color: '#d49a57',
     points: [
-      tr('Eliminated ~150 manual planner overrides per week and improved on-time fulfilment across 70K+ SKUs by fixing the fab-to-assembly start-signal logic behind a systemic under-build.'),
-      tr('Reduced production Spark runtimes by 30–80% through partitioning, skew and memory tuning; brought a legacy multi-model forecasting pipeline from 24h to under 7h.'),
-      tr('Let planners rerun forecast cycles on demand by productionising the Python demand-forecasting pipeline on Airflow, Spark and Oracle with modular data flows.'),
-      tr('Prepared production databases for a projected 2× load increase through capacity sizing, SQL tuning and on-call incident ownership; mentored 2 junior engineers and 3 interns.'),
+      tr('Removed ~150 manual planner overrides per week after the team traced a systemic under-build of production starts across 70K+ SKUs to the fab-to-assembly start-signal logic and fixed it.'),
+      tr('Reduced runtimes of the team’s production Spark jobs by 30-80% through partitioning, skew and memory/spill fixes; the legacy multi-model forecasting pipeline dropped from 24h to under 7h.'),
+      tr('Sized capacity and tuned SQL so the Kubernetes-hosted platform can take a projected 2× load increase; mentored 2 junior engineers and 3 interns and shared the team’s on-call.'),
     ],
     tags: ['Spark', 'Airflow', 'Oracle', 'Python', 'SQL tuning'],
   },
@@ -83,7 +82,7 @@ export const experience: Job[] = [
     icon: 'code',
     color: '#5a4032',
     points: [
-      tr('Built and launched an internal election platform for 10K+ employees, with hierarchical authorisation.'),
+      tr('Built an internal election platform used by 10K+ employees, with hierarchical authorisation.'),
     ],
     tags: ['Web platform', 'AuthZ'],
   },
@@ -94,9 +93,8 @@ export type SkillGroup =
   | 'Processing'
   | 'Lakehouse'
   | 'Databases'
-  | 'Cloud & IaC'
   | 'DevOps'
-  | 'AI';
+  | 'Evaluated';
 
 export type Skill = {
   name: string;
@@ -119,12 +117,10 @@ export const skills: Skill[] = [
   { name: 'Kafka', group: 'Processing', icon: 'siApachekafka' },
   { name: 'Flink', group: 'Processing', icon: 'siApacheflink' },
   { name: 'Airflow', group: 'Processing', icon: 'siApacheairflow' },
-  { name: 'dbt', group: 'Processing', icon: 'siDbt' },
   { name: 'Data Quality', group: 'Processing', mark: 'DQ', color: '#5a4032' },
 
   { name: 'Apache Iceberg', group: 'Lakehouse', mark: 'ICE', color: '#8b7766' },
-  { name: 'Delta Lake', group: 'Lakehouse', mark: 'Δ', color: '#00add4' },
-  { name: 'Databricks', group: 'Lakehouse', icon: 'siDatabricks' },
+  { name: 'MinIO', group: 'Lakehouse', mark: 'MIO', color: '#c72e49' },
   { name: 'ClickHouse', group: 'Lakehouse', icon: 'siClickhouse' },
   { name: 'Data Vault 2.0', group: 'Lakehouse', mark: 'DV', color: '#8e2f2a' },
   { name: 'Dimensional', group: 'Lakehouse', mark: '★', color: '#d49a57' },
@@ -134,25 +130,26 @@ export const skills: Skill[] = [
   { name: 'YugabyteDB', group: 'Databases', mark: 'YB', color: '#ff6e42' },
   { name: 'MySQL', group: 'Databases', icon: 'siMysql' },
   { name: 'Redis', group: 'Databases', icon: 'siRedis' },
-  { name: 'Snowflake', group: 'Databases', icon: 'siSnowflake' },
+  { name: 'FastAPI', group: 'Databases', mark: 'API', color: '#009688' },
 
-  { name: 'AWS', group: 'Cloud & IaC', icon: 'siAmazonwebservices' },
-  { name: 'S3 · EMR · Glue', group: 'Cloud & IaC', icon: 'siAmazons3' },
-  { name: 'Azure', group: 'Cloud & IaC', mark: 'AZ', color: '#0089d6' },
-  { name: 'ADF · ADLS Gen2', group: 'Cloud & IaC', mark: 'ADF', color: '#0089d6' },
-  { name: 'Terraform', group: 'Cloud & IaC', icon: 'siTerraform' },
-
+  { name: 'Linux', group: 'DevOps', mark: 'LNX', color: '#d49a57' },
   { name: 'Kubernetes', group: 'DevOps', icon: 'siKubernetes' },
   { name: 'Docker', group: 'DevOps', icon: 'siDocker' },
+  { name: 'Helm', group: 'DevOps', mark: 'HLM', color: '#0f1689' },
   { name: 'Jenkins', group: 'DevOps', icon: 'siJenkins' },
   { name: 'ArgoCD', group: 'DevOps', icon: 'siArgo' },
   { name: 'Git', group: 'DevOps', icon: 'siGit' },
   { name: 'Prometheus', group: 'DevOps', icon: 'siPrometheus' },
   { name: 'Grafana', group: 'DevOps', icon: 'siGrafana' },
 
-  { name: 'AI agents', group: 'AI', mark: 'AGT', color: '#b8612f' },
-  { name: 'Model inference', group: 'AI', mark: 'INF', color: '#d49a57' },
-  { name: 'LLM tooling', group: 'AI', mark: 'LLM', color: '#5a4032' },
+  { name: 'AWS', group: 'Evaluated', icon: 'siAmazonwebservices' },
+  { name: 'S3 · EMR · Glue', group: 'Evaluated', icon: 'siAmazons3' },
+  { name: 'Azure', group: 'Evaluated', mark: 'AZ', color: '#0089d6' },
+  { name: 'GCP', group: 'Evaluated', mark: 'GCP', color: '#4285f4' },
+  { name: 'Databricks', group: 'Evaluated', icon: 'siDatabricks' },
+  { name: 'Delta Lake', group: 'Evaluated', mark: 'Δ', color: '#00add4' },
+  { name: 'dbt', group: 'Evaluated', icon: 'siDbt' },
+  { name: 'Terraform', group: 'Evaluated', icon: 'siTerraform' },
 ];
 
 export type Work = {
@@ -174,9 +171,9 @@ export const work: Work[] = [
     period: tr('2025 – Now'),
     title: tr('Supply-Plan Re-platform'),
     description:
-      tr('Drove the data-engineering track of a 20-engineer programme that rebuilt monolithic cron jobs as distributed PySpark services, so planners can replan intra-day.'),
+      tr('One of three technical leads of a 20+ engineer programme that moved monolithic cron jobs to distributed PySpark services, so planners replan intra-day.'),
     metric: '24×',
-    metricLabel: tr('faster nightly supply-planning run'),
+    metricLabel: tr('faster end-to-end supply-planning run'),
     compare: { before: 18, after: 0.75, beforeLabel: '~18h', afterLabel: '~45min' },
     gradient: ['#b8612f', '#8e2f2a'],
     tags: ['PySpark', 'Distributed services', 'Planning'],
@@ -186,7 +183,7 @@ export const work: Work[] = [
     period: tr('2025 – Now'),
     title: tr('Rust ETL Engine'),
     description:
-      tr('A Rust-based ETL engine that lands ~16 TB/day of factory and operational data at 1.5 GB/s per node on identical hardware.'),
+      tr('My proposal and design, coded mostly with one intern: 1.5 GB/s per node on identical hardware, live since Sep 2026 at ~16 TB/day of factory data.'),
     metric: `${num(3.8, 1)}×`,
     metricLabel: tr('per-node throughput vs. previous Spark jobs'),
     compare: { before: 1, after: 3.8, beforeLabel: 'Spark', afterLabel: `Rust · ${num(1.5, 1)} GB/s` },
@@ -198,7 +195,7 @@ export const work: Work[] = [
     period: tr('2025 – Now'),
     title: tr('Governed Lakehouse'),
     description:
-      tr('Data Vault 2.0 models on an Iceberg/ClickHouse lakehouse: one governed source for planners, yield and logistics teams.'),
+      tr('Owner of the factory-data domain: Data Vault 2.0 on Iceberg/ClickHouse over on-prem MinIO, one governed source for yield, logistics and planning.'),
     metric: '~6 PB',
     metricLabel: tr('of new data every year'),
     gradient: ['#5a4032', '#2a1d16'],
@@ -209,18 +206,18 @@ export const work: Work[] = [
     period: tr('2025 – Now'),
     title: tr('Global MES & ERP Streams'),
     description:
-      tr('Owns Kafka ingestion from sites worldwide into the operational stores behind planning and factory apps, with S3/Iceberg as the raw landing zone.'),
+      tr('Kafka pipelines, built with the ingestion team, carry MES, ERP and equipment-sensor data from 27 fab and assembly/test sites to operational stores.'),
     metric: '<1s',
     metricLabel: tr('p95 latency, site to operational store'),
     gradient: ['#c8ac8c', '#8b7766'],
-    tags: ['Kafka', 'S3', 'Iceberg'],
+    tags: ['Kafka', 'MES · ERP', 'Sensor data'],
   },
   {
     category: tr('Platform'),
     period: tr('2025 – Now'),
     title: tr('Rule Orchestration'),
     description:
-      tr('Automated validation and staged rollouts for supply-chain business rules, with a full audit trail on every change.'),
+      tr('Built with one graduate engineer: automated data validation and staged rollouts for supply-chain rules, with an audit trail on every change.'),
     metric: tr('Same day'),
     metricLabel: tr('rule releases, down from a ~2-week cycle'),
     compare: { before: 14, after: 1, beforeLabel: tr('~2 weeks'), afterLabel: tr('same day') },
@@ -232,9 +229,9 @@ export const work: Work[] = [
     period: tr('2025 – Now'),
     title: tr('Site DB Consolidation'),
     description:
-      tr('Merged every site-level database into one distributed YugabyteDB cluster behind a unified Python/FastAPI layer.'),
+      tr('136 site-level databases of separate applications, consolidated into one YugabyteDB cluster behind a Python/FastAPI layer (cross-team effort).'),
     metric: '136 → 1',
-    metricLabel: tr('single source of truth for production data'),
+    metricLabel: tr('one API instead of slow cross-site database links'),
     gradient: ['#d49a57', '#8e2f2a'],
     tags: ['YugabyteDB', 'FastAPI', 'Python'],
   },
@@ -243,18 +240,18 @@ export const work: Work[] = [
     period: tr('2025 – Now'),
     title: tr('Production-Start Planner'),
     description:
-      tr('A concurrent engine that turns business rules and ML demand signals into factory build plans for every site.'),
+      tr('PySpark services the team built to turn business rules and ML demand signals into factory build plans for TI’s global sites.'),
     metric: tr('64 wks'),
-    metricLabel: tr('of build plans, generated per site'),
+    metricLabel: tr('planning horizon of the factory build plans'),
     gradient: ['#3b2a21', '#b8612f'],
-    tags: ['Concurrency', 'ML signals', 'Planning'],
+    tags: ['PySpark', 'ML signals', 'Planning'],
   },
   {
     category: tr('Algorithms'),
     period: '2023 – 2025',
     title: tr('Start-Signal Fix'),
     description:
-      tr('Fixed the fab-to-assembly start-signal logic behind a systemic under-build, improving on-time fulfilment across 70K+ SKUs.'),
+      tr('The team traced a systemic under-build of production starts across 70K+ SKUs to the fab-to-assembly start-signal logic and fixed it.'),
     metric: '~150',
     metricLabel: tr('manual planner overrides removed every week'),
     gradient: ['#b8612f', '#d49a57'],
@@ -264,12 +261,12 @@ export const work: Work[] = [
 
 export const achievements = [
   {
-    title: tr('Technical Presentation to Global IT Leadership'),
+    title: tr('Technical Presentation at TI Headquarters'),
     org: tr('Texas Instruments HQ, Dallas'),
     date: tr('Aug 2026'),
     icon: 'presentation',
     color: '#b8612f',
-    text: tr('Selected by the Director of IT to present the Rust ETL architecture; its benchmarks became the reference for TI’s global data pipelines.'),
+    text: tr('Selected by the Director of IT to present the Rust ETL architecture to ~30 developers, managers and directors; its benchmarks became TI’s pipeline reference.'),
   },
   {
     title: tr('Winner, TI India ITS Tech Hackathon'),
@@ -277,7 +274,7 @@ export const achievements = [
     date: '2024',
     icon: 'trophy',
     color: '#d49a57',
-    text: tr('Led the team that built an AI-optimised supply-chain simulator.'),
+    text: tr('Presenting author of the 5-person team that built an AI-optimised supply-chain simulator.'),
   },
   {
     title: tr('Star of the Quarter Award'),
@@ -325,14 +322,14 @@ export type Numeral = {
 // The reel's numbers, slowed down (W2). The first one gets the big card.
 export const numbers: Numeral[] = [
   { value: 24, suffix: '×', label: tr('Supply-plan run'), note: tr('~18h → ~45min, so planners replan intra-day'), tone: 'espresso' },
-  { value: 16, suffix: ' TB', label: tr('Landed / day'), note: tr('factory & operational data, via a Rust ETL engine'), tone: 'caramel' },
+  { value: 16, suffix: ' TB', label: tr('Landed / day'), note: tr('factory data, via a Rust ETL engine'), tone: 'caramel' },
   { value: 136, suffix: '→1', label: tr('Databases'), note: tr('site DBs merged into one YugabyteDB cluster'), tone: 'foam' },
   { value: 3.8, decimals: 1, suffix: '×', label: tr('Rust vs Spark'), note: tr('per-node ingest, 1.5 GB/s on identical hardware'), tone: 'cinnamon' },
   { value: 6, prefix: '~', suffix: ' PB', label: tr('New data / year'), note: tr('Data Vault 2.0 on an Iceberg/ClickHouse lakehouse'), tone: 'crema' },
-  { value: 1, prefix: '<', suffix: 's', label: tr('p95 latency'), note: tr('MES & ERP streams from sites worldwide'), tone: 'roast' },
+  { value: 1, prefix: '<', suffix: 's', label: tr('p95 latency'), note: tr('MES, ERP & sensor streams from 27 sites'), tone: 'roast' },
   { value: 70, suffix: tr('K+'), label: tr('SKUs'), note: tr('on-time fulfilment improved'), tone: 'oat' },
   { value: 150, prefix: '−', suffix: '', label: tr('Overrides / week'), note: tr('manual planner fixes eliminated'), tone: 'oat' },
-  { value: 64, suffix: tr(' wks'), label: tr('Build plans'), note: tr('factory plans for every site, from one engine'), tone: 'oat' },
+  { value: 64, suffix: tr(' wks'), label: tr('Build plans'), note: tr('factory build plans for TI’s global sites'), tone: 'oat' },
 ];
 
 export type Film = { title: string; kind: 'Series' | 'Film' | 'Anime' | 'Books' | 'Music' | 'Travel' | 'Kitchen'; take: string; spine: string; ink: string };

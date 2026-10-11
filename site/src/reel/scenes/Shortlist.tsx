@@ -8,19 +8,19 @@ import { tr } from '../../i18n';
 /**
  * The ten things that make a recruiter stop scrolling, ticked off one per hit
  * (every two beats): impact, scope, influence, visibility, growth, wins,
- * recognition, leadership, AI and availability. All from the resume; nothing
+ * recognition, mentoring, ownership and availability. All from the resume; nothing
  * here repeats another slide.
  */
 const ITEMS = [
-  { k: tr('IMPACT'), v: tr('Changed how a Fortune 500 plans its supply chain: same-day replans') },
-  { k: tr('SCOPE'), v: tr('Drove the data track of a 20-engineer modernisation programme') },
-  { k: tr('INFLUENCE'), v: tr('My benchmarks became TI’s reference for its global data pipelines') },
-  { k: tr('VISIBILITY'), v: tr('Picked by the Director of IT to brief global IT leadership in Dallas') },
+  { k: tr('IMPACT'), v: tr('Changed how a Fortune 500 plans its supply chain: intra-day replans') },
+  { k: tr('SCOPE'), v: tr('One of three technical leads of a 20+ engineer programme') },
+  { k: tr('INFLUENCE'), v: tr('My benchmarks became TI’s pipeline reference') },
+  { k: tr('VISIBILITY'), v: tr('Selected by the Director of IT to present at TI HQ in Dallas') },
   { k: tr('GROWTH'), v: tr('Intern to Data Engineer II in two years') },
-  { k: tr('WINNER'), v: tr('Won TI India’s tech hackathon leading an AI supply-chain simulator') },
+  { k: tr('WINNER'), v: tr('Won TI India’s tech hackathon as presenting author of a 5-person team') },
   { k: tr('RECOGNITION'), v: tr('Star of the Quarter, for planning algorithms and mentorship') },
-  { k: tr('LEADERSHIP'), v: tr('Mentors 2 engineers and 3 interns') },
-  { k: tr('AI'), v: tr('Builds with AI agents and model inference, every day') },
+  { k: tr('MENTORING'), v: tr('Mentored 2 junior engineers and 3 interns') },
+  { k: tr('OWNERSHIP'), v: tr('Owns the factory-data domain in TI’s lakehouse') },
   { k: tr('AVAILABILITY'), v: tr('Ready to relocate · notice period 1–2 months') },
 ];
 

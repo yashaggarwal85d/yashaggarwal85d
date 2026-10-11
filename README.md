@@ -8,7 +8,7 @@
   <a href="mailto:yashaggarwal85d@gmail.com"><img src="https://img.shields.io/badge/Email-say_hi-d49a57?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" /></a>
 </p>
 
-I build the **batch and streaming data platforms** behind semiconductor manufacturing and supply-chain planning at **Texas Instruments**: Python, SQL, PySpark, Kafka and Airflow at multi-terabyte scale, lakehouse modelling (Iceberg, Data Vault 2.0), and CI/CD on Kubernetes.
+I build **on-prem lakehouse, streaming and batch pipelines** for semiconductor manufacturing and supply chain at **Texas Instruments**, from MES, ERP and high-volume equipment-sensor data: Python, SQL, PySpark, Kafka, Airflow and Apache Iceberg on Kubernetes, every day on Linux.
 
 Off the clock I'm usually somewhere between a black hole, a qubit and a rewatch of *Interstellar*. My [portfolio](https://yashaggarwal85d.github.io/yashaggarwal85d/) opens with an intro cut bar for bar to Don Toliver's *TORE UP*. Move your mouse over it: the background is a keyboard.
 
@@ -16,18 +16,18 @@ Off the clock I'm usually somewhere between a black hole, a qubit and a rewatch 
 
 | The shot | What went into it |
 |---|---|
-| 🚀 **18h → 45min** | Rebuilt monolithic cron jobs as distributed PySpark services. The nightly supply-planning run is **24× faster**, so planners can replan intra-day. |
-| 🦀 **3.8× with Rust** | A Rust ETL engine that beats the previous Spark jobs per node (1.5 GB/s on identical hardware) and lands **~16 TB/day** of factory and operational data. |
-| 🧊 **~6 PB / year** | Data Vault 2.0 models on an Iceberg/ClickHouse lakehouse: one governed source for planners, yield and logistics teams. |
-| 📡 **< 1 s p95** | MES & ERP data streamed from sites worldwide through Kafka, with S3/Iceberg as the raw landing zone. |
-| 🗄️ **136 → 1** | Merged 136 site-level databases into one distributed YugabyteDB cluster behind a Python/FastAPI layer. |
-| 📦 **70K+ SKUs** | Fixed the fab-to-assembly start-signal logic, which removed ~150 manual planner overrides every week. |
+| 🚀 **18h → 45min** | Moved monolithic cron jobs to distributed PySpark services as one of three technical leads of a 20+ engineer programme. The end-to-end supply-planning run is **24× faster**, so planners replan intra-day. |
+| 🦀 **3.8× with Rust** | A Rust ETL engine I proposed and designed, coded mostly with one intern: 1.5 GB/s per node, 3.8× the previous Spark jobs on identical hardware. Live since Sep 2026 at **~16 TB/day** of factory data. |
+| 🧊 **~6 PB / year** | Owner of the factory-data domain in TI's Iceberg/ClickHouse lakehouse: Data Vault 2.0 on on-prem MinIO, one governed source for yield, logistics and planning teams. |
+| 📡 **< 1 s p95** | MES, ERP and equipment-sensor data from **27** fab and assembly/test sites to operational stores, through Kafka pipelines built with the ingestion team. |
+| 🗄️ **136 → 1** | Consolidated 136 site-level databases of separate applications into a YugabyteDB cluster behind a Python/FastAPI layer, replacing slow cross-site database links (cross-team effort). |
+| 📦 **70K+ SKUs** | The team traced a systemic under-build across 70K+ SKUs to the fab-to-assembly start-signal logic and fixed it, which removed ~150 manual planner overrides per week. |
 
 ### 🫘 How I brew data
 
 ```text
   Beans               Grind                  Brew                       Serve
-  Kafka · MES/ERP ──▶ PySpark · Rust ETL ──▶ Iceberg · Data Vault 2.0 ──▶ ClickHouse ──▶ planners
+  Kafka · MES/ERP ──▶ PySpark · Rust ETL ──▶ Iceberg on MinIO · Data Vault 2.0 ──▶ ClickHouse ──▶ planners
 ```
 
 ### 🧰 Tech I work with
@@ -43,12 +43,10 @@ Off the clock I'm usually somewhere between a black hole, a qubit and a rewatch 
 ![Apache Kafka](https://img.shields.io/badge/Kafka-231F20?style=flat-square&logo=apachekafka&logoColor=white)
 ![Apache Flink](https://img.shields.io/badge/Flink-E6526F?style=flat-square&logo=apacheflink&logoColor=white)
 ![Airflow](https://img.shields.io/badge/Airflow-017CEE?style=flat-square&logo=apacheairflow&logoColor=white)
-![dbt](https://img.shields.io/badge/dbt-FF694B?style=flat-square)
 
 **Lakehouse & modelling**<br/>
 ![Apache Iceberg](https://img.shields.io/badge/Iceberg-2D6CDF?style=flat-square)
-![Delta Lake](https://img.shields.io/badge/Delta%20Lake-00ADD4?style=flat-square)
-![Databricks](https://img.shields.io/badge/Databricks-FF3621?style=flat-square&logo=databricks&logoColor=white)
+![MinIO](https://img.shields.io/badge/MinIO-C72E49?style=flat-square&logo=minio&logoColor=white)
 ![ClickHouse](https://img.shields.io/badge/ClickHouse-FFCC01?style=flat-square&logo=clickhouse&logoColor=black)
 ![Data Vault 2.0](https://img.shields.io/badge/Data%20Vault%202.0-6A29B8?style=flat-square)
 
@@ -58,23 +56,26 @@ Off the clock I'm usually somewhere between a black hole, a qubit and a rewatch 
 ![YugabyteDB](https://img.shields.io/badge/YugabyteDB-FF6E42?style=flat-square)
 ![MySQL](https://img.shields.io/badge/MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white)
 ![Redis](https://img.shields.io/badge/Redis-FF4438?style=flat-square&logo=redis&logoColor=white)
-![Snowflake](https://img.shields.io/badge/Snowflake-29B5E8?style=flat-square&logo=snowflake&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)
 
-**Cloud, IaC & DevOps**<br/>
-![AWS](https://img.shields.io/badge/AWS%20%28S3%2C%20EMR%2C%20Glue%29-232F3E?style=flat-square&logo=amazonwebservices&logoColor=white)
-![Azure](https://img.shields.io/badge/Azure%20%28ADF%2C%20ADLS%20Gen2%29-0089D6?style=flat-square)
-![Terraform](https://img.shields.io/badge/Terraform-844FBA?style=flat-square&logo=terraform&logoColor=white)
+**Platform & DevOps**<br/>
+![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat-square&logo=linux&logoColor=black)
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat-square&logo=kubernetes&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)
+![Helm](https://img.shields.io/badge/Helm-0F1689?style=flat-square&logo=helm&logoColor=white)
 ![Jenkins](https://img.shields.io/badge/Jenkins-D24939?style=flat-square&logo=jenkins&logoColor=white)
 ![ArgoCD](https://img.shields.io/badge/ArgoCD-EF7B4D?style=flat-square&logo=argo&logoColor=white)
 ![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=white)
 ![Grafana](https://img.shields.io/badge/Grafana-F46800?style=flat-square&logo=grafana&logoColor=white)
 
-**AI**<br/>
-![AI agents](https://img.shields.io/badge/AI%20agents-b8612f?style=flat-square)
-![Model inference](https://img.shields.io/badge/Model%20inference-d49a57?style=flat-square)
-![LLM tooling](https://img.shields.io/badge/LLM%20tooling-5a4032?style=flat-square)
+**Evaluated (TI cloud study, personal projects)**<br/>
+![AWS](https://img.shields.io/badge/AWS%20%28S3%2C%20EMR%2C%20Glue%29-232F3E?style=flat-square&logo=amazonwebservices&logoColor=white)
+![Azure](https://img.shields.io/badge/Azure-0089D6?style=flat-square)
+![GCP](https://img.shields.io/badge/GCP-4285F4?style=flat-square&logo=googlecloud&logoColor=white)
+![Databricks](https://img.shields.io/badge/Databricks-FF3621?style=flat-square&logo=databricks&logoColor=white)
+![Delta Lake](https://img.shields.io/badge/Delta%20Lake-00ADD4?style=flat-square)
+![dbt](https://img.shields.io/badge/dbt-FF694B?style=flat-square)
+![Terraform](https://img.shields.io/badge/Terraform-844FBA?style=flat-square&logo=terraform&logoColor=white)
 
 ### 🌌 Off the clock
 
@@ -99,7 +100,7 @@ yash = {
     "based_in": "Bangalore, India",  # ready to relocate
     "experience": "3+ years",
     "daily_drivers": ["Python", "SQL", "PySpark", "Kafka", "Airflow", "Rust"],
-    "data_at_rest": ["Iceberg", "ClickHouse", "YugabyteDB", "Oracle", "PostgreSQL"],
+    "data_at_rest": ["Iceberg", "MinIO", "ClickHouse", "YugabyteDB", "Oracle", "PostgreSQL"],
     "ask_me_about": ["lakehouse modelling", "Spark tuning", "streaming ingestion", "planning engines"],
     "thinks_about": ["black holes", "qubits", "e ** (1j * pi) + 1"],
     "on_repeat": ["Dexter", "Interstellar", "Inception", "Re:Zero"],
@@ -111,16 +112,16 @@ yash = {
 ### 💼 Experience
 
 - **Data Engineer II**, Texas Instruments · *Feb 2025 – Present*<br/>
-  Rust ETL engine, Iceberg/ClickHouse lakehouse, global Kafka ingestion, rule orchestration, and the 64-week production-start planning engine.
+  Rust ETL engine (my design, live since Sep 2026), the factory-data domain of TI's Iceberg/ClickHouse lakehouse, Kafka ingestion from 27 sites, rule orchestration, and the 64-week production-start planning engine.
 - **Data Engineer**, Texas Instruments · *Jun 2023 – Feb 2025*<br/>
-  Cut production Spark runtimes by 30–80% and took a forecasting pipeline from 24h to under 7h. Mentored 2 junior engineers and 3 interns.
+  Cut the team's production Spark runtimes by 30-80%; the legacy forecasting pipeline went from 24h to under 7h. Mentored 2 junior engineers and 3 interns.
 - **Software Development Intern**, Texas Instruments · *Jan 2023 – Jun 2023*<br/>
   Built an internal election platform used by 10K+ employees.
 
 ### 🏆 Achievements
 
-- 🎤 **Technical presentation to global IT leadership** (Aug 2026): presented the Rust ETL architecture at TI HQ in Dallas. Its benchmarks became the reference for TI's global data pipelines.
-- 🥇 **Winner, TI India ITS Tech Hackathon** (2024): led the team that built an AI-optimised supply-chain simulator.
+- 🎤 **Technical Presentation at TI Headquarters** (Dallas, Aug 2026): selected by the Director of IT to present the Rust ETL architecture to ~30 developers, managers and directors. Its benchmarks became TI's pipeline reference.
+- 🥇 **Winner, TI India ITS Tech Hackathon** (2024): presenting author of the 5-person team that built an AI-optimised supply-chain simulator.
 - ⭐ **Star of the Quarter, Texas Instruments** (Q4 2024): recognised for planning algorithms and mentorship.
 
 ### 🗄 Repositories
