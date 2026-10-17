@@ -17,10 +17,10 @@ type Node = { id: string; at: number; path: 'src' | 'hot' | 'cold'; label: strin
 const NODES: Node[] = [
   { id: 'src', at: 0, path: 'src', label: tr('SOURCES · OLTP'), tech: 'ERP · MES · Oracle' },
   { id: 'kafka', at: 1, path: 'src', label: tr('CHANGE DATA CAPTURE'), tech: 'CDC → Kafka' },
-  { id: 'stream', at: 2, path: 'hot', label: tr('STREAM PROCESSING'), tech: 'Kafka · Flink' },
+  { id: 'stream', at: 2, path: 'hot', label: tr('STREAM PROCESSING'), tech: 'Kafka · Rust' },
   { id: 'ops', at: 2.25, path: 'hot', label: tr('OPERATIONAL STORE'), tech: 'YugabyteDB · OLTP' },
   { id: 'apps', at: 2.5, path: 'hot', label: tr('APPS & APIs'), tech: tr('planning · factory apps') },
-  { id: 'land', at: 3, path: 'cold', label: tr('RAW LANDING'), tech: 'MinIO · Iceberg' },
+  { id: 'land', at: 3, path: 'cold', label: tr('RAW LANDING'), tech: 'MinIO · S3 · Iceberg' },
   { id: 'xform', at: 3.25, path: 'cold', label: tr('TRANSFORM'), tech: 'PySpark · Airflow' },
   { id: 'model', at: 4, path: 'cold', label: tr('MODEL'), tech: tr('Data Vault → marts') },
   { id: 'olap', at: 4.25, path: 'cold', label: 'OLAP', tech: 'ClickHouse' },

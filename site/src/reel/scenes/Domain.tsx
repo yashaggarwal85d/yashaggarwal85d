@@ -14,7 +14,7 @@ import { tr } from '../../i18n';
  * where I fit in.
  */
 const STAGES = [
-  { icon: 0, label: tr('DEMAND'), note: tr('forecasts and ML demand signals') },
+  { icon: 0, label: tr('DEMAND'), note: tr('statistical demand forecasts') },
   { icon: 3, label: tr('PLANNING'), note: tr('supply plans and factory build plans') },
   { icon: 1, label: tr('WAFER FAB'), note: tr('MES & sensor streams from 27 sites') },
   { icon: 2, label: tr('ASSEMBLY & TEST'), note: tr('start signals from fab to assembly') },

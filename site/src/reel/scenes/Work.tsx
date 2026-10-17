@@ -194,7 +194,7 @@ export function Built(p: SceneProps) {
 /* ---------------------------------------------------------- the toolbox */
 
 const TOOLS = [
-  'Python', 'SQL', 'Rust', 'PySpark', 'Kafka', 'Flink', 'Airflow', 'Spark SQL',
+  'Python', 'SQL', 'Rust', 'PySpark', 'Kafka', 'Trino', 'Airflow', 'Spark SQL',
   'Apache Iceberg', 'MinIO', 'ClickHouse', 'Data Vault 2.0', 'PostgreSQL', 'Oracle', 'YugabyteDB', 'Redis',
   'Linux', 'Kubernetes', 'Docker', 'Helm', 'Jenkins', 'ArgoCD', 'Prometheus', 'Grafana',
 ].map((name) => skills.find((s) => s.name === name)!).filter(Boolean);
