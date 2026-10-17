@@ -17,7 +17,7 @@ const STAGES = [
   { icon: 0, label: tr('DEMAND'), note: tr('statistical demand forecasts') },
   { icon: 3, label: tr('PLANNING'), note: tr('supply plans and factory build plans') },
   { icon: 1, label: tr('WAFER FAB'), note: tr('MES & sensor streams from 27 sites') },
-  { icon: 2, label: tr('ASSEMBLY & TEST'), note: tr('start signals from fab to assembly') },
+  { icon: 2, label: tr('ASSEMBLY & TEST'), note: tr('production starts from fab to assembly') },
   { icon: 4, label: tr('DELIVERY'), note: tr('the right chip, to the right customer') },
 ];
 

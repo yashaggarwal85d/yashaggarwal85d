@@ -14,11 +14,11 @@ import { hook } from '../hook';
  * Seven cards, fourteen hits, then two for the finale: eight bars, the whole hook.
  */
 const CARDS = [
-  { label: tr('SUPPLY-PLANNING RUN'), old: tr('~18 HOURS'), now: tr('~45 MIN'), note: tr('24× faster: cron jobs rebuilt as PySpark services') },
+  { label: tr('SUPPLY-PLANNING RUN'), old: tr('~18 HOURS'), now: tr('~45 MIN'), note: tr('24× faster: sequential PL/SQL rebuilt as parallel PySpark') },
   { label: tr('INGEST THROUGHPUT'), old: tr('SPARK, 1×'), now: tr('RUST, 3.8×'), note: tr('1.5 GB/s on a 4-node cluster, identical hardware') },
-  { label: tr('SITE DATABASES'), old: tr('136 OF THEM'), now: tr('ONE CLUSTER'), note: tr('one API, no more slow cross-site DB links') },
+  { label: tr('SITE DATABASES'), old: tr('136 OF THEM'), now: tr('ONE CLUSTER'), note: tr('one API, no more slow, hanging cross-site queries') },
   { label: tr('SUPPLY-CHAIN RULE CHANGES'), old: tr('2-WEEK RELEASES'), now: tr('SAME DAY'), note: tr('validated, staged, fully audited') },
-  { label: tr('FORECASTING PIPELINE'), old: tr('24 HOURS'), now: tr('UNDER 7H'), note: tr('the legacy multi-model forecast, tuned') },
+  { label: tr('FORECASTING PIPELINE'), old: tr('24 HOURS'), now: tr('UNDER 7H'), note: tr('the statistical forecast, ported to PySpark') },
   { label: tr('MANUAL PLANNER OVERRIDES'), old: tr('~150 A WEEK'), now: tr('ZERO'), note: tr('on-time fulfilment up across 70K+ SKUs') },
   { label: tr('PRODUCTION SPARK JOBS'), old: tr('UNTUNED'), now: tr('30–80% FASTER'), note: tr('partitioning, skew and memory, tuned') },
 ];

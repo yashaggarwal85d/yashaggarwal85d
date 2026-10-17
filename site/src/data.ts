@@ -51,11 +51,11 @@ export const experience: Job[] = [
       tr('Supply Chain & Manufacturing IT: data platforms for demand, supply and factory planning.'),
     points: [
       tr('Replaced memory-bound Spark ingestion of factory data by designing a Rust ETL engine for streaming and CDC replication; led a 3-engineer team to build it: 1.5 GB/s on a 4-node cluster, 3.8× Spark on identical hardware, 4-5× less memory per worker; in production since Apr 2026 at ~16 TB/day.'),
-      tr('Cut the end-to-end supply-planning run from ~18h to ~45min (24×), so planners replan intra-day, by moving monolithic cron jobs to distributed PySpark services as one of three technical leads of a 20+ engineer programme.'),
+      tr('Cut the end-to-end supply-planning run from ~18h to ~45min (24×), so planners replan intra-day, by replacing sequential PL/SQL with parallel PySpark on Airflow and a new data architecture as one of three technical leads of a 20+ engineer programme.'),
       tr('Gave yield, logistics and planning teams one governed source for fab and assembly/test data as owner of the factory-data domain in TI’s lakehouse: Iceberg on MinIO and S3 (Glue Data Catalog), Trino and ClickHouse, Data Vault 2.0; ~6 PB/year of raw factory data.'),
       tr('Delivered MES, ERP and equipment-sensor data from 27 fab and assembly/test sites to analytics and operational stores at sub-second p95 through Kafka pipelines (MSK, Redpanda on EKS, Protobuf) designed with the ingestion team.'),
-      tr('Moved supply-chain rule changes from a ~2-week release cycle to same-day with a rule-orchestration platform on EKS (FastAPI, React), built with one graduate engineer: back-run validation, approval flow, instant rollback.'),
-      tr('Replaced slow cross-site database-link queries with one API: designed the consolidation of 136 site-level databases into YugabyteDB on Kubernetes behind FastAPI (cross-team effort).'),
+      tr('Moved supply-chain rule changes from a ~2-week release cycle to same-day with a rule-orchestration platform on EKS (FastAPI, React), built with one graduate engineer: backtests on past plans, approval flow, instant rollback.'),
+      tr('Replaced slow, hanging cross-site queries with one API: designed the consolidation of 136 site-level databases into YugabyteDB on Kubernetes behind FastAPI (cross-team effort).'),
       tr('Turned statistical demand forecasts into 64-week factory build plans for TI’s global sites with PySpark services on Databricks the team built for the production-start planning engine.'),
     ],
     tags: ['PySpark', 'Rust', 'Kafka', 'Iceberg', 'ClickHouse', 'YugabyteDB', 'FastAPI'],
@@ -68,9 +68,9 @@ export const experience: Job[] = [
     icon: 'workflow',
     color: '#d49a57',
     points: [
-      tr('Removed ~150 manual planner overrides per week after the team traced a systemic under-build of production starts across 70K+ SKUs to the fab-to-assembly start-signal logic and fixed it.'),
-      tr('Reduced runtimes of the team’s production Spark jobs by 30-80% through partitioning, skew and memory/spill fixes; the legacy multi-model forecasting pipeline dropped from 24h to under 7h.'),
-      tr('Sized capacity and tuned SQL so the Kubernetes-hosted platform can take a projected 2× load increase; mentored 2 junior engineers and 3 interns and shared the team’s on-call.'),
+      tr('Removed ~150 manual planner overrides per week after the team traced a systemic under-build of production starts across 70K+ SKUs to the fab-to-assembly production-start logic and fixed it.'),
+      tr('Tuned the team’s production Spark jobs for 30-80% shorter runtimes through partitioning, skew and memory/spill fixes; ported the statistical forecasting job to PySpark on Databricks: 24h to under 7h.'),
+      tr('Sized capacity and tuned SQL so the Kubernetes-hosted platform absorbs demand surges of a projected 2× load; mentored 2 junior engineers and 3 interns and shared the team’s on-call.'),
     ],
     tags: ['Spark', 'Airflow', 'Oracle', 'Python', 'SQL tuning'],
   },
@@ -82,9 +82,9 @@ export const experience: Job[] = [
     icon: 'code',
     color: '#5a4032',
     points: [
-      tr('Built an internal election platform used by 10K+ employees, with hierarchical authorisation.'),
+      tr('Built an internal election platform (MERN) for 10K+ employees with hierarchical authorisation.'),
     ],
-    tags: ['Web platform', 'AuthZ'],
+    tags: ['MERN', 'AuthZ'],
   },
 ];
 
@@ -178,19 +178,19 @@ export const work: Work[] = [
     period: tr('2025 – Now'),
     title: tr('Supply-Plan Re-platform'),
     description:
-      tr('One of three technical leads of a 20+ engineer programme that moved monolithic cron jobs to distributed PySpark services, so planners replan intra-day.'),
+      tr('One of three technical leads of a 20+ engineer programme that replaced sequential PL/SQL with parallel PySpark on Airflow and a new data architecture, so planners replan intra-day.'),
     metric: '24×',
     metricLabel: tr('faster end-to-end supply-planning run'),
     compare: { before: 18, after: 0.75, beforeLabel: '~18h', afterLabel: '~45min' },
     gradient: ['#b8612f', '#8e2f2a'],
-    tags: ['PySpark', 'Distributed services', 'Planning'],
+    tags: ['PySpark', 'Airflow', 'Planning'],
   },
   {
     category: tr('Ingestion engine'),
-    period: tr('2025 – Now'),
+    period: tr('2026 – Now'),
     title: tr('Rust ETL Engine'),
     description:
-      tr('My proposal and design, built by a 3-engineer team I led: streaming and CDC replication with exactly-once loads and checkpoint recovery, 1.5 GB/s on a 4-node cluster, 4-5× less memory per worker; in production since Apr 2026 at ~16 TB/day, now ~100 production pipelines for 3+ teams.'),
+      tr('My proposal and design, built by a 3-engineer team I led: streaming and CDC replication with exactly-once Iceberg commits, deduplicated ClickHouse loads and checkpoint recovery, 1.5 GB/s on a 4-node cluster, 4-5× less memory per worker; in production since Apr 2026 at ~16 TB/day, now ~100 production pipelines for 3+ teams.'),
     metric: `${num(3.8, 1)}×`,
     metricLabel: tr('throughput vs. Spark on identical hardware'),
     compare: { before: 1, after: 3.8, beforeLabel: 'Spark', afterLabel: `Rust · ${num(1.5, 1)} GB/s` },
@@ -204,7 +204,7 @@ export const work: Work[] = [
     description:
       tr('Owner of the factory-data domain: Data Vault 2.0 on Iceberg over MinIO and S3 (Glue Data Catalog), served by Trino and ClickHouse; one governed source for yield, logistics and planning.'),
     metric: '~6 PB',
-    metricLabel: tr('of raw factory data per year'),
+    metricLabel: tr('per year of raw factory data, my team’s intake into the domain I own'),
     gradient: ['#5a4032', '#2a1d16'],
     tags: ['Iceberg', 'Trino · ClickHouse', 'Data Vault 2.0'],
   },
@@ -224,12 +224,12 @@ export const work: Work[] = [
     period: tr('2025 – Now'),
     title: tr('Rule Orchestration'),
     description:
-      tr('Built with one graduate engineer on EKS (FastAPI, React): back-run validation, an approval flow and instant rollback for supply-chain rules, with an audit trail on every change.'),
+      tr('Built with one graduate engineer on EKS (FastAPI, React): backtests on past plans, an approval flow and instant rollback for supply-chain rules, with an audit trail on every change.'),
     metric: tr('Same day'),
     metricLabel: tr('rule releases, down from a ~2-week cycle'),
     compare: { before: 14, after: 1, beforeLabel: tr('~2 weeks'), afterLabel: tr('same day') },
     gradient: ['#8e2f2a', '#5a4032'],
-    tags: ['FastAPI · React', 'EKS', 'Back-run validation'],
+    tags: ['FastAPI · React', 'EKS', 'Backtests'],
   },
   {
     category: tr('Distributed DB'),
@@ -238,7 +238,7 @@ export const work: Work[] = [
     description:
       tr('136 site-level databases, consolidated into YugabyteDB on Kubernetes behind FastAPI: my design, in a cross-team effort.'),
     metric: '136 → 1',
-    metricLabel: tr('one API instead of slow cross-site database links'),
+    metricLabel: tr('one API instead of slow, hanging cross-site queries'),
     gradient: ['#d49a57', '#8e2f2a'],
     tags: ['YugabyteDB', 'FastAPI', 'Python'],
   },
@@ -256,9 +256,9 @@ export const work: Work[] = [
   {
     category: tr('Algorithms'),
     period: '2023 – 2025',
-    title: tr('Start-Signal Fix'),
+    title: tr('Production-Start Fix'),
     description:
-      tr('The team traced a systemic under-build of production starts across 70K+ SKUs to the fab-to-assembly start-signal logic and fixed it.'),
+      tr('The team traced a systemic under-build of production starts across 70K+ SKUs to the fab-to-assembly production-start logic and fixed it.'),
     metric: '~150',
     metricLabel: tr('manual planner overrides removed every week'),
     gradient: ['#b8612f', '#d49a57'],
