@@ -9,3 +9,16 @@ I write in more languages than I can count on my fingers, and I'm always learnin
 **Portfolio:** [yashaggarwal85d.github.io](https://yashaggarwal85d.github.io/yashaggarwal85d/)
 
 [LinkedIn](https://www.linkedin.com/in/yashaggarwal85d/) · [Email](mailto:yashaggarwal85d@gmail.com)
+
+## Open source contributions
+
+| Project | Issue | Pull request | Status |
+|---|---|---|---|
+| RisingWave | [#27509](https://github.com/risingwavelabs/risingwave/issues/27509) Refreshable tables with a TTL watermark panic | [#27624](https://github.com/risingwavelabs/risingwave/pull/27624) fix(frontend): reject TTL watermarks on refreshable tables | Open |
+| DataFusion | [#26622](https://github.com/apache/datafusion/issues/26622) `x > ALL (subquery)` in the SELECT list fails unless aliased | [#26638](https://github.com/apache/datafusion/pull/26638) fix: preserve expression names in RewriteSetComparison | Open (draft) |
+| DataFusion | [#26628](https://github.com/apache/datafusion/issues/26628) Sorted Final/Single aggregates fail with ResourcesExhausted | [#26637](https://github.com/apache/datafusion/pull/26637) fix: emit completed groups when fully sorted final and single aggregates run out of memory | Open |
+| DataFusion | [#26488](https://github.com/apache/datafusion/issues/26488) SortExec dropped below OFFSET under an aggregate | [#26584](https://github.com/apache/datafusion/pull/26584) fix: keep sort below OFFSET when the sort columns are projected away | Open |
+| RisingWave | [#27595](https://github.com/risingwavelabs/risingwave/issues/27595) Window sum/bit_\*/bool_\* don't return NULL when the frame empties | [#27605](https://github.com/risingwavelabs/risingwave/pull/27605) fix(expr): output NULL for window sum/bit_\*/bool_\* when no non-NULL input is left | Open |
+| DataFusion | [#26549](https://github.com/apache/datafusion/issues/26549) Security audit CI failing (RUSTSEC-2026-0382/0383) | [#26550](https://github.com/apache/datafusion/pull/26550) chore(deps): bump rustls-webpki and webpki-root-certs | Merged (2026-10-22) |
+| DataFusion | [#26285](https://github.com/apache/datafusion/issues/26285) Correlated `EXISTS` on a `CASE`/`UNION ALL` column fails | [#26558](https://github.com/apache/datafusion/pull/26558) fix: coerce correlated subqueries against the outer column's coerced type | Open |
+| RisingWave | [#27451](https://github.com/risingwavelabs/risingwave/issues/27451) Incorrect NULL row in streaming MV after GROUP BY | [#27594](https://github.com/risingwavelabs/risingwave/pull/27594) fix(optimizer): keep at least one group key in AggGroupBySimplifyRule | Open |
