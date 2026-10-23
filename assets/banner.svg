@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400" role="img" aria-label="Yash Aggarwal, Data Engineer. A blueprint of an isometric keyboard whose keys ripple in time.">
-  <title>Yash Aggarwal · Data Engineer</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400" role="img" aria-label="Yash Aggarwal: Data Engineer, Rust Developer, Full Stack Developer, Indie Game Developer. A blueprint of an isometric keyboard whose keys ripple in time.">
+  <title>Yash Aggarwal · Data Engineer · Rust Developer · Full Stack Developer · Indie Game Developer</title>
   <style>
     .k { animation: press 2s cubic-bezier(.2,.8,.2,1) infinite; }
     .g { opacity: 0; animation: glow 2s cubic-bezier(.2,.8,.2,1) infinite; }
@@ -49,9 +49,12 @@
   </g>
   <text x="54" y="168" font-family="'Avenir Next', 'Segoe UI', Helvetica, Arial, sans-serif" font-size="70" font-weight="600" fill="#f4f9ff" letter-spacing="-1">Yash Aggarwal</text>
   <path d="M58 190H560" stroke="#cfe6ff" stroke-width="1" opacity=".45"/>
-  <text x="58" y="220" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="16" letter-spacing="4" fill="#8fd8ff">DATA ENGINEER<tspan class="cur">▌</tspan></text>
-  <text x="58" y="264" font-family="Georgia, 'Times New Roman', serif" font-size="22" font-style="italic" fill="#dcebfb">Drafting systems that move data,</text>
-  <text x="58" y="294" font-family="Georgia, 'Times New Roman', serif" font-size="22" font-style="italic" fill="#dcebfb">and wondering about the ones that bend light.</text>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" letter-spacing="2.5" fill="#8fd8ff">
+    <text x="58" y="213">DATA ENGINEER · RUST DEVELOPER</text>
+    <text x="58" y="234">FULL STACK DEVELOPER · INDIE GAME DEVELOPER<tspan class="cur">▌</tspan></text>
+  </g>
+  <text x="58" y="270" font-family="Georgia, 'Times New Roman', serif" font-size="22" font-style="italic" fill="#dcebfb">Drafting systems that move data,</text>
+  <text x="58" y="298" font-family="Georgia, 'Times New Roman', serif" font-size="22" font-style="italic" fill="#dcebfb">and wondering about the ones that bend light.</text>
 
   <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5">
     <rect x="58" y="320" width="502" height="40" fill="none" stroke="#cfe6ff" stroke-width="1" opacity=".6"/>
