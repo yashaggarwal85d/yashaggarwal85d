@@ -18,6 +18,7 @@ I write in more languages than I can count on my fingers, and I'm always learnin
 
 | Date | Project | Issue | Pull request | Status |
 |---|---|---|---|---|
+| 2026-10-24 | LLVM | [#233277](https://github.com/llvm/llvm-project/issues/233277) clang-tidy modernize-type-traits suggests `tuple_size_v` inside constraints, changing meaning | [Branch](https://github.com/llvm/llvm-project/compare/main...yashaggarwal85d:llvm-project:clang-tidy-type-traits-tuple-size-constraints) [clang-tidy] Don't suggest tuple_size_v in constraints in modernize-type-traits | PR to be opened |
 | 2026-10-24 | Kubernetes | [#142345](https://github.com/kubernetes/kubernetes/issues/142345) conversion-gen doesn't pick up its own generated conversions across packages | [Branch](https://github.com/kubernetes/kubernetes/compare/master...yashaggarwal85d:kubernetes:fix-conversion-gen-cross-package-conversions) conversion-gen: call conversion functions generated in peer packages | PR to be opened |
 | 2026-10-23 | RisingWave | [#27509](https://github.com/risingwavelabs/risingwave/issues/27509) Refreshable tables with a TTL watermark panic | [#27624](https://github.com/risingwavelabs/risingwave/pull/27624) fix(frontend): reject TTL watermarks on refreshable tables | Open |
 | 2026-10-23 | DataFusion | [#26622](https://github.com/apache/datafusion/issues/26622) `x > ALL (subquery)` in the SELECT list fails unless aliased | [#26638](https://github.com/apache/datafusion/pull/26638) fix: preserve expression names in RewriteSetComparison | Open (draft) |
