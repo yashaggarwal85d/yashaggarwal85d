@@ -18,6 +18,7 @@ I write in more languages than I can count on my fingers, and I'm always learnin
 
 | Date | Project | Issue | Pull request | Status |
 |---|---|---|---|---|
+| 2026-10-24 | Kubernetes | [#142345](https://github.com/kubernetes/kubernetes/issues/142345) conversion-gen doesn't pick up its own generated conversions across packages | [Branch](https://github.com/kubernetes/kubernetes/compare/master...yashaggarwal85d:kubernetes:fix-conversion-gen-cross-package-conversions) conversion-gen: call conversion functions generated in peer packages | PR to be opened |
 | 2026-10-23 | RisingWave | [#27509](https://github.com/risingwavelabs/risingwave/issues/27509) Refreshable tables with a TTL watermark panic | [#27624](https://github.com/risingwavelabs/risingwave/pull/27624) fix(frontend): reject TTL watermarks on refreshable tables | Open |
 | 2026-10-23 | DataFusion | [#26622](https://github.com/apache/datafusion/issues/26622) `x > ALL (subquery)` in the SELECT list fails unless aliased | [#26638](https://github.com/apache/datafusion/pull/26638) fix: preserve expression names in RewriteSetComparison | Open (draft) |
 | 2026-10-23 | DataFusion | [#26628](https://github.com/apache/datafusion/issues/26628) Sorted Final/Single aggregates fail with ResourcesExhausted | [#26637](https://github.com/apache/datafusion/pull/26637) fix: emit completed groups when fully sorted final and single aggregates run out of memory | Open |
