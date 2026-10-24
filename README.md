@@ -4,7 +4,9 @@
 
 Hi, I'm Yash. I build systems that turn chaos into answers. Sensor streams, event firehoses and the occasional spreadsheet named `final_v7_REAL.xlsx` go in; data people can actually trust comes out. I've moved petabytes without losing a row, and once rewrote a pipeline in Rust just to see how fast "fast" could get (almost 4× faster, it turns out). My favourite systems are the ones nobody ever talks about, because nothing in them ever breaks.
 
-By day that means Kafka, Spark, Airflow, Iceberg, ClickHouse and Trino, running on Kubernetes and AWS. In Rust I work with tokio, Arrow and DataFusion, and I send fixes upstream to Apache DataFusion and RisingWave. On the full stack side I build FastAPI and Spring Boot backends behind React and Next.js frontends. And when the pipelines are quiet, I make indie games.
+By day that means Kafka, Spark, Airflow, Iceberg, ClickHouse and Trino, running on Kubernetes and AWS. In Rust I work with tokio, Arrow and DataFusion. On the full stack side I build FastAPI and Spring Boot backends behind React and Next.js frontends. And when the pipelines are quiet, I make indie games.
+
+I'm actively contributing to open source, sending fixes upstream to [Apache DataFusion](https://github.com/apache/datafusion), [RisingWave](https://github.com/risingwavelabs/risingwave), [Rust](https://github.com/rust-lang/rust), [LLVM](https://github.com/llvm/llvm-project) and [Kubernetes](https://github.com/kubernetes/kubernetes). Every pull request I've opened is tracked in the table below.
 
 I write in more languages than I can count on my fingers, and I'm always learning the next one. The blueprint is never finished.
 
