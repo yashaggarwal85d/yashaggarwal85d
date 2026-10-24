@@ -18,6 +18,7 @@ I write in more languages than I can count on my fingers, and I'm always learnin
 
 | Date | Project | Issue | Pull request | Status |
 |---|---|---|---|---|
+| 2026-10-24 | Rust | [#162109](https://github.com/rust-lang/rust/issues/162109) 1.99 regression: closure input type not inferred ("type annotations needed") | [#164836](https://github.com/rust-lang/rust/pull/164836) Add regression test for #162109 | Open |
 | 2026-10-24 | LLVM | [#233277](https://github.com/llvm/llvm-project/issues/233277) clang-tidy modernize-type-traits suggests `tuple_size_v` inside constraints, changing meaning | [#235257](https://github.com/llvm/llvm-project/pull/235257) [clang-tidy] Don't suggest tuple_size_v in constraints in type-traits | Open |
 | 2026-10-24 | Kubernetes | [#142345](https://github.com/kubernetes/kubernetes/issues/142345) conversion-gen doesn't pick up its own generated conversions across packages | [#143367](https://github.com/kubernetes/kubernetes/pull/143367) conversion-gen: use conversion functions generated in peer packages | Open |
 | 2026-10-23 | RisingWave | [#27509](https://github.com/risingwavelabs/risingwave/issues/27509) Refreshable tables with a TTL watermark panic | [#27624](https://github.com/risingwavelabs/risingwave/pull/27624) fix(frontend): reject TTL watermarks on refreshable tables | Open |
