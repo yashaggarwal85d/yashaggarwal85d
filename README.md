@@ -18,6 +18,7 @@ I write in more languages than I can count on my fingers, and I'm always learnin
 
 | Date | Project | Issue | Pull request | Status |
 |---|---|---|---|---|
+| 2026-10-26 | Rust | [#164945](https://github.com/rust-lang/rust/issues/164945) UEFI: `locate_handles` uses stale size for `set_len` | [#164955](https://github.com/rust-lang/rust/pull/164955) Use the updated buffer length in UEFI locate_handles | Open |
 | 2026-10-25 | Rust | [#156380](https://github.com/rust-lang/rust/issues/156380) `Reborrow` unsoundness due to not checking for `Copy` | [#164888](https://github.com/rust-lang/rust/pull/164888) Add regression tests for #156380 | Open |
 | 2026-10-25 | LLVM | [#233597](https://github.com/llvm/llvm-project/issues/233597) clang-tidy bugprone-macro-repeated-side-effects false positive with glibc 2.44 `assert()` | [#235410](https://github.com/llvm/llvm-project/pull/235410) [clang-tidy] Fix macro-repeated-side-effects false positive on assert | Open |
 | 2026-10-25 | Kubernetes | [#143281](https://github.com/kubernetes/kubernetes/issues/143281) scheduler-perf: inline createPods/createPodGroups into the group ops | [#143388](https://github.com/kubernetes/kubernetes/pull/143388) scheduler_perf: create pods and PodGroups from the group ops | Open |
