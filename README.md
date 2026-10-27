@@ -18,6 +18,7 @@ I write in more languages than I can count on my fingers, and I'm always learnin
 
 | # | Date | Project | Issue | Pull request | Status |
 |---|---|---|---|---|---|
+| 29 | 2026-10-27 | dbt | [#16830](https://github.com/dbt-labs/dbt/issues/16830) `tojson` doesn't escape non-ASCII like dbt 1.x | [#16908](https://github.com/dbt-labs/dbt/pull/16908) Escape non-ASCII characters in tojson like Python's json.dumps | Open |
 | 28 | 2026-10-27 | RisingWave | [#27660](https://github.com/risingwavelabs/risingwave/issues/27660) `TUMBLE` with month intervals puts rows outside their own window | [#27684](https://github.com/risingwavelabs/risingwave/pull/27684) fix(frontend): use fixed-length window size for tumble and hop bounds | Open |
 | 27 | 2026-10-27 | LLVM | [#235788](https://github.com/llvm/llvm-project/issues/235788) clang-format penalty overflow picks a worse layout for long braced lists | [#236087](https://github.com/llvm/llvm-project/pull/236087) [clang-format] Use 64-bit penalties in the optimizing line formatter | Open |
 | 26 | 2026-10-27 | LLVM | [#236015](https://github.com/llvm/llvm-project/issues/236015) clang-tidy bugprone-use-after-move false positive with forwarding class member | [#236086](https://github.com/llvm/llvm-project/pull/236086) [clang-tidy] Only flag uses of moved field in bugprone-use-after-move | Open |
